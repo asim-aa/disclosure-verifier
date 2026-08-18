@@ -34,6 +34,24 @@ class FilingMeta:
 
 
 @dataclass(frozen=True)
+class TextChunk:
+    """One paragraph-level block of prose from a filing's narrative sections (e.g.
+    MD&A) — the source material claim extraction (Phase 4) runs over."""
+
+    ticker: str
+    cik: str
+    accession_number: str
+    form: str
+    filing_date: str
+    section: str
+    chunk_index: int
+    text: str
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class FinancialFact:
     """One reported XBRL data point (a metric, value, unit, and the period it covers),
     tied back to the exact filing that reported it — this is the citation."""

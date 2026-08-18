@@ -56,15 +56,10 @@ class EdgarClient:
             time.sleep(_MIN_REQUEST_INTERVAL_SECONDS - elapsed)
         self._last_request_time = time.monotonic()
 
-    def _cache_path(self, cache_key: str) -> Path:
-        return self.cache_dir / f"{cache_key}.json"
+    def _cache_path(self, cache_key: str, suffix: str = "json") -> Path:
+        return self.cache_dir / f"{cache_key}.{suffix}"
 
-    def _get_json(self, url: str, cache_key: Optional[str] = None) -> dict:
-        if self.use_cache and cache_key:
-            cache_path = self._cache_path(cache_key)
-            if cache_path.exists():
-                return json.loads(cache_path.read_text())
-
+    def _get_raw(self, url: str) -> str:
         self._throttle()
         try:
             response = httpx.get(
@@ -73,13 +68,35 @@ class EdgarClient:
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise EdgarClientError(f"EDGAR request failed for {url}: {exc}") from exc
+        return response.text
 
-        data = response.json()
+    def _get_json(self, url: str, cache_key: Optional[str] = None) -> dict:
+        if self.use_cache and cache_key:
+            cache_path = self._cache_path(cache_key)
+            if cache_path.exists():
+                return json.loads(cache_path.read_text())
+
+        data = json.loads(self._get_raw(url))
 
         if self.use_cache and cache_key:
             self._cache_path(cache_key).write_text(json.dumps(data))
 
         return data
+
+    def get_document(self, url: str, cache_key: Optional[str] = None) -> str:
+        """Fetch a filing's primary document (HTML) by its direct EDGAR URL, e.g. from
+        FilingMeta.filing_url(). Unlike the JSON endpoints, these live on www.sec.gov."""
+        if self.use_cache and cache_key:
+            cache_path = self._cache_path(cache_key, suffix="html")
+            if cache_path.exists():
+                return cache_path.read_text()
+
+        html = self._get_raw(url)
+
+        if self.use_cache and cache_key:
+            self._cache_path(cache_key, suffix="html").write_text(html)
+
+        return html
 
     def resolve_cik(self, ticker: str) -> str:
         """Return the zero-padded 10-digit CIK for a ticker, e.g. 'AAPL' -> '0000320193'."""
