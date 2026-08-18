@@ -71,3 +71,60 @@ class FinancialFact:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+# Recognized ways a claim can compare a metric to source data.
+COMPARISON_ABSOLUTE = "absolute"  # claimed_value should equal the reported metric
+COMPARISON_GROWTH_PCT = "growth_pct"  # claimed_value is % change vs a comparison period
+COMPARISON_BPS_CHANGE = "bps_change"  # claimed_value is the bps change in a ratio
+COMPARISON_TYPES = (COMPARISON_ABSOLUTE, COMPARISON_GROWTH_PCT, COMPARISON_BPS_CHANGE)
+
+VERDICT_CONSISTENT = "consistent"
+VERDICT_INCONSISTENT = "inconsistent"
+VERDICT_UNVERIFIABLE = "unverifiable"  # source data needed to check the claim is missing
+
+
+@dataclass(frozen=True)
+class Claim:
+    """A discrete, checkable quantitative claim (Pillar 2's extraction target): a
+    metric, a value, a period, and how the value relates to the source data.
+
+    - absolute: `metric` at `period` should equal `claimed_value`.
+    - growth_pct: percent change in `metric` from `comparison_period` to `period`
+      should equal `claimed_value` (e.g. "revenue grew 12% YoY" -> claimed_value=12.0).
+    - bps_change: change in the ratio `metric / denominator_metric`, in basis points,
+      from `comparison_period` to `period` (e.g. "gross margin expanded 200 bps" with
+      metric="GrossProfit", denominator_metric="Revenues" -> claimed_value=200.0).
+    """
+
+    ticker: str
+    metric: str
+    comparison_type: str
+    claimed_value: float
+    period_end: str
+    period_start: str | None = None
+    comparison_period_end: str | None = None
+    comparison_period_start: str | None = None
+    denominator_metric: str | None = None
+    unit: str = "USD"
+    tolerance: float | None = None  # None -> use the type's default tolerance
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReconciliationResult:
+    """The outcome of checking a Claim against retrieved FinancialFacts — the
+    programmatically verifiable signal Pillar 4's RLVR reward function reuses."""
+
+    verdict: str  # consistent | inconsistent | unverifiable
+    claim: Claim
+    computed_value: float | None
+    difference: float | None
+    tolerance: float
+    explanation: str
+    citations: list[str]  # accession numbers of the facts used to compute this
+
+    def to_dict(self) -> dict:
+        return {**asdict(self), "claim": self.claim.to_dict()}
