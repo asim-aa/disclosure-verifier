@@ -22,5 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Run tests
+      - name: Run unit tests
         run: pytest -v
+
+      - name: Run live EDGAR checkpoint test
+        env:
+          EDGAR_USER_AGENT: "Disclosure Verifier CI ci@disclosure-verifier.dev"
+        run: pytest -v -m network
+        continue-on-error: true

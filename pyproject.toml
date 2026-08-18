@@ -19,6 +19,10 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+    "network: hits the real SEC EDGAR API (excluded by default; run with -m network)",
+]
+addopts = "-m 'not network'"
 
 [tool.setuptools.packages.find]
 include = ["tools*", "agents*", "eval*"]
