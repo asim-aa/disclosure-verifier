@@ -7,16 +7,19 @@ Run directly for a stdio smoke test:
     python -m tools.filing_retriever
 """
 
-from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
 from tools.edgar_client import EdgarClient
-from tools.xbrl_parser import parse_filings, parse_company_facts, list_available_concepts
+from tools.xbrl_parser import (
+    list_available_concepts,
+    parse_company_facts,
+    parse_filings,
+)
 
 mcp = FastMCP("filing-retriever")
 
-_client: Optional[EdgarClient] = None
+_client: EdgarClient | None = None
 
 
 def get_client() -> EdgarClient:
@@ -27,7 +30,7 @@ def get_client() -> EdgarClient:
 
 
 @mcp.tool()
-def list_filings(ticker: str, form_types: Optional[list[str]] = None, limit: int = 10) -> list[dict]:
+def list_filings(ticker: str, form_types: list[str] | None = None, limit: int = 10) -> list[dict]:
     """List recent filings (10-K/10-Q/8-K by default) for a ticker, most recent first.
     Each result includes the accession number, form type, filing/report dates, and a
     direct URL to the primary document (the citation source)."""
@@ -43,7 +46,7 @@ def list_filings(ticker: str, form_types: Optional[list[str]] = None, limit: int
 
 
 @mcp.tool()
-def get_xbrl_facts(ticker: str, concepts: Optional[list[str]] = None) -> list[dict]:
+def get_xbrl_facts(ticker: str, concepts: list[str] | None = None) -> list[dict]:
     """Get reported XBRL facts for a ticker (e.g. concepts=["Revenues"]). Omit `concepts`
     to get every reported us-gaap concept (large). Each fact carries the value, unit,
     period, and the accession number of the filing that reported it — the citation."""

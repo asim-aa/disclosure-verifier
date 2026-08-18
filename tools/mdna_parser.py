@@ -15,9 +15,9 @@ the TOC automatically without needing to special-case it.
 """
 
 import re
+import warnings
 from dataclasses import dataclass
 
-import warnings
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 
 from tools.schema import TextChunk
@@ -38,15 +38,15 @@ class _SectionPattern:
 # MD&A lives at a different Item number in a 10-K (Item 7) vs a 10-Q (Item 2).
 _SECTION_PATTERNS: dict[str, _SectionPattern] = {
     "10-K": _SectionPattern(
-        start=re.compile(r"Item\s*7\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.I),
+        start=re.compile(r"Item\s*7\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.IGNORECASE),
         end_candidates=(
-            re.compile(r"Item\s*7A\.?[\s\xa0]*Quantitative", re.I),
-            re.compile(r"Item\s*8\.?[\s\xa0]*Financial\s+Statements", re.I),
+            re.compile(r"Item\s*7A\.?[\s\xa0]*Quantitative", re.IGNORECASE),
+            re.compile(r"Item\s*8\.?[\s\xa0]*Financial\s+Statements", re.IGNORECASE),
         ),
     ),
     "10-Q": _SectionPattern(
-        start=re.compile(r"Item\s*2\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.I),
-        end_candidates=(re.compile(r"Item\s*3\.?[\s\xa0]*Quantitative", re.I),),
+        start=re.compile(r"Item\s*2\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.IGNORECASE),
+        end_candidates=(re.compile(r"Item\s*3\.?[\s\xa0]*Quantitative", re.IGNORECASE),),
     ),
 }
 

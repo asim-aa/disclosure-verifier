@@ -9,17 +9,16 @@ Run directly for a stdio smoke test:
     python -m tools.mdna_extractor
 """
 
-from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
 from tools.edgar_client import EdgarClient
+from tools.mdna_parser import MdnaNotFoundError, chunk_mdna
 from tools.xbrl_parser import parse_filings
-from tools.mdna_parser import chunk_mdna, MdnaNotFoundError
 
 mcp = FastMCP("mdna-extractor")
 
-_client: Optional[EdgarClient] = None
+_client: EdgarClient | None = None
 
 
 def get_client() -> EdgarClient:

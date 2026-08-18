@@ -10,7 +10,6 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Optional
 
 import httpx
 from dotenv import load_dotenv
@@ -26,6 +25,15 @@ CACHE_DIR = REPO_ROOT / "data" / "cache"
 # SEC asks for no more than ~10 requests/sec; stay well under that.
 _MIN_REQUEST_INTERVAL_SECONDS = 0.15
 
+# How long cached JSON responses are trusted before a fresh fetch is forced.
+# Filings/facts change at most a few times a quarter, but a stale cache from an
+# earlier dev session should never silently hide a company's newest filing —
+# so these default short rather than "forever". Filing documents (get_document)
+# are immutable once accessioned, so they're cached with no expiry at all.
+TICKER_MAP_MAX_AGE_SECONDS = 7 * 24 * 3600  # 7 days — rarely changes
+SUBMISSIONS_MAX_AGE_SECONDS = 24 * 3600  # 1 day — new filings appear here first
+COMPANY_FACTS_MAX_AGE_SECONDS = 24 * 3600  # 1 day
+
 
 class EdgarClientError(RuntimeError):
     """Raised for EDGAR request failures or unresolvable tickers."""
@@ -34,7 +42,7 @@ class EdgarClientError(RuntimeError):
 class EdgarClient:
     def __init__(
         self,
-        user_agent: Optional[str] = None,
+        user_agent: str | None = None,
         cache_dir: Path = CACHE_DIR,
         use_cache: bool = True,
     ):
@@ -70,20 +78,27 @@ class EdgarClient:
             raise EdgarClientError(f"EDGAR request failed for {url}: {exc}") from exc
         return response.text
 
-    def _get_json(self, url: str, cache_key: Optional[str] = None) -> dict:
+    def _get_json(
+        self, url: str, cache_key: str | None = None, max_age_seconds: float = 0
+    ) -> dict:
         if self.use_cache and cache_key:
             cache_path = self._cache_path(cache_key)
             if cache_path.exists():
-                return json.loads(cache_path.read_text())
+                cached = json.loads(cache_path.read_text())
+                fetched_at = cached.get("fetched_at")
+                if fetched_at is not None and (time.time() - fetched_at) < max_age_seconds:
+                    return cached["data"]
 
         data = json.loads(self._get_raw(url))
 
         if self.use_cache and cache_key:
-            self._cache_path(cache_key).write_text(json.dumps(data))
+            self._cache_path(cache_key).write_text(
+                json.dumps({"fetched_at": time.time(), "data": data})
+            )
 
         return data
 
-    def get_document(self, url: str, cache_key: Optional[str] = None) -> str:
+    def get_document(self, url: str, cache_key: str | None = None) -> str:
         """Fetch a filing's primary document (HTML) by its direct EDGAR URL, e.g. from
         FilingMeta.filing_url(). Unlike the JSON endpoints, these live on www.sec.gov."""
         if self.use_cache and cache_key:
@@ -101,7 +116,11 @@ class EdgarClient:
     def resolve_cik(self, ticker: str) -> str:
         """Return the zero-padded 10-digit CIK for a ticker, e.g. 'AAPL' -> '0000320193'."""
         ticker = ticker.upper().strip()
-        mapping = self._get_json(TICKER_MAP_URL, cache_key="company_tickers")
+        mapping = self._get_json(
+            TICKER_MAP_URL,
+            cache_key="company_tickers",
+            max_age_seconds=TICKER_MAP_MAX_AGE_SECONDS,
+        )
         for entry in mapping.values():
             if entry["ticker"] == ticker:
                 return f"{entry['cik_str']:010d}"
@@ -110,9 +129,15 @@ class EdgarClient:
     def get_submissions(self, cik: str) -> dict:
         """Raw filing history (10-K/10-Q/8-K/... metadata) for a CIK."""
         url = f"{EDGAR_BASE_URL}/submissions/CIK{cik}.json"
-        return self._get_json(url, cache_key=f"submissions_{cik}")
+        return self._get_json(
+            url, cache_key=f"submissions_{cik}", max_age_seconds=SUBMISSIONS_MAX_AGE_SECONDS
+        )
 
     def get_company_facts(self, cik: str) -> dict:
         """Raw XBRL company facts (every reported us-gaap concept, all periods) for a CIK."""
         url = f"{EDGAR_BASE_URL}/api/xbrl/companyfacts/CIK{cik}.json"
-        return self._get_json(url, cache_key=f"companyfacts_{cik}")
+        return self._get_json(
+            url,
+            cache_key=f"companyfacts_{cik}",
+            max_age_seconds=COMPANY_FACTS_MAX_AGE_SECONDS,
+        )

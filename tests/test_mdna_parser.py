@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.mdna_parser import chunk_mdna, extract_mdna_paragraphs, MdnaNotFoundError
+from tools.mdna_parser import MdnaNotFoundError, chunk_mdna, extract_mdna_paragraphs
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

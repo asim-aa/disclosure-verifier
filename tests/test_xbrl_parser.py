@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from tools.xbrl_parser import parse_company_facts, parse_filings, list_available_concepts
+from tools.xbrl_parser import (
+    list_available_concepts,
+    parse_company_facts,
+    parse_filings,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

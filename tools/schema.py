@@ -4,8 +4,7 @@ Every retriever tool normalizes EDGAR's raw JSON into these shapes so downstream
 phases (reconciler, extraction, orchestration) don't need to know EDGAR's wire format.
 """
 
-from dataclasses import dataclass, asdict
-from typing import Optional
+from dataclasses import asdict, dataclass
 
 
 @dataclass(frozen=True)
@@ -59,13 +58,13 @@ class FinancialFact:
     ticker: str
     cik: str
     concept: str
-    label: Optional[str]
+    label: str | None
     value: float
     unit: str
-    period_start: Optional[str]
+    period_start: str | None
     period_end: str
-    fiscal_year: Optional[int]
-    fiscal_period: Optional[str]
+    fiscal_year: int | None
+    fiscal_period: str | None
     form: str
     filed: str
     accession_number: str

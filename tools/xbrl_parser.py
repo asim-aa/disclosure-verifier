@@ -1,6 +1,5 @@
 """Parses raw EDGAR JSON (submissions, company facts) into the internal schema."""
 
-from typing import Optional
 
 from tools.schema import FilingMeta, FinancialFact
 
@@ -11,7 +10,7 @@ def parse_filings(
     submissions: dict,
     ticker: str,
     form_types: tuple[str, ...] = DEFAULT_FORM_TYPES,
-    limit: Optional[int] = None,
+    limit: int | None = None,
 ) -> list[FilingMeta]:
     """Turn the 'recent' filings block of a submissions payload into FilingMeta records,
     most recent first, optionally filtered to a set of form types."""
@@ -45,7 +44,7 @@ def parse_filings(
 def parse_company_facts(
     facts: dict,
     ticker: str,
-    concepts: Optional[list[str]] = None,
+    concepts: list[str] | None = None,
     taxonomy: str = "us-gaap",
 ) -> list[FinancialFact]:
     """Flatten EDGAR's nested company-facts payload into one FinancialFact per reported
