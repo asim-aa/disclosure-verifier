@@ -76,8 +76,14 @@ class FinancialFact:
 # Recognized ways a claim can compare a metric to source data.
 COMPARISON_ABSOLUTE = "absolute"  # claimed_value should equal the reported metric
 COMPARISON_GROWTH_PCT = "growth_pct"  # claimed_value is % change vs a comparison period
+COMPARISON_ABSOLUTE_CHANGE = "absolute_change"  # claimed_value is the $ change vs a comparison period
 COMPARISON_BPS_CHANGE = "bps_change"  # claimed_value is the bps change in a ratio
-COMPARISON_TYPES = (COMPARISON_ABSOLUTE, COMPARISON_GROWTH_PCT, COMPARISON_BPS_CHANGE)
+COMPARISON_TYPES = (
+    COMPARISON_ABSOLUTE,
+    COMPARISON_GROWTH_PCT,
+    COMPARISON_ABSOLUTE_CHANGE,
+    COMPARISON_BPS_CHANGE,
+)
 
 VERDICT_CONSISTENT = "consistent"
 VERDICT_INCONSISTENT = "inconsistent"
@@ -92,6 +98,9 @@ class Claim:
     - absolute: `metric` at `period` should equal `claimed_value`.
     - growth_pct: percent change in `metric` from `comparison_period` to `period`
       should equal `claimed_value` (e.g. "revenue grew 12% YoY" -> claimed_value=12.0).
+    - absolute_change: dollar change in `metric` from `comparison_period` to `period`
+      should equal `claimed_value` (e.g. "revenue increased $50.1 billion" ->
+      claimed_value=50_100_000_000.0).
     - bps_change: change in the ratio `metric / denominator_metric`, in basis points,
       from `comparison_period` to `period` (e.g. "gross margin expanded 200 bps" with
       metric="GrossProfit", denominator_metric="Revenues" -> claimed_value=200.0).

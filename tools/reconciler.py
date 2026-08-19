@@ -9,6 +9,7 @@ codebase.
 
 from tools.schema import (
     COMPARISON_ABSOLUTE,
+    COMPARISON_ABSOLUTE_CHANGE,
     COMPARISON_BPS_CHANGE,
     COMPARISON_GROWTH_PCT,
     VERDICT_CONSISTENT,
@@ -25,6 +26,7 @@ from tools.schema import (
 DEFAULT_TOLERANCES = {
     COMPARISON_ABSOLUTE: 0.01,  # 1% relative tolerance
     COMPARISON_GROWTH_PCT: 1.0,  # 1.0 percentage point
+    COMPARISON_ABSOLUTE_CHANGE: 0.01,  # 1% relative tolerance (of the larger magnitude)
     COMPARISON_BPS_CHANGE: 50.0,  # 50 basis points
 }
 
@@ -86,6 +88,8 @@ def reconcile(claim: Claim, facts: list[FinancialFact]) -> ReconciliationResult:
         return _reconcile_absolute(claim, facts, tolerance)
     if claim.comparison_type == COMPARISON_GROWTH_PCT:
         return _reconcile_growth_pct(claim, facts, tolerance)
+    if claim.comparison_type == COMPARISON_ABSOLUTE_CHANGE:
+        return _reconcile_absolute_change(claim, facts, tolerance)
     if claim.comparison_type == COMPARISON_BPS_CHANGE:
         return _reconcile_bps_change(claim, facts, tolerance)
 
@@ -164,6 +168,37 @@ def _reconcile_growth_pct(claim: Claim, facts: list[FinancialFact], tolerance: f
             f"Claimed {claim.metric} growth of {claim.claimed_value:.2f}%; EDGAR data implies "
             f"{computed_value:.2f}% ({prior.value:,.0f} -> {current.value:,.0f}), "
             f"a difference of {difference:.2f} percentage points."
+        ),
+        citations=[current.accession_number, prior.accession_number],
+    )
+
+
+def _reconcile_absolute_change(claim: Claim, facts: list[FinancialFact], tolerance: float) -> ReconciliationResult:
+    if claim.comparison_period_end is None:
+        return _unverifiable(claim, tolerance, "absolute_change claims require comparison_period_end.")
+
+    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit)
+    prior, err2 = _find_fact(
+        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit
+    )
+    if current is None or prior is None:
+        return _unverifiable(claim, tolerance, err1 or err2)
+
+    computed_value = current.value - prior.value
+    denom = max(abs(current.value), abs(prior.value)) or 1.0
+    difference = abs(computed_value - claim.claimed_value) / denom
+    verdict = VERDICT_CONSISTENT if difference <= tolerance else VERDICT_INCONSISTENT
+
+    return ReconciliationResult(
+        verdict=verdict,
+        claim=claim,
+        computed_value=computed_value,
+        difference=difference,
+        tolerance=tolerance,
+        explanation=(
+            f"Claimed {claim.metric} changed by {claim.claimed_value:,.0f}; EDGAR data implies "
+            f"{computed_value:,.0f} ({prior.value:,.0f} -> {current.value:,.0f}), "
+            f"a relative difference of {difference:.2%}."
         ),
         citations=[current.accession_number, prior.accession_number],
     )

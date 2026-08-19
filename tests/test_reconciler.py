@@ -299,6 +299,71 @@ def test_bps_change_missing_denominator_metric_is_unverifiable(aapl_facts):
     assert result.verdict == VERDICT_UNVERIFIABLE
 
 
+# ---------- absolute_change ----------
+
+
+def test_absolute_change_true_claim_is_consistent(aapl_facts):
+    # real figure: 383,285,000,000 - 394,328,000,000 = -11,043,000,000
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute_change",
+        claimed_value=-11_043_000_000,
+        period_end=FY23_END,
+        period_start=FY23_START,
+        comparison_period_end=FY22_END,
+        comparison_period_start=FY22_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_CONSISTENT
+    assert result.computed_value == pytest.approx(-11_043_000_000)
+    assert result.citations == ["0000320193-23-000106", "0000320193-22-000108"]
+
+
+def test_absolute_change_false_claim_is_inconsistent(aapl_facts):
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute_change",
+        claimed_value=50_000_000_000,  # revenue actually declined, not grew by $50B
+        period_end=FY23_END,
+        period_start=FY23_START,
+        comparison_period_end=FY22_END,
+        comparison_period_start=FY22_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_INCONSISTENT
+
+
+def test_absolute_change_within_rounding_tolerance_is_consistent(aapl_facts):
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute_change",
+        claimed_value=-11_000_000_000,  # rounded, ~0.1% off the real value
+        period_end=FY23_END,
+        period_start=FY23_START,
+        comparison_period_end=FY22_END,
+        comparison_period_start=FY22_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_CONSISTENT
+
+
+def test_absolute_change_missing_comparison_period_is_unverifiable(aapl_facts):
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute_change",
+        claimed_value=-11_043_000_000,
+        period_end=FY23_END,
+        period_start=FY23_START,
+        # comparison_period_end intentionally omitted
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+
+
 # ---------- misc ----------
 
 

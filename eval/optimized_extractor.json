@@ -1,0 +1,93 @@
+{
+  "extract": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "paragraph": "Commercial remaining performance obligation increased 84% to $678 billion.",
+        "claims": [
+          {
+            "metric": "Commercial remaining performance obligation",
+            "value": 84.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
+          },
+          {
+            "metric": "Commercial remaining performance obligation",
+            "value": 678000000000.0,
+            "value_unit": "USD",
+            "period": "",
+            "comparison_type": "absolute",
+            "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
+          }
+        ]
+      },
+      {
+        "augmented": true,
+        "paragraph": "Microsoft 365 Commercial cloud revenue increased 17%.",
+        "claims": [
+          {
+            "metric": "Microsoft 365 Commercial cloud revenue",
+            "value": 17.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "Microsoft 365 Commercial cloud revenue increased 17%."
+          }
+        ]
+      },
+      {
+        "augmented": true,
+        "paragraph": "Microsoft 365 Consumer cloud revenue increased 28%.",
+        "claims": [
+          {
+            "metric": "Microsoft 365 Consumer cloud revenue",
+            "value": 28.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "Microsoft 365 Consumer cloud revenue increased 28%"
+          }
+        ]
+      },
+      {
+        "augmented": true,
+        "paragraph": "LinkedIn revenue increased 11%.",
+        "claims": [
+          {
+            "metric": "LinkedIn revenue",
+            "value": 11.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "LinkedIn revenue increased 11%"
+          }
+        ]
+      }
+    ],
+    "signature": {
+      "instructions": "Extract discrete, checkable financial claims from a paragraph of a company's\nSEC filing. A claim is a specific assertion tying a number to a metric and a\nperiod. Ignore purely qualitative statements with no number attached.",
+      "fields": [
+        {
+          "prefix": "Paragraph:",
+          "description": "${paragraph}"
+        },
+        {
+          "prefix": "Claims:",
+          "description": "${claims}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.3.0",
+      "cloudpickle": "3.1"
+    }
+  }
+}

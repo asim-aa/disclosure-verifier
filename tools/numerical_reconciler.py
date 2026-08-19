@@ -48,6 +48,8 @@ def reconcile_claim(
       - "absolute": `metric` at `period_end` should equal `claimed_value`.
       - "growth_pct": percent change in `metric` from comparison_period_end to
         period_end should equal `claimed_value` (e.g. "revenue grew 12% YoY").
+      - "absolute_change": dollar change in `metric` from comparison_period_end
+        to period_end should equal `claimed_value` (e.g. "revenue increased $50.1 billion").
       - "bps_change": change in `metric / denominator_metric`, in basis points,
         from comparison_period_end to period_end (e.g. "margin expanded 200 bps").
 
