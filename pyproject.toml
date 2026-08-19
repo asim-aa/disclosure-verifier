@@ -9,6 +9,7 @@ dependencies = [
     "httpx>=0.27.0",
     "beautifulsoup4>=4.12.0",
     "lxml>=5.0.0",
+    "dspy>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -23,8 +24,9 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 markers = [
     "network: hits the real SEC EDGAR API (excluded by default; run with -m network)",
+    "llm: hits the live LLM backend, only reachable on the bootcamp network (excluded by default; run with -m llm)",
 ]
-addopts = "-m 'not network'"
+addopts = "-m 'not network and not llm'"
 filterwarnings = [
     "ignore::bs4.XMLParsedAsHTMLWarning",
 ]
