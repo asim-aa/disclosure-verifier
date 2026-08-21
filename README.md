@@ -23,15 +23,15 @@ Built as the capstone for the SupportVectors AI Agents Bootcamp, against four re
 ```mermaid
 flowchart LR
     subgraph Retrieval
-        A[Filing Retriever] -->|filings + XBRL facts| D
-        B[MD&A Extractor] -->|cited prose chunks| D
+        A["Filing Retriever"] -->|"filings + XBRL facts"| D
+        B["MD and A Extractor"] -->|"cited prose chunks"| D
     end
-    D[Coordinator] --> E[Extraction Agent]
-    E -->|DSPy-optimized signature| F["ExtractedClaim{metric, value, period, type}"]
-    F --> G[Verification Agent]
-    G -->|resolver: text → XBRL concept| H[Numerical Reconciler]
-    H -->|consistent / inconsistent / unverifiable| I[Cited Report]
-    D -.budget + checkpoint.-> D
+    D["Coordinator"] --> E["Extraction Agent"]
+    E -->|"DSPy-optimized signature"| F["ExtractedClaim"]
+    F --> G["Verification Agent"]
+    G -->|"resolver: text to XBRL concept"| H["Numerical Reconciler"]
+    H -->|"consistent / inconsistent / unverifiable"| I["Cited Report"]
+    D -. "budget + checkpoint" .-> D
 ```
 
 Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3), not a single autonomous loop — deliberately. The *sequence* here never needs an LLM's judgment (you always retrieve before extracting, always extract before verifying); what needs deciding is narrower — skip a chunk with no claims, flag a claim that can't be resolved — and that's ordinary code, not a reasoning task. The one stage that genuinely needs the model (claim extraction) is the one DSPy-optimized signature in the system.
