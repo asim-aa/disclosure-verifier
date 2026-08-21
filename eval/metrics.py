@@ -103,6 +103,38 @@ def score_example_by_category(predicted: list[ExtractedClaim], gold: list[Extrac
     return {category: tuple(counts) for category, counts in by_category.items()}
 
 
+def _describe_claim(claim: ExtractedClaim) -> str:
+    unit = {"USD": "", "percent": "%", "bps": " bps"}.get(claim.value_unit, f" {claim.value_unit}")
+    return f"{claim.comparison_type} claim for '{claim.metric}' (~{claim.value:g}{unit})"
+
+
+def feedback_for_example(predicted: list[ExtractedClaim], gold: list[ExtractedClaim]) -> str:
+    """A human/model-readable diagnostic for one example — the "actionable side
+    information" a reflective optimizer (e.g. dspy.GEPA) needs to improve a
+    prompt, as opposed to a bare score it can't act on. Reuses score_example's
+    own greedy matching so the feedback text and the scalar score it accompanies
+    are always describing the same judgment, not two different ones."""
+    unmatched_pred = list(predicted)
+    missed: list[ExtractedClaim] = []
+    for g in gold:
+        match = next((p for p in unmatched_pred if claims_match(p, g)), None)
+        if match is not None:
+            unmatched_pred.remove(match)
+        else:
+            missed.append(g)
+    extra = unmatched_pred  # predictions with no gold match
+
+    tp = len(gold) - len(missed)
+    parts = [f"{tp}/{len(gold)} gold claims correctly extracted."]
+    if missed:
+        parts.append("Missed: " + "; ".join(_describe_claim(c) for c in missed) + ".")
+    if extra:
+        parts.append("Extra (no matching gold claim): " + "; ".join(_describe_claim(c) for c in extra) + ".")
+    if not missed and not extra:
+        parts.append("Exact match — no missed or extra claims.")
+    return " ".join(parts)
+
+
 def merge_category_counts(
     total: dict[str, list[int]], new: dict[str, tuple[int, int, int]]
 ) -> None:

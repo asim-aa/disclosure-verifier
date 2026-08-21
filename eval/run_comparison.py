@@ -22,6 +22,7 @@ from eval.dataset import load_records, to_dspy_example, train_test_split
 from eval.dspy_extractor import ClaimExtractor
 from eval.llm_config import configure_dspy
 from eval.metrics import (
+    feedback_for_example,
     merge_category_counts,
     precision_recall_f1,
     score_example,
@@ -83,6 +84,22 @@ def dspy_metric(example, pred, trace=None):
     precision = tp / (tp + fp) if (tp + fp) else 1.0
     recall = tp / (tp + fn) if (tp + fn) else 1.0
     return 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+
+
+def dspy_metric_with_feedback(example, pred, trace=None, pred_name=None, pred_trace=None):
+    """Same score as dspy_metric, plus diagnostic feedback text (which claims were
+    missed or extra) — the "actionable side information" a reflective optimizer
+    like dspy.GEPA needs to improve a prompt, as opposed to a bare pass/fail bit
+    it can't act on. Not used by BootstrapFewShot (which only reads a scalar and
+    would ignore the rest of this); this exists so trying GEPA later is a metric
+    swap, not a metric redesign — see README's Results section for why GEPA
+    isn't attempted with dspy_metric's plain float today.
+
+    Accepts (and ignores) GEPA's extra pred_name/pred_trace arguments so this can
+    be passed directly as GEPA's `metric` without an adapter."""
+    score = dspy_metric(example, pred, trace)
+    feedback = feedback_for_example(pred.claims, example.claims)
+    return dspy.Prediction(score=score, feedback=feedback)
 
 
 def print_result(result: dict) -> None:

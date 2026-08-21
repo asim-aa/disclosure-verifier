@@ -2,6 +2,7 @@ import pytest
 
 from eval.metrics import (
     claims_match,
+    feedback_for_example,
     merge_category_counts,
     precision_recall_f1,
     score_example,
@@ -154,3 +155,44 @@ def test_merge_category_counts_accumulates_across_examples():
     merge_category_counts(total, {"growth_pct": (1, 0, 1), "absolute": (3, 0, 0)})
     assert total["growth_pct"] == [3, 1, 1]
     assert total["absolute"] == [3, 0, 0]
+
+
+# ---------- feedback_for_example (the "ASI" a reflective optimizer needs) ----------
+
+
+def test_feedback_reports_exact_match_with_no_missed_or_extra():
+    gold = [claim(metric="revenue", value=27.0)]
+    predicted = [claim(metric="revenue", value=27.0)]
+    feedback = feedback_for_example(predicted, gold)
+    assert "1/1" in feedback
+    assert "Missed" not in feedback
+    assert "Extra" not in feedback
+
+
+def test_feedback_names_a_missed_claim():
+    gold = [claim(metric="Data Center revenue", value=68.0, comparison_type="growth_pct")]
+    feedback = feedback_for_example([], gold)
+    assert "0/1" in feedback
+    assert "Missed" in feedback
+    assert "Data Center revenue" in feedback
+    assert "growth_pct" in feedback
+
+
+def test_feedback_names_an_extra_claim_not_in_gold():
+    gold = [claim(metric="revenue", value=27.0)]
+    predicted = [claim(metric="revenue", value=27.0), claim(metric="margin", value=66.0, comparison_type="absolute", value_unit="percent")]
+    feedback = feedback_for_example(predicted, gold)
+    assert "1/1" in feedback
+    assert "Extra" in feedback
+    assert "margin" in feedback
+
+
+def test_feedback_score_and_text_agree_on_the_same_matching():
+    # Regression guard: feedback_for_example must reuse claims_match, not a
+    # different equality notion, or the score and the feedback text could
+    # describe two different judgments of the same example.
+    gold = [claim(metric="revenue", value=27.0), claim(metric="margin", value=66.0, comparison_type="absolute", value_unit="percent")]
+    predicted = [claim(metric="revenue", value=27.0)]
+    tp, _fp, fn = score_example(predicted, gold)
+    feedback = feedback_for_example(predicted, gold)
+    assert f"{tp}/{tp + fn}" in feedback

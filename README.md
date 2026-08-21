@@ -76,7 +76,7 @@ The honest conclusion: reasoning (`ChainOfThought`) is a real, large improvement
 
 *A further caveat worth naming explicitly:* `eval/dataset.py`'s split (train ~80% / test ~20%, by index) is a clean single-touch holdout in structure, but not in practice at this point — the same 20% test slice has now been scored and reported on repeatedly during this project's own development (baseline, zero-shot, optimized, the stratified breakdown, the noise-floor check above). By the discipline this project otherwise holds itself to, that means the reported numbers above are better read as "the best available honest estimate from a set we've looked at many times" than as a single clean holdout evaluation. A genuinely fresh, never-touched test slice is what it would take to fully re-close this — flagged as a real gap, not silently assumed away.
 
-Separately: `eval/run_comparison.py`'s DSPy optimization metric (`dspy_metric`) returns a bare F1 float, no diagnostic feedback text. That matters for one specific decision — `dspy.GEPA` (a reflective optimizer, a candidate next step above `BootstrapFewShot`) only out-performs simpler optimizers when its metric can describe *why* an attempt failed; against a purely scalar pass/fail-shaped metric like this one, GEPA's reflective-mutation step has nothing to read and its usual edge doesn't apply. Checked directly rather than assumed — the metric would need to emit structured feedback (score + which failure mode) before trying GEPA would be well-motivated over the current optimizer.
+Separately: `eval/run_comparison.py`'s original DSPy optimization metric (`dspy_metric`, still what `BootstrapFewShot` uses) returns a bare F1 float, no diagnostic feedback text. That matters for one specific decision — `dspy.GEPA` (a reflective optimizer, a candidate next step above `BootstrapFewShot`) only out-performs simpler optimizers when its metric can describe *why* an attempt failed; against a purely scalar pass/fail-shaped metric, GEPA's reflective-mutation step has nothing to read and its usual edge doesn't apply. The prerequisite is now built rather than left as a gap: `dspy_metric_with_feedback` (backed by `eval/metrics.py`'s `feedback_for_example`) returns the same score plus a diagnostic string naming exactly which claims were missed or extraneous, and accepts GEPA's calling convention directly. Trying GEPA is now a metric swap away, not a metric redesign — not run here, since it needs a live optimization pass with a strong reflection model (real cost/time), but the blocker identified above is closed.
 
 **Pillar 4 pre-flight — the Reconciler's own correctness, isolated from extraction.** Before the Reconciler is ever trusted as an RLVR reward, `eval/reconciler_audit.py` runs it against a battery of known-good, known-bad, and adversarial cases (sign flips, order-of-magnitude confusion, mislabeled comparison types, exact tolerance-boundary probes) — 15/15 matched the hand-computed expected verdict, and critically, **zero false-"consistent" results**, the dangerous failure mode for a reward signal (a false "inconsistent" just costs training signal; a false "consistent" actively teaches a policy that a wrong answer was right). Enforced permanently in CI via `tests/test_reconciler_audit.py`. Every verdict also carries a machine-readable `reason_code` (`near_miss`, `missing_fact`, `zero_denominator`, ...) instead of only free-text explanation — usable both as reward-shaping material for Phase 7 and as structured error-analysis output today.
 
@@ -94,7 +94,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 140 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 147 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 ## What actually broke, and how it got caught
 
@@ -129,7 +129,7 @@ tools/    MCP servers — Filing Retriever, MD&A Extractor, Numerical Reconciler
 eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (Pillar 2)
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
 data/     Local cache / checkpoints (gitignored)
-tests/    132 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    139 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -144,7 +144,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 132 unit tests, no network/LLM required
+pytest -v                 # 139 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```
