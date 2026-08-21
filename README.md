@@ -16,6 +16,8 @@ Public companies make thousands of quantitative claims a year in MD&A prose — 
 
 Built as the capstone for the SupportVectors AI Agents Bootcamp, against four required pillars: real MCP tools, a DSPy-optimized prompt with a measured baseline delta, a justified multi-agent architecture, and (pending compute) RLVR/GRPO fine-tuning.
 
+📄 **[Read the full case study (PDF)](docs/case-study.pdf)** — results, a live example, and the real bugs found along the way.
+
 ---
 
 ## Architecture
