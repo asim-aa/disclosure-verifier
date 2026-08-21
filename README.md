@@ -29,14 +29,14 @@ flowchart LR
         B["MD and A Extractor"] -->|"cited prose chunks"| D
     end
     D["Coordinator"] --> E["Extraction Agent"]
-    E -->|"DSPy-optimized signature"| F["ExtractedClaim"]
+    E -->|"DSPy ChainOfThought, optimized"| F["ExtractedClaim"]
     F --> G["Verification Agent"]
     G -->|"resolver: text to XBRL concept"| H["Numerical Reconciler"]
     H -->|"consistent / inconsistent / unverifiable"| I["Cited Report"]
     D -. "budget + checkpoint" .-> D
 ```
 
-Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3), not a single autonomous loop — deliberately. The *sequence* here never needs an LLM's judgment (you always retrieve before extracting, always extract before verifying); what needs deciding is narrower — skip a chunk with no claims, flag a claim that can't be resolved — and that's ordinary code, not a reasoning task. The one stage that genuinely needs the model (claim extraction) is the one DSPy-optimized signature in the system.
+Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3), not a single autonomous loop — deliberately. The *sequence* here never needs an LLM's judgment (you always retrieve before extracting, always extract before verifying); what needs deciding is narrower — skip a chunk with no claims, flag a claim that can't be resolved — and that's ordinary code, not a reasoning task. The one stage that genuinely needs the model (claim extraction) is the one DSPy-optimized signature in the system, run as `dspy.ChainOfThought` so the model reasons through which spans are checkable claims before committing to structured output.
 
 | Layer | What it does | Real / Mock |
 |---|---|---|
@@ -54,10 +54,10 @@ Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3)
 | | Precision | Recall | F1 |
 |---|---|---|---|
 | Hand-written baseline prompt | 0.711 | 0.750 | 0.730 |
-| DSPy zero-shot (bare signature) | 0.658 | 0.694 | 0.676 |
-| **DSPy optimized** (BootstrapFewShot, 4 demos) | **0.730** | **0.750** | **0.740** |
+| DSPy zero-shot (`ChainOfThought`, no demos) | 0.763 | 0.806 | 0.784 |
+| **DSPy optimized** (BootstrapFewShot, 4 demos) | **0.763** | **0.806** | **0.784** |
 
-The honest framing: DSPy's *own* zero-shot signature underperformed the hand-written baseline — generic auto-generated instructions lost to detailed hand-written rules. Optimization closed that gap and edged narrowly ahead (+0.010 F1), rather than beating a competent prompt by a wide margin. Ground truth: 78 hand-labeled examples / 161 claims / 9 true negatives, drawn from real MSFT and NVDA filings.
+The honest framing, including a result that didn't go the way you'd expect: switching the DSPy signature from `Predict` to `ChainOfThought` — reasoning before committing to structured output — took zero-shot DSPy from *underperforming* the hand-written baseline (0.676 F1) to clearly *beating* it (0.784 F1) before any optimization ran at all. But `BootstrapFewShot` optimization on top of that produced **exactly identical numbers** — same precision, same recall, the same 29/9/7 true-positive/false-positive/false-negative split. Verified this wasn't an evaluation bug (the compiled program is a genuinely separate instance, and the optimizer log confirms it bootstrapped 4 real demonstrations). The reasoning step captured essentially all of the available signal on this test set; 4 few-shot demos added nothing further. That's a more interesting and more honest finding than a clean "optimization wins" story: reasoning mattered far more than few-shot optimization for this task. The trade-off is real too — reasoning calls take noticeably longer per request than a bare `Predict` call. Ground truth: 78 hand-labeled examples / 161 claims / 9 true negatives, drawn from real MSFT and NVDA filings.
 
 **A real, current end-to-end run** (NVDA's FY2026 10-K, live EDGAR + live LLM, no cached answers):
 
@@ -84,6 +84,8 @@ The interesting engineering in this project wasn't writing the happy path — it
 - **A later filing can corrupt an earlier one's claims.** A claim extracted from a 10-K's MD&A describes *that 10-K's* fiscal year — but if a newer 10-Q has since been filed (nearly always true), its more recent quarterly `period_end` would otherwise get picked as "current," comparing the wrong two numbers entirely. Fixed with an `as_of` cutoff anchoring resolution to the claim's own source filing.
 
 - **A metric-matching bug caught by its own unit test before it ever ran on real data**: an early precision/recall scorer would have counted generic `"Revenue"` as matching segment-specific `"Microsoft Cloud revenue"` — a bug in the *measurement*, which is worse than a bug in the thing being measured, since it makes bad results look good. Caught and fixed before the real comparison ran.
+
+- **Chain-of-thought reasoning silently corrupted its own numeric output.** Switching to `dspy.ChainOfThought` made the model write dollar amounts in shorthand inside its `reasoning` field — *"$215.9 billion"* — and then just echo that literal `215.9` into the structured `value` field instead of expanding it to `215900000000`, consistently, every run. Plain `Predict` never had this failure mode because it never generates that intervening shorthand text to anchor on. Fixed by instructing the signature to write the fully-expanded number in the reasoning itself, so the structured step has nothing left to get wrong. [`eval/dspy_extractor.py`](eval/dspy_extractor.py)
 
 One limitation is still open and documented rather than hidden: the verification agent can distinguish "the source filing's own period" from "the next most recent one," but doesn't yet parse a claim's *stated* period text (e.g. distinguishing a paragraph's FY2026 figure from its FY2025 comparison in the same sentence) — so a claim about an explicitly non-current period can still resolve against the wrong one. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken.
 

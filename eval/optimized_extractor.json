@@ -1,20 +1,13 @@
 {
-  "extract": {
+  "extract.predict": {
     "traces": [],
     "train": [],
     "demos": [
       {
         "augmented": true,
         "paragraph": "Commercial remaining performance obligation increased 84% to $678 billion.",
+        "reasoning": "The paragraph states that the commercial remaining performance obligation increased 84 percent to $678 billion. This provides two specific, checkable claims: the new dollar amount of the obligation and the percent growth that led to that amount.",
         "claims": [
-          {
-            "metric": "Commercial remaining performance obligation",
-            "value": 84.0,
-            "value_unit": "percent",
-            "period": "",
-            "comparison_type": "growth_pct",
-            "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
-          },
           {
             "metric": "Commercial remaining performance obligation",
             "value": 678000000000.0,
@@ -22,12 +15,21 @@
             "period": "",
             "comparison_type": "absolute",
             "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
+          },
+          {
+            "metric": "Commercial remaining performance obligation",
+            "value": 84.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
           }
         ]
       },
       {
         "augmented": true,
         "paragraph": "Microsoft 365 Commercial cloud revenue increased 17%.",
+        "reasoning": "The paragraph states that Microsoft 365 Commercial cloud revenue increased by 17 %. The text gives no specific fiscal period, so the period field is left empty. The claim is a percentage change, so the comparison type is `growth_pct`, the value is 17.0, and the unit is `percent`.",
         "claims": [
           {
             "metric": "Microsoft 365 Commercial cloud revenue",
@@ -42,6 +44,7 @@
       {
         "augmented": true,
         "paragraph": "Microsoft 365 Consumer cloud revenue increased 28%.",
+        "reasoning": "The paragraph states that Microsoft 365 Consumer cloud revenue increased by 28 percent.  This is a numeric claim of percent growth for a specific metric, with no explicit period given.  The claim is therefore a growth_pct comparison of the metric “Microsoft 365 Consumer cloud revenue” with value 28 and unit “percent”.",
         "claims": [
           {
             "metric": "Microsoft 365 Consumer cloud revenue",
@@ -56,9 +59,10 @@
       {
         "augmented": true,
         "paragraph": "LinkedIn revenue increased 11%.",
+        "reasoning": "The paragraph states only that LinkedIn revenue increased by 11%, with no specific fiscal or calendar period mentioned. The claim thus describes a percent growth in revenue relative to the prior period, and the period field is left empty because the text does not specify it.",
         "claims": [
           {
-            "metric": "LinkedIn revenue",
+            "metric": "revenue",
             "value": 11.0,
             "value_unit": "percent",
             "period": "",
@@ -69,11 +73,15 @@
       }
     ],
     "signature": {
-      "instructions": "Extract discrete, checkable financial claims from a paragraph of a company's\nSEC filing. A claim is a specific assertion tying a number to a metric and a\nperiod. Ignore purely qualitative statements with no number attached.",
+      "instructions": "Extract discrete, checkable financial claims from a paragraph of a company's\nSEC filing. A claim is a specific assertion tying a number to a metric and a\nperiod. Ignore purely qualitative statements with no number attached.\n\nWhen your reasoning mentions a dollar amount, always write out the fully\nexpanded number there too (e.g. \"$215.9 billion\" -> 215900000000), not the\nabbreviated form — the structured `value` field must match a number that\nalready appears fully expanded in your reasoning, not one you expand only\nat the last step.",
       "fields": [
         {
           "prefix": "Paragraph:",
           "description": "${paragraph}"
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
         },
         {
           "prefix": "Claims:",
