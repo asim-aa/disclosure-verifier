@@ -14,6 +14,14 @@ import pytest
 
 from tools.reconciler import reconcile
 from tools.schema import (
+    REASON_AMBIGUOUS_PERIOD,
+    REASON_LARGE_MISS,
+    REASON_MATCH,
+    REASON_MISSING_COMPARISON_CONTEXT,
+    REASON_MISSING_FACT,
+    REASON_NEAR_MISS,
+    REASON_UNSUPPORTED_COMPARISON_TYPE,
+    REASON_ZERO_DENOMINATOR,
     VERDICT_CONSISTENT,
     VERDICT_INCONSISTENT,
     VERDICT_UNVERIFIABLE,
@@ -489,3 +497,98 @@ def test_as_of_growth_pct_uses_contemporaneous_values_on_both_sides(aapl_facts):
     )
     result = reconcile(claim, facts, as_of="2023-11-03")  # before the restatement was filed
     assert result.verdict == VERDICT_CONSISTENT
+
+
+# ---------- reason_code (typed diagnostic, not just free-text explanation) ----------
+
+
+def test_reason_code_match_on_a_correct_absolute_claim(aapl_facts):
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="absolute",
+        claimed_value=383_285_000_000, period_end=FY23_END, period_start=FY23_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_CONSISTENT
+    assert result.reason_code == REASON_MATCH
+
+
+def test_reason_code_near_miss_just_past_tolerance(aapl_facts):
+    # 1.5% off — past the 1% absolute tolerance, but within the 2x-tolerance near-miss band.
+    claimed = 383_285_000_000 * 1.015
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="absolute",
+        claimed_value=claimed, period_end=FY23_END, period_start=FY23_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_INCONSISTENT
+    assert result.reason_code == REASON_NEAR_MISS
+
+
+def test_reason_code_large_miss_well_past_tolerance(aapl_facts):
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="absolute",
+        claimed_value=999_999_999_999, period_end=FY23_END, period_start=FY23_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_INCONSISTENT
+    assert result.reason_code == REASON_LARGE_MISS
+
+
+def test_reason_code_missing_fact_when_concept_unknown(aapl_facts):
+    claim = Claim(
+        ticker=TICKER, metric="NotAReportedConcept", comparison_type="absolute",
+        claimed_value=1, period_end=FY23_END, period_start=FY23_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+    assert result.reason_code == REASON_MISSING_FACT
+
+
+def test_reason_code_ambiguous_period_when_start_unspecified():
+    facts = [
+        _fact("Revenues", 100, "2023-01-01", "2023-12-31", "accn-fy"),
+        _fact("Revenues", 30, "2023-10-01", "2023-12-31", "accn-q4"),
+    ]
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="absolute",
+        claimed_value=100, period_end="2023-12-31",  # no period_start -> ambiguous
+    )
+    result = reconcile(claim, facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+    assert result.reason_code == REASON_AMBIGUOUS_PERIOD
+
+
+def test_reason_code_missing_comparison_context_for_growth_pct(aapl_facts):
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="growth_pct",
+        claimed_value=-2.8, period_end=FY23_END, period_start=FY23_START,
+        # comparison_period_end omitted
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+    assert result.reason_code == REASON_MISSING_COMPARISON_CONTEXT
+
+
+def test_reason_code_zero_denominator_for_growth_pct():
+    facts = [
+        _fact("Revenues", 0, FY22_START, FY22_END, "accn-prior"),
+        _fact("Revenues", 100, FY23_START, FY23_END, "accn-current"),
+    ]
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="growth_pct",
+        claimed_value=10.0, period_end=FY23_END, period_start=FY23_START,
+        comparison_period_end=FY22_END, comparison_period_start=FY22_START,
+    )
+    result = reconcile(claim, facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+    assert result.reason_code == REASON_ZERO_DENOMINATOR
+
+
+def test_reason_code_unsupported_comparison_type(aapl_facts):
+    claim = Claim(
+        ticker=TICKER, metric="Revenues", comparison_type="not_a_real_type",
+        claimed_value=1, period_end=FY23_END, period_start=FY23_START,
+    )
+    result = reconcile(claim, aapl_facts)
+    assert result.verdict == VERDICT_UNVERIFIABLE
+    assert result.reason_code == REASON_UNSUPPORTED_COMPARISON_TYPE

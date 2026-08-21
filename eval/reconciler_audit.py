@@ -212,6 +212,60 @@ RESTATEMENT_PROBE_FACTS = FACTS + [
     _fact("Revenues", 390_000_000_000, FY23_START, FY23_END, "0000320193-24-999999", filed="2024-03-01"),
 ]
 
+# The restatement-demo case above is deliberately excluded from the recall/false-
+# positive estimate below: its expected_verdict documents the pre-as_of *bug*
+# behavior, not the real pipeline's behavior (which always passes as_of), so
+# treating it as a genuine "should be X" case would corrupt the estimate.
+_RESTATEMENT_DEMO_LABEL = "restatement without as_of: correct-at-the-time claim reads as false inconsistent"
+
+# DSPy-optimized claim-extraction precision, from eval/run_comparison.py's live run
+# (see README's Results section) — the "p" (generator correctness) term in the
+# precision-ceiling formula below. Not re-derived here since that requires a live
+# LLM call; hardcoded with its source cited so it's checkable, not silently assumed.
+EXTRACTION_PRECISION_DSPY_OPTIMIZED = 0.763
+
+
+def reconciler_recall_and_false_positive_rate(facts: list[FinancialFact] = FACTS) -> dict:
+    """The Reconciler's own recall (r) and false-positive rate (f), estimated from
+    this audit's cases: r = fraction of genuinely-consistent claims correctly
+    accepted; f = fraction of genuinely-not-consistent claims wrongly accepted.
+    Small n (6 and 8 cases respectively) — illustrative, not a statistically tight
+    estimate. When f is observed as exactly 0, the "rule of three" gives a rough
+    95% upper bound of ~3/n on the true rate a zero count doesn't rule out."""
+    cases = [c for c in CASES if c.label != _RESTATEMENT_DEMO_LABEL]
+    should_be_consistent = [c for c in cases if c.expected_verdict == "consistent"]
+    should_not_be_consistent = [c for c in cases if c.expected_verdict != "consistent"]
+
+    true_positives = sum(1 for c in should_be_consistent if reconcile(c.claim, facts).verdict == "consistent")
+    false_positives = sum(1 for c in should_not_be_consistent if reconcile(c.claim, facts).verdict == "consistent")
+
+    n_good, n_bad = len(should_be_consistent), len(should_not_be_consistent)
+    recall = true_positives / n_good if n_good else float("nan")
+    false_positive_rate = false_positives / n_bad if n_bad else float("nan")
+
+    return {
+        "recall": recall,
+        "n_should_be_consistent": n_good,
+        "true_positives": true_positives,
+        "false_positive_rate": false_positive_rate,
+        "n_should_not_be_consistent": n_bad,
+        "false_positives": false_positives,
+        "false_positive_rate_upper_bound_95": (3.0 / n_bad) if false_positives == 0 and n_bad else None,
+    }
+
+
+def precision_ceiling(p: float, r: float, f: float) -> float:
+    """Pr(correct | accepted) = p*r / (p*r + (1-p)*f) — the fraction of claims the
+    verifier accepts as "consistent" that are actually correct, given generator
+    (extraction) correctness p, verifier recall r, and verifier false-positive
+    rate f. The point of this formula (from the course material this audit was
+    built against): verification precision, not generation quality, sets the
+    ceiling on what a maker/checker loop can deliver end-to-end — a high-recall
+    verifier still ships garbage if f is non-trivial, no matter how good p is."""
+    numerator = p * r
+    denominator = numerator + (1 - p) * f
+    return numerator / denominator if denominator else float("nan")
+
 
 def run_audit() -> dict:
     results = []
@@ -241,12 +295,35 @@ def run_audit() -> dict:
     for c, r in false_consistent:
         print(f"  - {c.label}: {r.explanation}")
 
+    stats = reconciler_recall_and_false_positive_rate()
+    p = EXTRACTION_PRECISION_DSPY_OPTIMIZED
+    ceiling = precision_ceiling(p, stats["recall"], stats["false_positive_rate"])
+    print()
+    print(f"Reconciler recall (r): {stats['recall']:.3f} ({stats['true_positives']}/{stats['n_should_be_consistent']})")
+    print(
+        f"Reconciler false-positive rate (f): {stats['false_positive_rate']:.3f} "
+        f"({stats['false_positives']}/{stats['n_should_not_be_consistent']})"
+        + (
+            f" — 0 observed, ~{stats['false_positive_rate_upper_bound_95']:.3f} 95% upper bound (rule of three) at this n"
+            if stats["false_positive_rate_upper_bound_95"] is not None
+            else ""
+        )
+    )
+    print(
+        f"System precision ceiling Pr(correct|accepted), given extraction precision p={p}: {ceiling:.3f} "
+        f"(verification precision, not extraction quality, is what actually bounds this)"
+    )
+
     return {
         "total": total,
         "correct": correct,
         "accuracy": correct / total,
         "false_consistent_count": len(false_consistent),
         "false_consistent_cases": [c.label for c, r in false_consistent],
+        "recall": stats["recall"],
+        "false_positive_rate": stats["false_positive_rate"],
+        "false_positive_rate_upper_bound_95": stats["false_positive_rate_upper_bound_95"],
+        "precision_ceiling": ceiling,
     }
 
 

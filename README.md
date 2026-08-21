@@ -74,7 +74,11 @@ Switching the DSPy signature from `Predict` to `ChainOfThought` — reasoning be
 
 The honest conclusion: reasoning (`ChainOfThought`) is a real, large improvement over a bare `Predict` call. Whether `BootstrapFewShot` optimization helped, hurt, or did nothing net is **not resolved by this test set** — it's too small to tell, and what data exists suggests it may have *traded* accuracy from one claim type for another rather than improving overall. Ground truth: 78 hand-labeled examples / 161 claims / 9 true negatives, drawn from real MSFT and NVDA filings.
 
-**Pillar 4 pre-flight — the Reconciler's own correctness, isolated from extraction.** Before the Reconciler is ever trusted as an RLVR reward, `eval/reconciler_audit.py` runs it against a battery of known-good, known-bad, and adversarial cases (sign flips, order-of-magnitude confusion, mislabeled comparison types, exact tolerance-boundary probes) — 15/15 matched the hand-computed expected verdict, and critically, **zero false-"consistent" results**, the dangerous failure mode for a reward signal (a false "inconsistent" just costs training signal; a false "consistent" actively teaches a policy that a wrong answer was right). Enforced permanently in CI via `tests/test_reconciler_audit.py`. Reward-shaping design for Phase 7 itself — not yet built, pending GPU compute — is recorded in [`docs/phase7-reward-design.md`](docs/phase7-reward-design.md).
+**Pillar 4 pre-flight — the Reconciler's own correctness, isolated from extraction.** Before the Reconciler is ever trusted as an RLVR reward, `eval/reconciler_audit.py` runs it against a battery of known-good, known-bad, and adversarial cases (sign flips, order-of-magnitude confusion, mislabeled comparison types, exact tolerance-boundary probes) — 15/15 matched the hand-computed expected verdict, and critically, **zero false-"consistent" results**, the dangerous failure mode for a reward signal (a false "inconsistent" just costs training signal; a false "consistent" actively teaches a policy that a wrong answer was right). Enforced permanently in CI via `tests/test_reconciler_audit.py`. Every verdict also carries a machine-readable `reason_code` (`near_miss`, `missing_fact`, `zero_denominator`, ...) instead of only free-text explanation — usable both as reward-shaping material for Phase 7 and as structured error-analysis output today.
+
+The audit also lets us apply the maker/checker precision-ceiling formula — `Pr(correct | accepted) = pr / (pr + (1-p)f)`, where `p` is extraction precision, `r` is verifier recall, and `f` is verifier false-positive rate — to state what actually bounds end-to-end system accuracy. From the audit's cases: `r = 1.000` (6/6), `f = 0.000` (0/8, ~0.375 95% upper bound by the rule of three at this sample size). With the DSPy-optimized extraction precision (`p = 0.763`), the formula gives a ceiling of **1.000** — a f=0 verifier means every claim it accepts as "consistent" is trustworthy regardless of upstream extraction precision, on this test surface. The small n keeps this illustrative rather than statistically tight, same caveat as the noise-floor finding above.
+
+Reward-shaping design for Phase 7 itself — not yet built, pending GPU compute — is recorded in [`docs/phase7-reward-design.md`](docs/phase7-reward-design.md).
 
 **A real, current end-to-end run** (NVDA's FY2026 10-K, live EDGAR + live LLM, no cached answers):
 
@@ -86,7 +90,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 125 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 140 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 ## What actually broke, and how it got caught
 
@@ -106,6 +110,8 @@ The interesting engineering in this project wasn't writing the happy path — it
 
 - **A claim could be marked wrong for being correct — at the time it was made.** SEC filings restate: a later 10-K/A amendment can revise an XBRL figure after the original filing. Without tracking *when* a fact was filed relative to the claim's own source filing, the reconciler's restatement-handling logic (correctly preferring the most recent value when duplicates disagree) could compare an old, accurate claim against a *later* restatement and call it "inconsistent" — the claim was right when it was written, and the world's record of that period simply changed afterward. Fixed by threading the claim's own filing date (`as_of`) into the reconciler's fact-matching itself, not just its period-selection layer (which Phase 5 already handled). [`tools/reconciler.py`](tools/reconciler.py)
 
+- **The same bitemporal bug, found a second time via a tool-contract audit.** Reading `tools/numerical_reconciler.py`'s MCP tool docstring as if deciding how to call it (the "read it like the calling model would" discipline) surfaced that `reconcile_claim` — the literal Pillar 1 tool, callable independently of the Coordinator — never exposed an `as_of` parameter at all, so a direct caller had no bitemporal protection even after the agent-path fix above landed. Fixed by adding `as_of` to the tool's signature and threading it into `reconcile()`. [`tools/numerical_reconciler.py`](tools/numerical_reconciler.py)
+
 One limitation is still open and documented rather than hidden: the verification agent can distinguish "the source filing's own period" from "the next most recent one," but doesn't yet parse a claim's *stated* period text (e.g. distinguishing a paragraph's FY2026 figure from its FY2025 comparison in the same sentence) — so a claim about an explicitly non-current period can still resolve against the wrong one. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
 
 ## Harness: budget and checkpointing
@@ -119,7 +125,7 @@ tools/    MCP servers — Filing Retriever, MD&A Extractor, Numerical Reconciler
 eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (Pillar 2)
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
 data/     Local cache / checkpoints (gitignored)
-tests/    117 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    132 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -134,7 +140,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 117 unit tests, no network/LLM required
+pytest -v                 # 132 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

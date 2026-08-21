@@ -5,6 +5,18 @@ filings, chunked into paragraph-level text — the claim source used in place of
 earnings-call transcripts (see the proposal's Week 13 scope safeguard). This is
 Pillar 1, tool 2 of 3.
 
+Cost/latency: dominated by fetching and parsing each filing's full HTML document
+(disk-cached by accession number after the first fetch — see
+tools/edgar_client.py); `limit` controls how many filings are parsed per call,
+so cost scales linearly with it, not with document size alone.
+
+Error taxonomy: an invalid `form_type` raises ValueError immediately (fix the
+call, don't retry). A filing whose MD&A section can't be located is not an
+exception — it's included in the returned list as an `{"error": ...}` entry
+carrying that filing's own accession_number/form/filing_date, so a caller
+processing multiple filings gets partial results plus an explicit account of
+what was skipped, not a silent gap or a hard failure of the whole batch.
+
 Run directly for a stdio smoke test:
     python -m tools.mdna_extractor
 """

@@ -12,6 +12,14 @@ from tools.schema import (
     COMPARISON_ABSOLUTE_CHANGE,
     COMPARISON_BPS_CHANGE,
     COMPARISON_GROWTH_PCT,
+    REASON_AMBIGUOUS_PERIOD,
+    REASON_LARGE_MISS,
+    REASON_MATCH,
+    REASON_MISSING_COMPARISON_CONTEXT,
+    REASON_MISSING_FACT,
+    REASON_NEAR_MISS,
+    REASON_UNSUPPORTED_COMPARISON_TYPE,
+    REASON_ZERO_DENOMINATOR,
     VERDICT_CONSISTENT,
     VERDICT_INCONSISTENT,
     VERDICT_UNVERIFIABLE,
@@ -44,11 +52,13 @@ def _find_fact(
     period_end: str,
     unit: str,
     as_of: str | None = None,
-) -> tuple[FinancialFact | None, str | None]:
-    """Find the fact for a (concept, period, unit). Returns (fact, error) — error is
-    None on success, or a human-readable reason it couldn't be resolved (not found,
-    or ambiguous because multiple period_start values share this period_end and the
-    claim didn't disambiguate).
+) -> tuple[FinancialFact | None, str | None, str | None]:
+    """Find the fact for a (concept, period, unit). Returns (fact, error, error_code)
+    — error/error_code are None on success. error is a human-readable reason it
+    couldn't be resolved (not found, or ambiguous because multiple period_start
+    values share this period_end and the claim didn't disambiguate); error_code is
+    the same reason as one of the REASON_* constants, for callers that need to
+    branch on it rather than parse prose.
 
     `as_of` — bitemporal cutoff, the filing_date of the source paragraph the claim
     came from — restricts candidates to facts filed on or before that date. Without
@@ -67,15 +77,19 @@ def _find_fact(
     else:
         distinct_starts = {f.period_start for f in candidates}
         if len(distinct_starts) > 1:
-            return None, (
-                f"Ambiguous period: {len(distinct_starts)} different period_start values "
-                f"report '{concept}' ending {period_end} (e.g. a quarter and a fiscal year "
-                f"can share an end date) — claim must specify period_start."
+            return (
+                None,
+                (
+                    f"Ambiguous period: {len(distinct_starts)} different period_start values "
+                    f"report '{concept}' ending {period_end} (e.g. a quarter and a fiscal year "
+                    f"can share an end date) — claim must specify period_start."
+                ),
+                REASON_AMBIGUOUS_PERIOD,
             )
 
     if not candidates:
         as_of_note = f" as of {as_of}" if as_of else ""
-        return None, f"No reported '{concept}' found for period ending {period_end}{as_of_note}."
+        return None, f"No reported '{concept}' found for period ending {period_end}{as_of_note}.", REASON_MISSING_FACT
 
     # The same period is often re-reported verbatim in later filings' comparative
     # columns (e.g. a 10-K shows 3 years of history) — that's not a restatement, so
@@ -88,7 +102,14 @@ def _find_fact(
         best = min(candidates, key=lambda f: (f.filed, f.accession_number))
     else:
         best = max(candidates, key=lambda f: (f.filed, f.accession_number))
-    return best, None
+    return best, None, None
+
+
+def _miss_reason_code(difference: float, tolerance: float) -> str:
+    """A wrong verdict from a hair's-width miss is a different training/error-analysis
+    signal than one from a wildly wrong number — this is the cheapest possible shaping
+    of that distinction, using the tolerance itself as the scale."""
+    return REASON_NEAR_MISS if difference <= tolerance * 2 else REASON_LARGE_MISS
 
 
 def reconcile(claim: Claim, facts: list[FinancialFact], as_of: str | None = None) -> ReconciliationResult:
@@ -120,10 +141,11 @@ def reconcile(claim: Claim, facts: list[FinancialFact], as_of: str | None = None
         tolerance=tolerance,
         explanation=f"Unknown comparison_type '{claim.comparison_type}'.",
         citations=[],
+        reason_code=REASON_UNSUPPORTED_COMPARISON_TYPE,
     )
 
 
-def _unverifiable(claim: Claim, tolerance: float, reason: str) -> ReconciliationResult:
+def _unverifiable(claim: Claim, tolerance: float, reason: str, reason_code: str) -> ReconciliationResult:
     return ReconciliationResult(
         verdict=VERDICT_UNVERIFIABLE,
         claim=claim,
@@ -132,15 +154,16 @@ def _unverifiable(claim: Claim, tolerance: float, reason: str) -> Reconciliation
         tolerance=tolerance,
         explanation=reason,
         citations=[],
+        reason_code=reason_code,
     )
 
 
 def _reconcile_absolute(
     claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
 ) -> ReconciliationResult:
-    fact, error = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
+    fact, error, error_code = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
     if fact is None:
-        return _unverifiable(claim, tolerance, error)
+        return _unverifiable(claim, tolerance, error, error_code)
 
     computed_value = fact.value
     denom = abs(computed_value) if computed_value != 0 else 1.0
@@ -159,6 +182,7 @@ def _reconcile_absolute(
             f"(relative difference {difference:.2%})."
         ),
         citations=[fact.accession_number],
+        reason_code=REASON_MATCH if verdict == VERDICT_CONSISTENT else _miss_reason_code(difference, tolerance),
     )
 
 
@@ -166,16 +190,20 @@ def _reconcile_growth_pct(
     claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
 ) -> ReconciliationResult:
     if claim.comparison_period_end is None:
-        return _unverifiable(claim, tolerance, "growth_pct claims require comparison_period_end.")
+        return _unverifiable(
+            claim, tolerance, "growth_pct claims require comparison_period_end.", REASON_MISSING_COMPARISON_CONTEXT
+        )
 
-    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
-    prior, err2 = _find_fact(
+    current, err1, code1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
+    prior, err2, code2 = _find_fact(
         facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
     if current is None or prior is None:
-        return _unverifiable(claim, tolerance, err1 or err2)
+        return _unverifiable(claim, tolerance, err1 or err2, code1 or code2)
     if prior.value == 0:
-        return _unverifiable(claim, tolerance, "Comparison period value is zero; percentage growth is undefined.")
+        return _unverifiable(
+            claim, tolerance, "Comparison period value is zero; percentage growth is undefined.", REASON_ZERO_DENOMINATOR
+        )
 
     computed_value = (current.value - prior.value) / abs(prior.value) * 100
     difference = abs(computed_value - claim.claimed_value)
@@ -193,6 +221,7 @@ def _reconcile_growth_pct(
             f"a difference of {difference:.2f} percentage points."
         ),
         citations=[current.accession_number, prior.accession_number],
+        reason_code=REASON_MATCH if verdict == VERDICT_CONSISTENT else _miss_reason_code(difference, tolerance),
     )
 
 
@@ -200,14 +229,16 @@ def _reconcile_absolute_change(
     claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
 ) -> ReconciliationResult:
     if claim.comparison_period_end is None:
-        return _unverifiable(claim, tolerance, "absolute_change claims require comparison_period_end.")
+        return _unverifiable(
+            claim, tolerance, "absolute_change claims require comparison_period_end.", REASON_MISSING_COMPARISON_CONTEXT
+        )
 
-    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
-    prior, err2 = _find_fact(
+    current, err1, code1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
+    prior, err2, code2 = _find_fact(
         facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
     if current is None or prior is None:
-        return _unverifiable(claim, tolerance, err1 or err2)
+        return _unverifiable(claim, tolerance, err1 or err2, code1 or code2)
 
     computed_value = current.value - prior.value
     denom = max(abs(current.value), abs(prior.value)) or 1.0
@@ -226,6 +257,7 @@ def _reconcile_absolute_change(
             f"a relative difference of {difference:.2%}."
         ),
         citations=[current.accession_number, prior.accession_number],
+        reason_code=REASON_MATCH if verdict == VERDICT_CONSISTENT else _miss_reason_code(difference, tolerance),
     )
 
 
@@ -234,25 +266,30 @@ def _reconcile_bps_change(
 ) -> ReconciliationResult:
     if claim.comparison_period_end is None or claim.denominator_metric is None:
         return _unverifiable(
-            claim, tolerance, "bps_change claims require comparison_period_end and denominator_metric."
+            claim,
+            tolerance,
+            "bps_change claims require comparison_period_end and denominator_metric.",
+            REASON_MISSING_COMPARISON_CONTEXT,
         )
 
-    num_current, e1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
-    den_current, e2 = _find_fact(
+    num_current, e1, c1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
+    den_current, e2, c2 = _find_fact(
         facts, claim.denominator_metric, claim.period_start, claim.period_end, claim.unit, as_of
     )
-    num_prior, e3 = _find_fact(
+    num_prior, e3, c3 = _find_fact(
         facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
-    den_prior, e4 = _find_fact(
+    den_prior, e4, c4 = _find_fact(
         facts, claim.denominator_metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
 
     missing = [f for f in (num_current, den_current, num_prior, den_prior) if f is None]
     if missing:
-        return _unverifiable(claim, tolerance, e1 or e2 or e3 or e4)
+        return _unverifiable(claim, tolerance, e1 or e2 or e3 or e4, c1 or c2 or c3 or c4)
     if den_current.value == 0 or den_prior.value == 0:
-        return _unverifiable(claim, tolerance, "Denominator metric is zero in one of the periods; ratio undefined.")
+        return _unverifiable(
+            claim, tolerance, "Denominator metric is zero in one of the periods; ratio undefined.", REASON_ZERO_DENOMINATOR
+        )
 
     margin_current = num_current.value / den_current.value
     margin_prior = num_prior.value / den_prior.value
@@ -277,4 +314,5 @@ def _reconcile_bps_change(
             num_prior.accession_number,
             den_prior.accession_number,
         ],
+        reason_code=REASON_MATCH if verdict == VERDICT_CONSISTENT else _miss_reason_code(difference, tolerance),
     )

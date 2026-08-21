@@ -19,6 +19,15 @@ threaded through to a scalar yet:
 - **`difference`** — the actual numeric miss (relative % for absolute/absolute_change,
   percentage points for growth_pct, bps for bps_change), already returned on every
   `ReconciliationResult`.
+- **`reason_code`** — a typed diagnostic (`near_miss` vs. `large_miss` for a wrong
+  verdict; `missing_fact`, `ambiguous_period`, `zero_denominator`,
+  `missing_comparison_context`, `unsupported_comparison_type` for unverifiable)
+  now returned on every result (`tools/schema.py`) — this is the ASI ("actionable
+  side information") a shaped reward needs, already built rather than still
+  planned. A policy that's confidently wrong by 10x should be penalized
+  differently from one that's a hair past the tolerance boundary; `reason_code`
+  makes that distinction free to compute instead of requiring the reward function
+  to re-derive it from `difference` and `tolerance` at training time.
 - **which `comparison_type` was involved** — a model that gets the right verdict
   via the wrong reasoning path (e.g. treating a `growth_pct` claim as `absolute`)
   should be distinguishable from one that reasoned correctly.

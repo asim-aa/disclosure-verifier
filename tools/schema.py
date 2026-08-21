@@ -89,6 +89,20 @@ VERDICT_CONSISTENT = "consistent"
 VERDICT_INCONSISTENT = "inconsistent"
 VERDICT_UNVERIFIABLE = "unverifiable"  # source data needed to check the claim is missing
 
+# Machine-readable reason codes for *why* a verdict came out the way it did — a
+# typed complement to ReconciliationResult.explanation's free text. Two uses:
+# (1) reward shaping for Phase 7 (a wrong verdict from a genuinely ambiguous
+# period is a different training signal than one from a clean large numeric
+# miss), and (2) error-analysis reporting that doesn't require re-parsing prose.
+REASON_MATCH = "match"  # consistent
+REASON_NEAR_MISS = "near_miss"  # inconsistent, difference within 2x tolerance
+REASON_LARGE_MISS = "large_miss"  # inconsistent, difference beyond 2x tolerance
+REASON_MISSING_FACT = "missing_fact"  # unverifiable: no matching fact in the retrieved data
+REASON_AMBIGUOUS_PERIOD = "ambiguous_period"  # unverifiable: multiple period_start candidates
+REASON_ZERO_DENOMINATOR = "zero_denominator"  # unverifiable: division by a zero prior/denominator value
+REASON_MISSING_COMPARISON_CONTEXT = "missing_comparison_context"  # unverifiable: claim omitted required fields
+REASON_UNSUPPORTED_COMPARISON_TYPE = "unsupported_comparison_type"  # unverifiable: unrecognized comparison_type
+
 
 @dataclass(frozen=True)
 class Claim:
@@ -134,6 +148,7 @@ class ReconciliationResult:
     tolerance: float
     explanation: str
     citations: list[str]  # accession numbers of the facts used to compute this
+    reason_code: str = "unknown"  # one of the REASON_* constants above
 
     def to_dict(self) -> dict:
         return {**asdict(self), "claim": self.claim.to_dict()}

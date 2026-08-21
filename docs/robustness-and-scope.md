@@ -45,6 +45,36 @@ final value lookup wasn't. See `tests/test_reconciler.py`'s `as_of` test section
 for the regression tests, including a live-numbers reproduction of the bug this
 fixes.
 
+The same gap existed a second time, independently, in `tools/numerical_reconciler.py`'s
+MCP tool — found by auditing its docstring against the standard tool-contract
+checklist (typed schema, honest error taxonomy, and a description a calling model
+can act on correctly) and asking whether anything was left unsaid. `reconcile_claim`
+never exposed an `as_of` parameter at all, so any caller invoking the tool directly
+(bypassing the Coordinator) had no bitemporal protection even after the agent-path
+fix above landed. Fixed the same way, with offline tests in
+`tests/test_numerical_reconciler_tool.py`.
+
+**Reconciler verdicts carry a typed `reason_code`.** Beyond the three verdicts
+themselves, every `ReconciliationResult` now includes a machine-readable reason
+(`match`, `near_miss`, `large_miss`, `missing_fact`, `ambiguous_period`,
+`zero_denominator`, `missing_comparison_context`, `unsupported_comparison_type`
+— see `tools/schema.py`) instead of only free-text `explanation`. This exists for
+two reasons: it's usable as reward-shaping material for Phase 7 (a wrong verdict
+from a hair's-width miss is a different training signal than one from a wildly
+wrong number), and it enables structured error-analysis reporting today without
+parsing prose.
+
+**Precision-ceiling check.** `eval/reconciler_audit.py` also estimates the
+Reconciler's own recall and false-positive rate from its case set and applies
+`Pr(correct | accepted) = pr / (pr + (1-p)f)` — the formula stating that
+verification precision, not extraction quality, bounds what a maker/checker loop
+can deliver end-to-end. With `r = 1.000`, `f = 0.000` (0/8, ~0.375 95% upper bound
+by the rule of three at this n), and the DSPy-optimized extraction precision
+(`p = 0.763`), the ceiling comes out to 1.000: a zero-false-positive verifier means
+every accepted claim is trustworthy regardless of upstream extraction quality, on
+this test surface. Small n keeps this illustrative, not statistically tight — the
+same caveat that applies to the DSPy noise-floor finding above.
+
 ## Explicitly out of scope (considered, not silently omitted)
 
 **Sagas / compensating actions for irreversible effects.** Doesn't apply — all

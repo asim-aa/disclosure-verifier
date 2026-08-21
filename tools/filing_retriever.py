@@ -3,6 +3,17 @@
 Pulls 10-K/10-Q/8-K filing metadata and XBRL structured facts from SEC EDGAR
 for a given ticker. This is Pillar 1, tool 1 of 3.
 
+Cost/latency: EDGAR reads are rate-limited (~1 req/sec) and disk-cached
+(tools/edgar_client.py) — the first call for a ticker in a session is a live,
+~1s+ network round trip; repeated calls for the same ticker are cache-served
+and effectively free. All three tools below are read-only GETs, so a retry
+after a timeout is always safe to reissue with the same arguments.
+
+Error taxonomy: an unresolvable ticker raises EdgarClientError (invalid input
+— don't retry with the same ticker); a transient network failure raises the
+underlying requests exception (retry is reasonable). Neither case returns a
+silently empty result.
+
 Run directly for a stdio smoke test:
     python -m tools.filing_retriever
 """
