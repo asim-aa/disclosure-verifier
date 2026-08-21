@@ -165,6 +165,14 @@ dynamic — there's no selection decision for progressive disclosure to improve.
 **Confused-deputy / multi-tenant authorization hardening.** Single-user local
 tool, no multi-tenant secrets or external callers to protect against.
 
+**LLM-judge pathologies (position/verbosity/self-enhancement bias, disposition
+drift, "the ruler bends while you measure with it").** Doesn't apply — the
+Numerical Reconciler, the sole verifier in this pipeline, is a hard
+programmatic verifier (arithmetic against XBRL facts), not a soft LLM-as-judge
+component. There's no judge prompt in the loop for these failure modes to
+attach to. Worth stating rather than leaving the reader to wonder whether it
+was checked.
+
 ## Interpreting "inconsistent" — a known simplification
 
 The Reconciler currently collapses every mismatch into one `inconsistent`
