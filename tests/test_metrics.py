@@ -1,6 +1,12 @@
 import pytest
 
-from eval.metrics import claims_match, precision_recall_f1, score_example
+from eval.metrics import (
+    claims_match,
+    merge_category_counts,
+    precision_recall_f1,
+    score_example,
+    score_example_by_category,
+)
 from eval.schema import ExtractedClaim
 
 
@@ -89,3 +95,62 @@ def test_precision_recall_f1_no_predictions_and_no_gold_is_perfect():
     result = precision_recall_f1(total_tp=0, total_fp=0, total_fn=0)
     assert result["precision"] == 1.0
     assert result["recall"] == 1.0
+
+
+# ---------- stratified (per comparison_type) scoring ----------
+
+
+def test_score_by_category_separates_categories():
+    gold = [
+        claim(metric="revenue", value=27.0, comparison_type="growth_pct"),
+        claim(metric="revenue", value=100.0, comparison_type="absolute"),
+    ]
+    predicted = [
+        claim(metric="revenue", value=27.0, comparison_type="growth_pct"),  # matches
+        # absolute claim missing entirely -> fn in that category
+    ]
+    result = score_example_by_category(predicted, gold)
+    assert result["growth_pct"] == (1, 0, 0)
+    assert result["absolute"] == (0, 0, 1)
+
+
+def test_score_by_category_attributes_false_positive_to_predicted_type():
+    gold = [claim(metric="revenue", value=27.0, comparison_type="growth_pct")]
+    predicted = [
+        claim(metric="revenue", value=27.0, comparison_type="growth_pct"),  # matches
+        claim(metric="margin", value=200.0, comparison_type="bps_change"),  # extra, no gold match
+    ]
+    result = score_example_by_category(predicted, gold)
+    assert result["growth_pct"] == (1, 0, 0)
+    assert result["bps_change"] == (0, 1, 0)
+
+
+def test_score_by_category_a_weak_category_does_not_hide_in_a_strong_pooled_average():
+    """The whole point of stratification: a category that's failing completely can
+    still produce a fine-looking pooled score if it's rare relative to a category
+    that's doing well."""
+    gold = [
+        claim(metric="revenue", value=27.0, comparison_type="growth_pct"),
+        claim(metric="revenue", value=28.0, comparison_type="growth_pct"),
+        claim(metric="revenue", value=29.0, comparison_type="growth_pct"),
+        claim(metric="margin", value=200.0, comparison_type="bps_change"),
+    ]
+    predicted = [
+        claim(metric="revenue", value=27.0, comparison_type="growth_pct"),
+        claim(metric="revenue", value=28.0, comparison_type="growth_pct"),
+        claim(metric="revenue", value=29.0, comparison_type="growth_pct"),
+        # bps_change claim entirely missed
+    ]
+    pooled = score_example(predicted, gold)
+    assert pooled == (3, 0, 1)  # looks fine pooled: 75% recall
+
+    by_category = score_example_by_category(predicted, gold)
+    assert by_category["bps_change"] == (0, 0, 1)  # 0% recall, invisible in the pooled number
+
+
+def test_merge_category_counts_accumulates_across_examples():
+    total: dict = {}
+    merge_category_counts(total, {"growth_pct": (2, 1, 0)})
+    merge_category_counts(total, {"growth_pct": (1, 0, 1), "absolute": (3, 0, 0)})
+    assert total["growth_pct"] == [3, 1, 1]
+    assert total["absolute"] == [3, 0, 0]

@@ -57,7 +57,24 @@ Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3)
 | DSPy zero-shot (`ChainOfThought`, no demos) | 0.763 | 0.806 | 0.784 |
 | **DSPy optimized** (BootstrapFewShot, 4 demos) | **0.763** | **0.806** | **0.784** |
 
-The honest framing, including a result that didn't go the way you'd expect: switching the DSPy signature from `Predict` to `ChainOfThought` — reasoning before committing to structured output — took zero-shot DSPy from *underperforming* the hand-written baseline (0.676 F1) to clearly *beating* it (0.784 F1) before any optimization ran at all. But `BootstrapFewShot` optimization on top of that produced **exactly identical numbers** — same precision, same recall, the same 29/9/7 true-positive/false-positive/false-negative split. Verified this wasn't an evaluation bug (the compiled program is a genuinely separate instance, and the optimizer log confirms it bootstrapped 4 real demonstrations). The reasoning step captured essentially all of the available signal on this test set; 4 few-shot demos added nothing further. That's a more interesting and more honest finding than a clean "optimization wins" story: reasoning mattered far more than few-shot optimization for this task. The trade-off is real too — reasoning calls take noticeably longer per request than a bare `Predict` call. Ground truth: 78 hand-labeled examples / 161 claims / 9 true negatives, drawn from real MSFT and NVDA filings.
+Switching the DSPy signature from `Predict` to `ChainOfThought` — reasoning before committing to structured output — took zero-shot DSPy from *underperforming* the hand-written baseline (0.676 F1) to clearly *beating* it (0.784 F1) before any optimization ran. `BootstrapFewShot` on top of that produced **exactly identical numbers** — verified this wasn't an evaluation bug (the compiled program is a genuinely separate instance, and the optimizer log confirms 4 real demonstrations were bootstrapped). Reasoning captured essentially all the available signal; the few-shot demos added nothing further.
+
+**But the pooled F1 delta doesn't survive closer scrutiny, and that's worth reporting rather than smoothing over.** Two checks that changed the honest headline:
+
+1. **Noise floor.** At n=45 claim-level decisions (the actual sample size the precision/recall proportions are computed over — not just the 16 test paragraphs), the 95% noise floor is **±0.120 F1**. The measured +0.054 delta over baseline is *inside* that noise floor — not statistically distinguishable from chance at this sample size. `eval/run_comparison.py` computes and prints this check on every run rather than reporting a bare delta.
+2. **Stratified breakdown by `comparison_type` exposes a masked regression.** The pooled number hides a real split:
+
+   | comparison_type | baseline F1 | optimized F1 |
+   |---|---|---|
+   | `growth_pct` | 1.000 | 1.000 |
+   | `absolute` | 0.625 | 0.788 |
+   | `absolute_change` | 0.429 | **0.308** (worse) |
+
+   `growth_pct` is trivially easy for this task and perfect in every condition, propping up the pooled score. `absolute` genuinely improved with optimization. `absolute_change` got *worse* — a real regression that a pooled average completely hides, because it happened at the same time `absolute` improved and the two roughly canceled out. This is precisely the "aggregate smiles while a stratum bleeds" failure mode: reporting only the pooled F1 would have missed it entirely.
+
+The honest conclusion: reasoning (`ChainOfThought`) is a real, large improvement over a bare `Predict` call. Whether `BootstrapFewShot` optimization helped, hurt, or did nothing net is **not resolved by this test set** — it's too small to tell, and what data exists suggests it may have *traded* accuracy from one claim type for another rather than improving overall. Ground truth: 78 hand-labeled examples / 161 claims / 9 true negatives, drawn from real MSFT and NVDA filings.
+
+**Pillar 4 pre-flight — the Reconciler's own correctness, isolated from extraction.** Before the Reconciler is ever trusted as an RLVR reward, `eval/reconciler_audit.py` runs it against a battery of known-good, known-bad, and adversarial cases (sign flips, order-of-magnitude confusion, mislabeled comparison types, exact tolerance-boundary probes) — 15/15 matched the hand-computed expected verdict, and critically, **zero false-"consistent" results**, the dangerous failure mode for a reward signal (a false "inconsistent" just costs training signal; a false "consistent" actively teaches a policy that a wrong answer was right). Enforced permanently in CI via `tests/test_reconciler_audit.py`. Reward-shaping design for Phase 7 itself — not yet built, pending GPU compute — is recorded in [`docs/phase7-reward-design.md`](docs/phase7-reward-design.md).
 
 **A real, current end-to-end run** (NVDA's FY2026 10-K, live EDGAR + live LLM, no cached answers):
 
@@ -69,7 +86,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 107 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 125 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 ## What actually broke, and how it got caught
 
@@ -87,7 +104,9 @@ The interesting engineering in this project wasn't writing the happy path — it
 
 - **Chain-of-thought reasoning silently corrupted its own numeric output.** Switching to `dspy.ChainOfThought` made the model write dollar amounts in shorthand inside its `reasoning` field — *"$215.9 billion"* — and then just echo that literal `215.9` into the structured `value` field instead of expanding it to `215900000000`, consistently, every run. Plain `Predict` never had this failure mode because it never generates that intervening shorthand text to anchor on. Fixed by instructing the signature to write the fully-expanded number in the reasoning itself, so the structured step has nothing left to get wrong. [`eval/dspy_extractor.py`](eval/dspy_extractor.py)
 
-One limitation is still open and documented rather than hidden: the verification agent can distinguish "the source filing's own period" from "the next most recent one," but doesn't yet parse a claim's *stated* period text (e.g. distinguishing a paragraph's FY2026 figure from its FY2025 comparison in the same sentence) — so a claim about an explicitly non-current period can still resolve against the wrong one. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken.
+- **A claim could be marked wrong for being correct — at the time it was made.** SEC filings restate: a later 10-K/A amendment can revise an XBRL figure after the original filing. Without tracking *when* a fact was filed relative to the claim's own source filing, the reconciler's restatement-handling logic (correctly preferring the most recent value when duplicates disagree) could compare an old, accurate claim against a *later* restatement and call it "inconsistent" — the claim was right when it was written, and the world's record of that period simply changed afterward. Fixed by threading the claim's own filing date (`as_of`) into the reconciler's fact-matching itself, not just its period-selection layer (which Phase 5 already handled). [`tools/reconciler.py`](tools/reconciler.py)
+
+One limitation is still open and documented rather than hidden: the verification agent can distinguish "the source filing's own period" from "the next most recent one," but doesn't yet parse a claim's *stated* period text (e.g. distinguishing a paragraph's FY2026 figure from its FY2025 comparison in the same sentence) — so a claim about an explicitly non-current period can still resolve against the wrong one. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
 
 ## Harness: budget and checkpointing
 
@@ -100,7 +119,7 @@ tools/    MCP servers — Filing Retriever, MD&A Extractor, Numerical Reconciler
 eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (Pillar 2)
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
 data/     Local cache / checkpoints (gitignored)
-tests/    107 tests — unit (always run) + live-network + live-LLM (opt-in via -m)
+tests/    117 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -115,7 +134,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 107 unit tests, no network/LLM required
+pytest -v                 # 117 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

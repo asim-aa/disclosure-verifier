@@ -43,12 +43,24 @@ def _find_fact(
     period_start: str | None,
     period_end: str,
     unit: str,
+    as_of: str | None = None,
 ) -> tuple[FinancialFact | None, str | None]:
     """Find the fact for a (concept, period, unit). Returns (fact, error) — error is
     None on success, or a human-readable reason it couldn't be resolved (not found,
     or ambiguous because multiple period_start values share this period_end and the
-    claim didn't disambiguate)."""
+    claim didn't disambiguate).
+
+    `as_of` — bitemporal cutoff, the filing_date of the source paragraph the claim
+    came from — restricts candidates to facts filed on or before that date. Without
+    it, a claim made in an old filing can get compared against a *later restatement*
+    of the same period and read as a false "inconsistent": the claim was accurate as
+    of when it was written, but the world's record of that period changed afterward.
+    A restatement is a real event (see the "prefer most recent if values differ"
+    logic below) — but only for someone asking about the period *today*, not for a
+    claim frozen at the moment its own filing was published."""
     candidates = [f for f in facts if f.concept == concept and f.unit == unit and f.period_end == period_end]
+    if as_of is not None:
+        candidates = [f for f in candidates if f.filed <= as_of]
 
     if period_start is not None:
         candidates = [f for f in candidates if f.period_start == period_start]
@@ -62,14 +74,15 @@ def _find_fact(
             )
 
     if not candidates:
-        return None, f"No reported '{concept}' found for period ending {period_end}."
+        as_of_note = f" as of {as_of}" if as_of else ""
+        return None, f"No reported '{concept}' found for period ending {period_end}{as_of_note}."
 
     # The same period is often re-reported verbatim in later filings' comparative
     # columns (e.g. a 10-K shows 3 years of history) — that's not a restatement, so
     # the most natural citation is the original filing, not the latest one to repeat
     # it. But if the reported *value* actually differs across filings, that's a real
-    # restatement/correction, and the most recently filed value is the authoritative
-    # one to reconcile against.
+    # restatement/correction, and the most recently filed value (within the as_of
+    # cutoff, if any) is the authoritative one to reconcile against.
     distinct_values = {f.value for f in candidates}
     if len(distinct_values) == 1:
         best = min(candidates, key=lambda f: (f.filed, f.accession_number))
@@ -78,20 +91,26 @@ def _find_fact(
     return best, None
 
 
-def reconcile(claim: Claim, facts: list[FinancialFact]) -> ReconciliationResult:
+def reconcile(claim: Claim, facts: list[FinancialFact], as_of: str | None = None) -> ReconciliationResult:
     """Check a Claim against a list of FinancialFacts (typically all facts retrieved
     for one ticker). Never raises on missing data — returns verdict='unverifiable'
-    instead, since a reward function must always produce a signal."""
+    instead, since a reward function must always produce a signal.
+
+    `as_of` — the filing_date of the claim's own source filing — restricts fact
+    lookups to data filed on or before that date, so a claim is checked against
+    what was true *when it was made*, not against a later restatement of the same
+    period. Optional and defaults to None (no cutoff, matching prior behavior) so
+    existing callers that don't have this context keep working unchanged."""
     tolerance = _resolve_tolerance(claim)
 
     if claim.comparison_type == COMPARISON_ABSOLUTE:
-        return _reconcile_absolute(claim, facts, tolerance)
+        return _reconcile_absolute(claim, facts, tolerance, as_of)
     if claim.comparison_type == COMPARISON_GROWTH_PCT:
-        return _reconcile_growth_pct(claim, facts, tolerance)
+        return _reconcile_growth_pct(claim, facts, tolerance, as_of)
     if claim.comparison_type == COMPARISON_ABSOLUTE_CHANGE:
-        return _reconcile_absolute_change(claim, facts, tolerance)
+        return _reconcile_absolute_change(claim, facts, tolerance, as_of)
     if claim.comparison_type == COMPARISON_BPS_CHANGE:
-        return _reconcile_bps_change(claim, facts, tolerance)
+        return _reconcile_bps_change(claim, facts, tolerance, as_of)
 
     return ReconciliationResult(
         verdict=VERDICT_UNVERIFIABLE,
@@ -116,8 +135,10 @@ def _unverifiable(claim: Claim, tolerance: float, reason: str) -> Reconciliation
     )
 
 
-def _reconcile_absolute(claim: Claim, facts: list[FinancialFact], tolerance: float) -> ReconciliationResult:
-    fact, error = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit)
+def _reconcile_absolute(
+    claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
+) -> ReconciliationResult:
+    fact, error = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
     if fact is None:
         return _unverifiable(claim, tolerance, error)
 
@@ -141,13 +162,15 @@ def _reconcile_absolute(claim: Claim, facts: list[FinancialFact], tolerance: flo
     )
 
 
-def _reconcile_growth_pct(claim: Claim, facts: list[FinancialFact], tolerance: float) -> ReconciliationResult:
+def _reconcile_growth_pct(
+    claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
+) -> ReconciliationResult:
     if claim.comparison_period_end is None:
         return _unverifiable(claim, tolerance, "growth_pct claims require comparison_period_end.")
 
-    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit)
+    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
     prior, err2 = _find_fact(
-        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit
+        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
     if current is None or prior is None:
         return _unverifiable(claim, tolerance, err1 or err2)
@@ -173,13 +196,15 @@ def _reconcile_growth_pct(claim: Claim, facts: list[FinancialFact], tolerance: f
     )
 
 
-def _reconcile_absolute_change(claim: Claim, facts: list[FinancialFact], tolerance: float) -> ReconciliationResult:
+def _reconcile_absolute_change(
+    claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
+) -> ReconciliationResult:
     if claim.comparison_period_end is None:
         return _unverifiable(claim, tolerance, "absolute_change claims require comparison_period_end.")
 
-    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit)
+    current, err1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
     prior, err2 = _find_fact(
-        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit
+        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
     if current is None or prior is None:
         return _unverifiable(claim, tolerance, err1 or err2)
@@ -204,19 +229,23 @@ def _reconcile_absolute_change(claim: Claim, facts: list[FinancialFact], toleran
     )
 
 
-def _reconcile_bps_change(claim: Claim, facts: list[FinancialFact], tolerance: float) -> ReconciliationResult:
+def _reconcile_bps_change(
+    claim: Claim, facts: list[FinancialFact], tolerance: float, as_of: str | None = None
+) -> ReconciliationResult:
     if claim.comparison_period_end is None or claim.denominator_metric is None:
         return _unverifiable(
             claim, tolerance, "bps_change claims require comparison_period_end and denominator_metric."
         )
 
-    num_current, e1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit)
-    den_current, e2 = _find_fact(facts, claim.denominator_metric, claim.period_start, claim.period_end, claim.unit)
+    num_current, e1 = _find_fact(facts, claim.metric, claim.period_start, claim.period_end, claim.unit, as_of)
+    den_current, e2 = _find_fact(
+        facts, claim.denominator_metric, claim.period_start, claim.period_end, claim.unit, as_of
+    )
     num_prior, e3 = _find_fact(
-        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit
+        facts, claim.metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
     den_prior, e4 = _find_fact(
-        facts, claim.denominator_metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit
+        facts, claim.denominator_metric, claim.comparison_period_start, claim.comparison_period_end, claim.unit, as_of
     )
 
     missing = [f for f in (num_current, den_current, num_prior, den_prior) if f is None]

@@ -73,3 +73,43 @@ def precision_recall_f1(total_tp: int, total_fp: int, total_fn: int) -> dict:
     recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) else 1.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
     return {"precision": precision, "recall": recall, "f1": f1, "tp": total_tp, "fp": total_fp, "fn": total_fn}
+
+
+def score_example_by_category(predicted: list[ExtractedClaim], gold: list[ExtractedClaim]) -> dict[str, tuple[int, int, int]]:
+    """Same greedy matching as score_example, but broken out per comparison_type —
+    a pooled F1 can hide a category that's doing badly inside an average that
+    "smiles" while one stratum quietly fails (e.g. absolute_change might be much
+    weaker than absolute while the pooled number looks fine). A false positive is
+    attributed to the *predicted* claim's stated comparison_type (it has no gold
+    match to categorize it by); true positives and false negatives are attributed
+    to the *gold* claim's comparison_type."""
+    unmatched_pred = list(predicted)
+    by_category: dict[str, list[int]] = {}
+
+    def bucket(category: str) -> list[int]:
+        return by_category.setdefault(category, [0, 0, 0])
+
+    for g in gold:
+        match = next((p for p in unmatched_pred if claims_match(p, g)), None)
+        if match is not None:
+            unmatched_pred.remove(match)
+            bucket(g.comparison_type)[0] += 1  # tp
+        else:
+            bucket(g.comparison_type)[2] += 1  # fn
+
+    for p in unmatched_pred:
+        bucket(p.comparison_type)[1] += 1  # fp
+
+    return {category: tuple(counts) for category, counts in by_category.items()}
+
+
+def merge_category_counts(
+    total: dict[str, list[int]], new: dict[str, tuple[int, int, int]]
+) -> None:
+    """Accumulates score_example_by_category's output across a whole test set,
+    in place, into `total` (a dict of category -> [tp, fp, fn])."""
+    for category, (tp, fp, fn) in new.items():
+        bucket = total.setdefault(category, [0, 0, 0])
+        bucket[0] += tp
+        bucket[1] += fp
+        bucket[2] += fn

@@ -391,3 +391,101 @@ def test_custom_tolerance_overrides_default(aapl_facts):
     )
     result = reconcile(claim, aapl_facts)
     assert result.verdict == VERDICT_INCONSISTENT
+
+
+# ---------- as_of (bitemporal correctness) ----------
+
+
+def test_as_of_protects_a_claim_from_a_later_restatement():
+    """A claim made in the FY2023 10-K (filed 2023-11-03) states the FY2023 revenue
+    it was accurate about at the time. A LATER filing (e.g. a 10-K/A amendment filed
+    in 2024) restates that same period with a different figure. Without an as_of
+    cutoff, the reconciler's own "prefer most recent if values differ" rule (a
+    legitimate restatement-handling rule in general) would compare the original
+    claim against the *restated* number and wrongly call it inconsistent — even
+    though the claim was correct as of when it was written."""
+    facts = [
+        _fact("Revenues", 383_285_000_000, FY23_START, FY23_END, "0000320193-23-000106", filed="2023-11-03"),
+        _fact("Revenues", 390_000_000_000, FY23_START, FY23_END, "0000320193-24-999999", filed="2024-03-01"),
+    ]
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute",
+        claimed_value=383_285_000_000,  # accurate as of the FY2023 10-K itself
+        period_end=FY23_END,
+        period_start=FY23_START,
+    )
+
+    # without as_of: the later restatement wins, and a genuinely accurate claim
+    # reads as inconsistent
+    result_no_cutoff = reconcile(claim, facts)
+    assert result_no_cutoff.verdict == VERDICT_INCONSISTENT
+    assert result_no_cutoff.citations == ["0000320193-24-999999"]
+
+    # with as_of pinned to the claim's own source filing date: correctly consistent
+    result_with_cutoff = reconcile(claim, facts, as_of="2023-11-03")
+    assert result_with_cutoff.verdict == VERDICT_CONSISTENT
+    assert result_with_cutoff.citations == ["0000320193-23-000106"]
+
+
+def test_as_of_still_prefers_most_recent_restatement_within_the_cutoff():
+    """as_of doesn't mean "always use the earliest value" — if there's a genuine
+    restatement filed BEFORE the claim's own source filing, that restatement is
+    correctly the authoritative contemporaneous figure."""
+    facts = [
+        _fact("Revenues", 383_000_000_000, FY23_START, FY23_END, "0000320193-23-000001", filed="2023-10-01"),
+        _fact("Revenues", 383_285_000_000, FY23_START, FY23_END, "0000320193-23-000106", filed="2023-11-03"),
+    ]
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute",
+        claimed_value=383_285_000_000,
+        period_end=FY23_END,
+        period_start=FY23_START,
+    )
+    result = reconcile(claim, facts, as_of="2023-11-03")
+    assert result.verdict == VERDICT_CONSISTENT
+    assert result.citations == ["0000320193-23-000106"]
+
+
+def test_as_of_none_preserves_prior_behavior():
+    """Backward compatibility: omitting as_of behaves exactly as before this fix —
+    verified against the existing restatement-preference test's own facts shape."""
+    facts = [
+        _fact("Revenues", 383_285_000_000, FY23_START, FY23_END, "0000320193-23-000106", filed="2023-11-03"),
+        _fact("Revenues", 383_500_000_000, FY23_START, FY23_END, "0000320193-24-999999", filed="2024-03-01"),
+    ]
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="absolute",
+        claimed_value=383_500_000_000,
+        period_end=FY23_END,
+        period_start=FY23_START,
+    )
+    result = reconcile(claim, facts)  # no as_of at all
+    assert result.verdict == VERDICT_CONSISTENT
+    assert result.citations == ["0000320193-24-999999"]
+
+
+def test_as_of_growth_pct_uses_contemporaneous_values_on_both_sides(aapl_facts):
+    """The as_of cutoff must apply to the comparison period's fact lookup too, not
+    just the current period's — a growth_pct claim has two fact lookups."""
+    restated_prior = _fact(
+        "Revenues", 999_999_999_999, FY22_START, FY22_END, "0000320193-24-888888", filed="2024-06-01"
+    )
+    facts = aapl_facts + [restated_prior]
+    claim = Claim(
+        ticker=TICKER,
+        metric="Revenues",
+        comparison_type="growth_pct",
+        claimed_value=-2.8,  # real figure, computed from the ORIGINAL FY22 value
+        period_end=FY23_END,
+        period_start=FY23_START,
+        comparison_period_end=FY22_END,
+        comparison_period_start=FY22_START,
+    )
+    result = reconcile(claim, facts, as_of="2023-11-03")  # before the restatement was filed
+    assert result.verdict == VERDICT_CONSISTENT

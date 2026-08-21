@@ -1,6 +1,8 @@
 """Verification agent: resolves an ExtractedClaim's free-text metric/period into
-a tools.schema.Claim, then reuses Phase 3's reconciler exactly as-is (the same
-logic Phase 7 reuses as the RLVR reward function — nothing about it changes here).
+a tools.schema.Claim, then reuses Phase 3's reconciler (the same logic Phase 7
+reuses as the RLVR reward function). Passes through the same `as_of` cutoff used
+for period/concept resolution so fact-matching inside the reconciler stays
+bitemporally consistent too — see tools/reconciler.py's `_find_fact` docstring.
 """
 
 from typing import Protocol
@@ -70,7 +72,7 @@ class RealVerificationAgent:
             unit=current_fact.unit,
         )
 
-        result = reconcile(claim, facts)
+        result = reconcile(claim, facts, as_of=as_of)
         return VerificationOutcome(
             verdict=result.verdict,
             explanation=result.explanation,
