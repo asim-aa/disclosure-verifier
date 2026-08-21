@@ -28,6 +28,46 @@ because there's no side effect to deduplicate.
 method that returns a concrete value or raises — there's no "silently doesn't
 finish" state a synchronous Python function call can be in. Termination is
 structurally guaranteed by the call convention, not something that needed adding.
+In the options-formalism vocabulary (a sub-agent as ⟨I, π, β⟩ — an initiation
+set, a policy, and a termination condition), β is exactly "returns or raises,"
+checkable by inspection rather than by runtime monitoring.
+
+**No growing context to reclaim.** `Coordinator.run()` processes one MD&A chunk
+at a time and calls `ExtractionAgent.extract(chunk.text)` with a single
+paragraph, no accumulated history — confirmed by reading the actual signature
+(`agents/extraction_agent.py`) and the coordinator's loop (`agents/coordinator.py`),
+not assumed. There is no session-length context window that grows across a
+filing's run for compress/delegate/externalize to manage: each extraction call
+is independently bounded, and the Reconciler is a pure arithmetic function with
+no context at all. The Reclamation Trilemma (compress/delegate/externalize)
+targets long-running, context-accumulating loops; this pipeline structurally
+isn't one, so the pattern doesn't apply — checked against the actual call
+signatures, not asserted from the architecture description alone.
+
+**Checkpoint granularity makes resume idempotent by construction.** Reading
+`agents/checkpoint.py` and `Coordinator.run()`'s loop together: a chunk's claims
+are only added to `processed` and only checkpointed (`checkpoint_store.save`,
+which serializes the *entire* accumulated `verified_claims` list) after every
+claim in that chunk has been verified — never partway through. A crash mid-chunk
+loses at most that one chunk's in-flight work; on resume, `load()` restores the
+last fully-committed state and the loop re-processes exactly the unprocessed
+chunks (`if chunk.chunk_index in processed: continue`). Since `extract()` and
+`verify()` are effectively pure functions of their inputs (no side effects
+beyond the return value), re-running a chunk that never got checkpointed
+produces the same result, not a duplicate one. This is why no idempotency-key
+scheme (a caller-minted UUID mapped to a cached result) is needed for the
+resume path specifically: the chunk-level all-or-nothing commit already
+prevents any double-effect, by construction rather than by an added key.
+
+**Delegation interface completeness.** Checked whether anything a sub-agent
+computes is silently dropped before it reaches the final `Report` — the risk
+being that a sub-agent's report to its caller is a lossy summary, and whatever
+it omits is gone for good. It isn't, currently: `VerificationOutcome` and
+`VerifiedClaim` (`agents/schema.py`) both carry the *entire*
+`ReconciliationResult` object (verdict, computed_value, difference, tolerance,
+reason_code, all citations), not a trimmed subset, and `Coordinator.run()`
+passes it straight through unchanged. There's no report-shaped bottleneck
+between Verification and the final output today.
 
 ## Bitemporal correctness (implemented)
 
@@ -75,6 +115,25 @@ every accepted claim is trustworthy regardless of upstream extraction quality, o
 this test surface. Small n keeps this illustrative, not statistically tight — the
 same caveat that applies to the DSPy noise-floor finding above.
 
+## The four-exit taxonomy — only two of four apply here
+
+The standard run-level stop-rule taxonomy names four exits: success, insolvency
+(budget spent), futility (a stuck/doom loop detected), and deference (the system
+concludes its own uncertainty and escalates to a human). Checked against this
+project's actual outcomes rather than forcing all four to fit:
+
+- **Success** and **insolvency** are real and already modeled — `Report.partial`
+  and `Report.partial_reason` (set from `Budget.exceeded_reason`) are exactly
+  this distinction today.
+- **Futility** has no detector, deliberately — see "Doom-loop detection" below;
+  there's no autonomous retry loop for one to fire on.
+- **Deference** has no *run-level* analog — there's no human-escalation path for
+  the Coordinator to invoke. But the idea shows up one level down: a per-claim
+  `unverifiable` verdict *is* the system declining to force a verdict it doesn't
+  have the data to support, which is deference's substance without its
+  machinery. Worth naming explicitly rather than pretending a four-way taxonomy
+  cleanly covers a run shape that only has two of its four exits.
+
 ## Explicitly out of scope (considered, not silently omitted)
 
 **Sagas / compensating actions for irreversible effects.** Doesn't apply — all
@@ -86,15 +145,17 @@ communication).** Doesn't apply — MD&A prose is public filing text, not
 adversarial injected content; the system holds no private data and makes no
 outbound communication beyond read-only EDGAR requests.
 
-**Doom-loop detection and context-reclamation (compress/delegate/externalize).**
-Both target failure modes of a long-running, unsupervised multi-turn agent loop.
-This project doesn't have one — the coordinator is a fixed-sequence pipeline
-(retrieval → extraction → verification, each a bounded synchronous call), not an
-autonomous loop that can get stuck retrying, and each filing's run completes in
-one pass rather than accumulating context across an open-ended session. The
-`Budget`/checkpoint harness (`agents/checkpoint.py`) already covers the actual
-risk this architecture has — an expensive run with no cost cap — without needing
-stuck-detection machinery for a loop shape that isn't present.
+**Doom-loop detection (`E[Δq] ≈ 0` over a sliding window).** Targets a failure
+mode of a long-running, unsupervised multi-turn agent loop that keeps retrying
+without making progress. This project doesn't have that loop shape — the
+coordinator is a fixed-sequence pipeline (retrieval → extraction →
+verification, each a bounded synchronous call per chunk), not an autonomous
+loop that can get stuck retrying the same step. (Context-reclamation, the
+sibling concern this pattern is usually paired with, is addressed separately
+above with its own code-verified finding, not lumped in here by assumption.)
+The `Budget`/checkpoint harness (`agents/checkpoint.py`) already covers the
+actual risk this architecture has — an expensive run with no cost cap —
+without needing stuck-detection machinery for a loop shape that isn't present.
 
 **Progressive disclosure of tool descriptions.** Targets dynamic tool selection
 (an agent choosing among many tools per turn, where irrelevant tool detail in
