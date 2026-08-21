@@ -9,3 +9,4 @@ venv/
 .DS_Store
 data/raw/
 data/cache/
+data/checkpoints/

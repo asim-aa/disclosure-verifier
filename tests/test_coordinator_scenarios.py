@@ -39,21 +39,21 @@ CLAIM = ExtractedClaim(
 )
 
 
-def make_coordinator(outcome: VerificationOutcome) -> Coordinator:
+def make_coordinator(outcome: VerificationOutcome, checkpoint_dir) -> Coordinator:
     retrieval = MockRetrievalAgent(chunks=[CHUNK], facts=[])
     extraction = MockExtractionAgent(canned={CHUNK.text: [CLAIM]})
     verification = MockVerificationAgent(outcomes=[outcome])
-    return Coordinator(retrieval, extraction, verification)
+    return Coordinator(retrieval, extraction, verification, checkpoint_dir=checkpoint_dir)
 
 
 # ---------- the 3 required scenarios ----------
 
 
-def test_scenario_claim_is_consistent():
+def test_scenario_claim_is_consistent(tmp_path):
     outcome = VerificationOutcome(
         verdict=VERDICT_CONSISTENT, explanation="Matches EDGAR data.", citations=["0000000001-26-000001"]
     )
-    report = make_coordinator(outcome).run("ACME")
+    report = make_coordinator(outcome, tmp_path).run("ACME")
 
     assert len(report.verified_claims) == 1
     vc = report.verified_claims[0]
@@ -63,21 +63,21 @@ def test_scenario_claim_is_consistent():
     assert vc.citations == ["0000000001-26-000001"]
 
 
-def test_scenario_claim_is_inconsistent():
+def test_scenario_claim_is_inconsistent(tmp_path):
     outcome = VerificationOutcome(
         verdict=VERDICT_INCONSISTENT, explanation="Does not match EDGAR data.", citations=["0000000001-26-000001"]
     )
-    report = make_coordinator(outcome).run("ACME")
+    report = make_coordinator(outcome, tmp_path).run("ACME")
 
     assert len(report.verified_claims) == 1
     assert report.verified_claims[0].verdict == VERDICT_INCONSISTENT
 
 
-def test_scenario_claim_cannot_be_verified_missing_data():
+def test_scenario_claim_cannot_be_verified_missing_data(tmp_path):
     outcome = VerificationOutcome(
         verdict=VERDICT_UNVERIFIABLE, explanation="No reported data for this period.", citations=[]
     )
-    report = make_coordinator(outcome).run("ACME")
+    report = make_coordinator(outcome, tmp_path).run("ACME")
 
     assert len(report.verified_claims) == 1
     vc = report.verified_claims[0]
@@ -88,7 +88,7 @@ def test_scenario_claim_cannot_be_verified_missing_data():
 # ---------- routing / aggregation correctness ----------
 
 
-def test_chunk_with_no_claims_is_skipped_not_errored():
+def test_chunk_with_no_claims_is_skipped_not_errored(tmp_path):
     empty_chunk = TextChunk(
         ticker="ACME", cik="0000000001", accession_number="a", form="10-K",
         filing_date="2026-01-01", section="MD&A", chunk_index=1, text="Boilerplate with no numbers.",
@@ -96,14 +96,14 @@ def test_chunk_with_no_claims_is_skipped_not_errored():
     retrieval = MockRetrievalAgent(chunks=[empty_chunk], facts=[])
     extraction = MockExtractionAgent(canned={})  # no claims for any paragraph
     verification = MockVerificationAgent(outcomes=[])
-    report = Coordinator(retrieval, extraction, verification).run("ACME")
+    report = Coordinator(retrieval, extraction, verification, checkpoint_dir=tmp_path).run("ACME")
 
     assert report.verified_claims == []
     decisions = [e for e in report.trace if e.kind == "decision" and e.action == "skip_empty_chunk"]
     assert len(decisions) == 1
 
 
-def test_multiple_chunks_mixed_verdicts_all_captured():
+def test_multiple_chunks_mixed_verdicts_all_captured(tmp_path):
     chunk_a = TextChunk(
         ticker="ACME", cik="0000000001", accession_number="a", form="10-K",
         filing_date="2026-01-01", section="MD&A", chunk_index=0, text="Revenue was $100.",
@@ -123,16 +123,16 @@ def test_multiple_chunks_mixed_verdicts_all_captured():
             VerificationOutcome(verdict=VERDICT_UNVERIFIABLE, explanation="no data", citations=[]),
         ]
     )
-    report = Coordinator(retrieval, extraction, verification).run("ACME")
+    report = Coordinator(retrieval, extraction, verification, checkpoint_dir=tmp_path).run("ACME")
 
     assert len(report.verified_claims) == 2
     verdicts = {vc.verdict for vc in report.verified_claims}
     assert verdicts == {VERDICT_CONSISTENT, VERDICT_UNVERIFIABLE}
 
 
-def test_report_summary_counts_tool_calls_and_decisions_and_verdicts():
+def test_report_summary_counts_tool_calls_and_decisions_and_verdicts(tmp_path):
     outcome = VerificationOutcome(verdict=VERDICT_CONSISTENT, explanation="", citations=["x"])
-    report = make_coordinator(outcome).run("ACME")
+    report = make_coordinator(outcome, tmp_path).run("ACME")
     summary = report.summary()
 
     assert summary["ticker"] == "ACME"
@@ -145,13 +145,14 @@ def test_report_summary_counts_tool_calls_and_decisions_and_verdicts():
     assert summary["tool_calls_by_agent"]["verification"] == 1
     assert summary["time_to_first_action_seconds"] is not None
     assert summary["n_reasoning_steps"] >= 3  # chunks_retrieved, facts_retrieved, claim_verdict
+    assert summary["partial"] is False
 
 
-def test_empty_ticker_no_chunks_produces_empty_report_not_a_crash():
+def test_empty_ticker_no_chunks_produces_empty_report_not_a_crash(tmp_path):
     retrieval = MockRetrievalAgent(chunks=[], facts=[])
     extraction = MockExtractionAgent(canned={})
     verification = MockVerificationAgent(outcomes=[])
-    report = Coordinator(retrieval, extraction, verification).run("EMPTY")
+    report = Coordinator(retrieval, extraction, verification, checkpoint_dir=tmp_path).run("EMPTY")
 
     assert report.verified_claims == []
     assert report.summary()["n_claims"] == 0
