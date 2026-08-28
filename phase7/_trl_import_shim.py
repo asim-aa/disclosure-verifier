@@ -1,17 +1,33 @@
 """Workaround for an upstream packaging gap, not anything about our own code:
-trl 0.24's GRPOTrainer unconditionally imports two optional integrations
-(llm_blender for a judge class we never use, weave for W&B-style tracing we
-don't use either) that aren't declared as real dependencies and, in llm_blender's
-case, are broken outright against a current `transformers` (it imports
-`TRANSFORMERS_CACHE`, removed years ago). Installing them for real doesn't fix
-it — llm_blender is unmaintained and incompatible regardless of version, and
-trl's own `is_weave_available()` check appears to return a false positive
-in this environment even when `weave` isn't installed.
+`trl.trainer.grpo_trainer` (and modules it imports) unconditionally imports
+several optional integrations this project never uses, each gated behind an
+`is_X_available()` check — and on this training environment specifically,
+those checks have repeatedly returned a false positive (package "found" via
+`importlib.util.find_spec`, but not actually importable/usable) rather than
+correctly reporting the package isn't really there. Confirmed empirically,
+one at a time, as each one crashed a real training run in turn: `is_weave_available()`
+(trl 0.24), then `is_vllm_available()` and `is_vllm_ascend_available()` (both
+trl 0.18.0, both reachable from `trl.extras.vllm_client` AND from
+`grpo_trainer.py`'s own `from vllm import LLM, SamplingParams` gate).
 
-Since neither integration is reachable from anything GRPO training actually
-does (no LLM-judge callback, no W&B/weave logging configured), stub them out
-in sys.modules before trl's grpo_trainer module is ever imported, rather than
-chase a dependency chain for functionality this project doesn't use.
+None of llm_blender, weave, vllm, vllm_ascend, or liger_kernel are reachable
+from anything this project's training/evaluation actually does — no LLM-judge
+callback, no W&B/weave logging, no `use_vllm=True` anywhere (see
+train_grpo.py's `FastLanguageModel.from_pretrained` comment on why
+`fast_inference` is deliberately off), no Liger fused loss configured.
+
+Given the check function itself is what's unreliable here, patching the
+`is_X_available()` functions directly (rather than faking every individual
+downstream module those gates import) is the robust fix: it makes every gate
+that reads them correctly skip the optional-integration branch, in trl's
+`grpo_trainer.py` and in every module it imports, in one place, instead of
+chasing each newly-discovered import site as it's individually hit. `weave`
+and `llm_blender` are additionally stubbed directly, since they're imported
+unconditionally by `trl.trainer.judges`/`trl.trainer.callbacks` at module
+scope (not behind a same-module `is_X_available()` gate this shim patches).
+`wandb`/`comet_ml` are stubbed too as cheap insurance against the same
+false-positive pattern recurring for them, though not yet individually
+confirmed to.
 
 Import this module *before* `from trl import GRPOConfig, GRPOTrainer` anywhere
 in phase7/ — see train_grpo.py and evaluate.py.
@@ -40,6 +56,20 @@ def install() -> None:
     weave_trace_context = _stub("weave.trace.context")
     weave_trace_context.weave_client_context = object
     weave.trace = weave_trace
+
+    _stub("wandb")
+    _stub("comet_ml")
+
+    # The robust fix: patch trl's own availability checks to correctly report
+    # "not available" for integrations this project never uses, rather than
+    # faking every module these checks gate. Import trl.import_utils directly
+    # (not `import trl`) so this patches the checks before trl.trainer.* ever
+    # reads them, without triggering trl's own top-level package import yet.
+    import trl.import_utils as trl_import_utils
+
+    trl_import_utils.is_vllm_available = lambda: False
+    trl_import_utils.is_vllm_ascend_available = lambda: False
+    trl_import_utils.is_liger_kernel_available = lambda: False
 
 
 install()
