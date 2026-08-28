@@ -11,7 +11,10 @@ them through full resolution would produce a dataset that's mostly "unverifiable
 with little arithmetic-reasoning signal. Building directly from resolved
 (concept, ticker, period) triples with the 14 concepts resolver.py *does* handle
 avoids that entirely, and there's abundant real data to draw from (see the concept
-coverage printed by this script).
+coverage printed by this script). "14 concepts" was resolver.py's scope when this
+was first written; it's since grown to 32 (see agents/resolver.py's module
+docstring) - RESOLVABLE_CONCEPTS below tracks that dictionary directly rather than
+hard-coding a count, so this file doesn't go stale the next time it grows again.
 
 Run: uv run python -m phase7.build_dataset
 """
@@ -37,12 +40,36 @@ TICKERS = {"0000320193": "AAPL", "0000789019": "MSFT", "0001045810": "NVDA"}
 RESOLVABLE_CONCEPTS = sorted({c for cands in METRIC_TO_CONCEPTS.values() for c in cands})
 
 # (numerator, denominator) pairs that make a real, checkable ratio — mirrors the
-# margin claims that actually appear in MD&A prose ("gross margin", "operating margin").
+# margin claims that actually appear in MD&A prose ("gross margin", "operating
+# margin", "net margin", "R&D as a percent of revenue", ...).
+#
+# bps_change came out the smallest RLVR training category (8.7% of train, vs.
+# 43.3% for absolute) even after the original 2-pair set below was tried - not
+# because bps_change claims are rare in the reward-function sense, but because
+# this generator only produces one per (ticker, ratio pair, sampled period pair),
+# and 2 real distinct ratios (gross margin, operating margin - the *Revenues vs
+# *RevenueFromContractWithCustomerExcludingAssessedTax entries are the same ratio
+# under a company's two possible revenue tags, not a second ratio) was a narrow
+# base to draw from. The 5 pairs added below use concepts already present in
+# RESOLVABLE_CONCEPTS after agents/resolver.py's dictionary expansion - each
+# confirmed present in the cached AAPL/MSFT/NVDA data before adding (SG&A is
+# absent for MSFT, CostOfRevenue is absent for AAPL; both degrade gracefully via
+# the "concept not in by_concept: continue" check below, same as any other pair).
 RATIO_PAIRS = [
     ("GrossProfit", "Revenues"),
     ("GrossProfit", "RevenueFromContractWithCustomerExcludingAssessedTax"),
     ("OperatingIncomeLoss", "Revenues"),
     ("OperatingIncomeLoss", "RevenueFromContractWithCustomerExcludingAssessedTax"),
+    ("NetIncomeLoss", "Revenues"),
+    ("NetIncomeLoss", "RevenueFromContractWithCustomerExcludingAssessedTax"),
+    ("ResearchAndDevelopmentExpense", "Revenues"),
+    ("ResearchAndDevelopmentExpense", "RevenueFromContractWithCustomerExcludingAssessedTax"),
+    ("SellingGeneralAndAdministrativeExpense", "Revenues"),
+    ("SellingGeneralAndAdministrativeExpense", "RevenueFromContractWithCustomerExcludingAssessedTax"),
+    ("CostOfRevenue", "Revenues"),
+    ("CostOfRevenue", "RevenueFromContractWithCustomerExcludingAssessedTax"),
+    ("OperatingExpenses", "Revenues"),
+    ("OperatingExpenses", "RevenueFromContractWithCustomerExcludingAssessedTax"),
 ]
 
 PERTURBATION_KINDS = ["sign_flip", "magnitude_1000x", "magnitude_0001x", "near_miss", "large_miss"]
