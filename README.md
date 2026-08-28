@@ -140,6 +140,7 @@ A real 10-K MD&A can run 100+ paragraphs, each needing its own LLM call. The coo
 tools/    MCP servers — Filing Retriever, MD&A Extractor, Numerical Reconciler (Pillar 1)
 eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (Pillar 2)
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
+phase6/   End-to-end integration-at-scale run (real Coordinator, 5 companies, no mocks)
 phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scripts (Pillar 4, GPU-only)
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
@@ -165,4 +166,4 @@ pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 
 ## Status
 
-Phases 0–5 and 7 complete (scaffolding, all 3 Pillar-1 MCP tools, DSPy optimization, hierarchical orchestration with mock scenario tests, RLVR/GRPO fine-tuning with a noise-floor-checked result — see [`docs/phase7-results.md`](docs/phase7-results.md)). Phase 6 (end-to-end integration at scale) remains.
+**All phases (0–7) complete.** Phase 6 (end-to-end integration at scale — the real Coordinator, no mocks, run against 5 companies including 2 never used during development) surfaced two honest, well-diagnosed coverage gaps rather than a clean pass: the resolver's 14-concept scope doesn't cover most real MD&A prose (dominated by segment/product-specific figures), and MD&A heading detection doesn't generalize past the 3 companies it was built against (confirmed root cause for both — see [`docs/phase6-results.md`](docs/phase6-results.md)). Zero crashes across the batch; the harness held up, the coverage claims didn't, and that distinction is the actual finding.
