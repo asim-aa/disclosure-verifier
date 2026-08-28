@@ -37,7 +37,7 @@ class RealVerificationAgent:
             )
 
         try:
-            current_fact, comparison_fact = resolve_periods(facts, concept, as_of=as_of)
+            current_fact, comparison_fact = resolve_periods(facts, concept, as_of=as_of, period_hint=extracted.period)
         except ValueError as exc:
             return VerificationOutcome(verdict=VERDICT_UNVERIFIABLE, explanation=str(exc), citations=[])
 

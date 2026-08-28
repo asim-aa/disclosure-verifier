@@ -128,7 +128,9 @@ The interesting engineering in this project wasn't writing the happy path — it
 
 - **The same bitemporal bug, found a second time via a tool-contract audit.** Reading `tools/numerical_reconciler.py`'s MCP tool docstring as if deciding how to call it (the "read it like the calling model would" discipline) surfaced that `reconcile_claim` — the literal Pillar 1 tool, callable independently of the Coordinator — never exposed an `as_of` parameter at all, so a direct caller had no bitemporal protection even after the agent-path fix above landed. Fixed by adding `as_of` to the tool's signature and threading it into `reconcile()`. [`tools/numerical_reconciler.py`](tools/numerical_reconciler.py)
 
-One limitation is still open and documented rather than hidden: the verification agent can distinguish "the source filing's own period" from "the next most recent one," but doesn't yet parse a claim's *stated* period text (e.g. distinguishing a paragraph's FY2026 figure from its FY2025 comparison in the same sentence) — so a claim about an explicitly non-current period can still resolve against the wrong one. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
+- **A claim's own stated period was being ignored entirely.** `resolve_periods()` always picked the globally most-recent fact as "current," regardless of what the claim's `period` text actually said — so two claims from the same sentence naming two different fiscal years ("Income tax expense was $21.4 billion and $11.1 billion for fiscal years 2026 and 2025, respectively") both resolved to the *same* (current, comparison) pair, and the FY2025 claim ended up checked against the FY2026 fact. Confirmed against this exact live NVDA sentence: without a hint, the FY2025 claim's "current" resolved to the FY2026 annual figure ($21.38B) against a $13.9B quarterly comparison — nonsensical. Fixed by threading the claim's own period text through as a hint: an explicit fiscal year ("fiscal year 2025", "FY2025") now picks that year's fact as current; "sequentially" vs. "a year ago"/"year-over-year" now correctly select the immediately-preceding period vs. the same period ~12 months back for `growth_pct` claims, instead of always picking "next most recent" regardless of which the text meant. Re-run against the same live sentence: both the FY2026 and FY2025 income-tax claims now independently resolve `consistent` against their own correct periods. [`agents/resolver.py`](agents/resolver.py)
+
+One limitation is still open and documented rather than hidden: a *named quarter* in prose ("the September quarter", "the third quarter") still isn't parsed into a specific fiscal period — real filings name quarters inconsistently (calendar month vs. fiscal quarter number) in ways that risk a wrong-but-confident match, so that case still falls back to the default "most recent" pick rather than guessing. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
 
 ## Harness: budget and checkpointing
 
@@ -159,7 +161,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 181 unit tests, no network/LLM required
+pytest -v                 # 188 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

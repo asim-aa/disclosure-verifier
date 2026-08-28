@@ -4,7 +4,10 @@ from agents.resolver import resolve_concept, resolve_periods
 from tools.schema import FinancialFact
 
 
-def fact(concept, value, period_start, period_end, accn="a", filed="2026-01-01", unit="USD"):
+def fact(
+    concept, value, period_start, period_end, accn="a", filed="2026-01-01", unit="USD",
+    fiscal_year=2026, fiscal_period="FY",
+):
     return FinancialFact(
         ticker="MSFT",
         cik="0000789019",
@@ -14,8 +17,8 @@ def fact(concept, value, period_start, period_end, accn="a", filed="2026-01-01",
         unit=unit,
         period_start=period_start,
         period_end=period_end,
-        fiscal_year=2026,
-        fiscal_period="FY",
+        fiscal_year=fiscal_year,
+        fiscal_period=fiscal_period,
         form="10-K",
         filed=filed,
         accession_number=accn,
@@ -181,6 +184,98 @@ def test_resolve_periods_ignores_other_concepts():
     current, _comparison = resolve_periods(facts, "Revenues")
     assert current.concept == "Revenues"
     assert (current.period_start, current.period_end) == ("2024-01-01", "2024-12-31")
+
+
+# ---------- period_hint ----------
+
+
+def test_resolve_periods_period_hint_fixes_the_documented_nvda_bug():
+    """Regression test for the exact bug flagged in the module docstring,
+    confirmed against live NVDA data: 'Income tax expense was $21.4 billion and
+    $11.1 billion for fiscal years 2026 and 2025, respectively' is extracted as
+    two claims, one per stated year. Without period_hint both resolved to the
+    SAME (current, comparison) pair; with it, each resolves to its own year."""
+    facts = [
+        fact("IncomeTaxExpenseBenefit", 21_400_000_000, "2025-01-27", "2026-01-25", fiscal_year=2026),
+        fact("IncomeTaxExpenseBenefit", 11_100_000_000, "2024-01-29", "2025-01-26", fiscal_year=2025),
+        fact("IncomeTaxExpenseBenefit", 5_000_000_000, "2023-01-30", "2024-01-28", fiscal_year=2024),
+    ]
+    current_2026, comparison_2026 = resolve_periods(
+        facts, "IncomeTaxExpenseBenefit", period_hint="fiscal year 2026"
+    )
+    assert current_2026.value == 21_400_000_000
+    assert comparison_2026.value == 11_100_000_000
+
+    current_2025, comparison_2025 = resolve_periods(
+        facts, "IncomeTaxExpenseBenefit", period_hint="fiscal year 2025"
+    )
+    assert current_2025.value == 11_100_000_000
+    assert comparison_2025.value == 5_000_000_000  # FY2024, not FY2026 - not "backwards"
+
+
+def test_resolve_periods_period_hint_recognizes_fy_shorthand():
+    facts = [
+        fact("Revenues", 200, "2025-01-01", "2026-12-31", fiscal_year=2026),
+        fact("Revenues", 180, "2024-01-01", "2024-12-31", fiscal_year=2025),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="FY2025")
+    assert current.value == 180
+
+
+def test_resolve_periods_unparseable_hint_falls_back_to_default():
+    facts = [
+        fact("Revenues", 200, "2025-01-01", "2025-12-31"),
+        fact("Revenues", 180, "2024-01-01", "2024-12-31"),
+    ]
+    current, comparison = resolve_periods(facts, "Revenues", period_hint="the September quarter")
+    assert current.value == 200  # unchanged default: most recent
+    assert comparison.value == 180
+
+
+def test_resolve_periods_hinted_year_not_found_falls_back_to_default():
+    facts = [fact("Revenues", 200, "2025-01-01", "2025-12-31", fiscal_year=2025)]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="fiscal year 1999")
+    assert current.value == 200  # no FY1999 data - falls back rather than erroring
+
+
+def test_resolve_periods_sequential_picks_immediately_preceding_same_length_period():
+    """'sequentially' means prior quarter, not same quarter last year - a
+    quarterly current period should pick the nearest prior quarter, skipping
+    over a same-length period from a year further back and any annual figures
+    mixed into the same concept's fact history."""
+    facts = [
+        fact("Revenues", 100, "2026-01-01", "2026-03-31"),  # current: Q1 FY2026
+        fact("Revenues", 90, "2025-10-01", "2025-12-31"),  # immediately prior quarter
+        fact("Revenues", 80, "2025-01-01", "2025-03-31"),  # same quarter last year
+        fact("Revenues", 350, "2025-01-01", "2025-12-31"),  # FY2025 annual - different length
+    ]
+    current, comparison = resolve_periods(facts, "Revenues", period_hint="sequentially")
+    assert current.value == 100
+    assert comparison.value == 90
+
+
+def test_resolve_periods_year_ago_picks_same_quarter_prior_year_not_prior_quarter():
+    facts = [
+        fact("Revenues", 100, "2026-01-01", "2026-03-31"),  # current: Q1 FY2026
+        fact("Revenues", 90, "2025-10-01", "2025-12-31"),  # immediately prior quarter
+        fact("Revenues", 80, "2025-01-01", "2025-03-31"),  # same quarter last year
+    ]
+    current, comparison = resolve_periods(facts, "Revenues", period_hint="up 25% from a year ago")
+    assert current.value == 100
+    assert comparison.value == 80
+
+
+def test_resolve_periods_year_ago_ignores_a_match_outside_tolerance():
+    """A same-length candidate that isn't actually ~1 year back (e.g. a
+    fiscal-calendar quirk landing it 4+ months off) shouldn't be guessed at -
+    falls back to the default pick instead of a wrong 'year ago' match."""
+    facts = [
+        fact("Revenues", 100, "2026-01-01", "2026-03-31"),
+        fact("Revenues", 90, "2025-06-01", "2025-08-31"),  # ~7 months back, same length - too far for "year ago"
+    ]
+    current, comparison = resolve_periods(facts, "Revenues", period_hint="a year ago")
+    assert current.value == 100
+    assert comparison.value == 90  # default fallback still finds it, just not via the year-ago path
 
 
 # ---------- concepts added after Phase 6's integration-at-scale run ----------
