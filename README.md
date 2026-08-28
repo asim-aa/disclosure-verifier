@@ -14,7 +14,7 @@ Public companies make thousands of quantitative claims a year in MD&A prose — 
                    inconsistent (EDGAR implies 46.09% growth, not 65%)
 ```
 
-Built as the capstone for the SupportVectors AI Agents Bootcamp, against four required pillars: real MCP tools, a DSPy-optimized prompt with a measured baseline delta, a justified multi-agent architecture, and (pending compute) RLVR/GRPO fine-tuning.
+Built as the capstone for the SupportVectors AI Agents Bootcamp, against four required pillars: real MCP tools, a DSPy-optimized prompt with a measured baseline delta, a justified multi-agent architecture, and RLVR/GRPO fine-tuning with a noise-floor-checked before/after result.
 
 📄 **[Read the full case study (PDF)](docs/case-study.pdf)** — results, a live example, and the real bugs found along the way.
 
@@ -46,6 +46,7 @@ Three independent tools (Pillar 1) wired into a hierarchical pipeline (Pillar 3)
 | **Extraction Agent** | DSPy-optimized signature — prose → structured claims | [`eval/dspy_extractor.py`](eval/dspy_extractor.py) |
 | **Verification Agent** | Resolves free-text claims to exact XBRL concepts, then reconciles | [`agents/verification_agent.py`](agents/verification_agent.py) |
 | **Coordinator** | Routes the pipeline; enforces a budget; checkpoints for resume | [`agents/coordinator.py`](agents/coordinator.py) |
+| **RLVR/GRPO fine-tuning** | Trains reconciliation-reasoning via the Reconciler-derived reward | [`phase7/train_grpo.py`](phase7/train_grpo.py) |
 
 ## Results
 
@@ -82,7 +83,18 @@ Separately: `eval/run_comparison.py`'s original DSPy optimization metric (`dspy_
 
 The audit also lets us apply the maker/checker precision-ceiling formula — `Pr(correct | accepted) = pr / (pr + (1-p)f)`, where `p` is extraction precision, `r` is verifier recall, and `f` is verifier false-positive rate — to state what actually bounds end-to-end system accuracy. From the audit's cases: `r = 1.000` (6/6), `f = 0.000` (0/8, ~0.375 95% upper bound by the rule of three at this sample size). With the DSPy-optimized extraction precision (`p = 0.763`), the formula gives a ceiling of **1.000** — a f=0 verifier means every claim it accepts as "consistent" is trustworthy regardless of upstream extraction precision, on this test surface. The small n keeps this illustrative rather than statistically tight, same caveat as the noise-floor finding above.
 
-Reward-shaping design for Phase 7 itself — not yet built, pending GPU compute — is recorded in [`docs/phase7-reward-design.md`](docs/phase7-reward-design.md).
+Reward-shaping design for Phase 7 was recorded in [`docs/phase7-reward-design.md`](docs/phase7-reward-design.md) before any GPU time was spent on it — full results below.
+
+**Pillar 4 — RLVR/GRPO fine-tuning**, measured the same way as Pillar 2: baseline vs. trained, checked against the noise floor, not just reported as a raw delta. `Qwen2.5-7B-Instruct` (QLoRA, LoRA rank 32, via Unsloth) trained on a single RTX 4090, using the shaped Reconciler-derived reward to learn reconciliation-*reasoning* — given already-resolved claim values, reason to a verdict, rather than calling `reconcile()` directly:
+
+| | baseline (zero-shot) | trained (1 epoch, 1,300 GRPO steps) |
+|---|---|---|
+| accuracy | 0.766 | **0.855** |
+| mean reward | 0.633 | **0.826** |
+| false-consistent rate (dangerous case) | 0.148 | **0.036** |
+| format failures | 1/304 | **0/304** |
+
+At n=304, the accuracy delta (+0.089) clears its 95% noise floor (±0.062) and the false-consistent-rate drop (−0.112) clears its own (±0.045) — both are real, not sampling noise. The `absolute_change` claim category shows the largest, also noise-floor-clearing gain (0.589→0.821). `bps_change` — the hardest category (two ratios, then a basis-point difference) — moved (0.233→0.400) but not provably at its small n=30. Full breakdown, a worked before/after example, and the three real upstream packaging bugs found getting here: [`docs/phase7-results.md`](docs/phase7-results.md).
 
 **A real, current end-to-end run** (NVDA's FY2026 10-K, live EDGAR + live LLM, no cached answers):
 
@@ -94,7 +106,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 147 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 172 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 ## What actually broke, and how it got caught
 
@@ -128,8 +140,10 @@ A real 10-K MD&A can run 100+ paragraphs, each needing its own LLM call. The coo
 tools/    MCP servers — Filing Retriever, MD&A Extractor, Numerical Reconciler (Pillar 1)
 eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (Pillar 2)
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
+phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scripts (Pillar 4, GPU-only)
+docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
-tests/    139 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    164 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -144,11 +158,11 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 139 unit tests, no network/LLM required
+pytest -v                 # 164 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```
 
 ## Status
 
-Phases 0–5 complete (scaffolding, all 3 Pillar-1 MCP tools, DSPy optimization, hierarchical orchestration with mock scenario tests). Phase 6 (end-to-end integration at scale) and Phase 7 (RLVR/GRPO fine-tuning, pending GPU compute) remain.
+Phases 0–5 and 7 complete (scaffolding, all 3 Pillar-1 MCP tools, DSPy optimization, hierarchical orchestration with mock scenario tests, RLVR/GRPO fine-tuning with a noise-floor-checked result — see [`docs/phase7-results.md`](docs/phase7-results.md)). Phase 6 (end-to-end integration at scale) remains.

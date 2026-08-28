@@ -1,8 +1,10 @@
-# Phase 7 reward design (planning doc — not yet built, pending GPU compute)
+# Phase 7 reward design (built and run — see docs/phase7-results.md for outcomes)
 
-This records a design decision made *before* any GRPO training run, so it doesn't
-get made ad hoc once compute is available and there's pressure to just start. No
-code here — this is what to build when Phase 7 starts.
+This records the design decisions made *before* any GRPO training run, so they
+weren't made ad hoc once compute became available and there was pressure to just
+start. Everything below was written before a single training step ran; the
+result of actually building and running it is in
+[`docs/phase7-results.md`](phase7-results.md).
 
 ## Shaped, not sparse
 

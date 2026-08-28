@@ -18,6 +18,21 @@ dev = [
     "pytest-asyncio>=0.24.0",
     "ruff>=0.6.0",
 ]
+# Phase 7 (RLVR/GRPO fine-tuning) — heavy, GPU-only, installed separately on the
+# training box (not needed for the rest of the project). See phase7/README.md.
+phase7 = [
+    "torch>=2.5.0",
+    "transformers>=4.46.0",
+    "accelerate>=1.0.0",
+    "peft>=0.13.0",
+    "trl>=0.12.0",
+    "bitsandbytes>=0.44.0",
+    "datasets>=3.0.0",
+    "unsloth",
+    "unsloth_zoo",
+    "mergekit",  # trl 0.24's GRPOTrainer imports this internally; not auto-pulled as a dependency
+    "llm-blender",  # ditto — pulled in transitively via trl.trainer.callbacks -> trl.trainer.judges
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
