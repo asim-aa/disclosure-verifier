@@ -106,7 +106,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 172 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 176 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 ## What actually broke, and how it got caught
 
@@ -144,7 +144,7 @@ phase6/   End-to-end integration-at-scale run (real Coordinator, 5 companies, no
 phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scripts (Pillar 4, GPU-only)
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
-tests/    164 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    168 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -159,11 +159,11 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 164 unit tests, no network/LLM required
+pytest -v                 # 168 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```
 
 ## Status
 
-**All phases (0–7) complete.** Phase 6 (end-to-end integration at scale — the real Coordinator, no mocks, run against 5 companies including 2 never used during development) surfaced two honest, well-diagnosed coverage gaps rather than a clean pass: the resolver's 14-concept scope doesn't cover most real MD&A prose (dominated by segment/product-specific figures), and MD&A heading detection doesn't generalize past the 3 companies it was built against (confirmed root cause for both — see [`docs/phase6-results.md`](docs/phase6-results.md)). Zero crashes across the batch; the harness held up, the coverage claims didn't, and that distinction is the actual finding.
+**All phases (0–7) complete.** Phase 6 (end-to-end integration at scale — the real Coordinator, no mocks, run against 5 companies including 2 never used during development) surfaced two honest, well-diagnosed coverage gaps rather than a clean pass. One is fixed and re-verified against live data: MD&A heading detection didn't generalize past the 3 companies it was built against, root-caused and fixed in `tools/mdna_parser.py` (all 5 companies now retrieve real MD&A text). The other is confirmed, not yet fixed: the resolver's 14-concept scope doesn't cover most real MD&A prose, which is dominated by segment/product-specific figures. Zero crashes across the batch throughout; the harness held up, the coverage claims didn't, and that distinction is the actual finding — see [`docs/phase6-results.md`](docs/phase6-results.md).

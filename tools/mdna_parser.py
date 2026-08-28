@@ -7,11 +7,20 @@ companies narrate their own results ("revenue grew 12% YoY...") — the same kin
 checkable claims transcripts would have provided.
 
 Section boundaries are found by matching the *body heading* text, not just the item
-number: EDGAR filings render their table of contents as separate text nodes per cell
-(e.g. "Item 7." on its own line, then the title, then a page number on other lines),
-while the real section heading is one text node combining both ("Item 7.
-Management's Discussion and Analysis..."). Matching on the combined pattern skips
-the TOC automatically without needing to special-case it.
+number — a bare "Item 7." also appears in the table of contents and in incidental
+cross-references elsewhere in the document. The item number and title can render as
+one combined text node or as separate adjacent nodes depending on the filer (Phase 6's
+integration-at-scale run found this varies: AAPL/MSFT/NVDA combine them, GOOGL/AMZN
+render the real heading the same split way a table-of-contents entry does) — so
+matching on "combined node" alone doesn't generalize, and can't be used to tell a real
+heading from a ToC entry once matching is loosened to allow the split form too.
+
+What does generalize: a real section runs for hundreds of lines of prose before the
+next Item heading; a ToC entry or a cross-reference is only ever a few lines from
+whatever comes next. Every window where the item number and title appear near each
+other is treated as a *candidate*, matched against every candidate end-of-section
+marker the same way, and the (start, end) pair with the largest gap between them wins
+— which is robust to exactly how a given filer happens to render the heading.
 """
 
 import re
@@ -57,6 +66,34 @@ class MdnaNotFoundError(RuntimeError):
     poison every claim extracted from it downstream."""
 
 
+# How many consecutive text-node lines to join when checking for a heading match —
+# covers a title split across up to this many nodes (item number, title, and one
+# more for safety) without being so wide it starts matching unrelated nearby text.
+_HEADING_WINDOW = 3
+
+
+def _find_heading_candidates(lines: list[str], pattern: re.Pattern) -> list[tuple[int, int]]:
+    """Every position where up to _HEADING_WINDOW consecutive lines, joined with a
+    space, match `pattern` — as (start_idx, end_idx_exclusive) spans. Returns every
+    candidate rather than just the first; the caller (which also knows where each
+    candidate's *next* heading falls) is what actually tells a real section heading
+    apart from a table-of-contents entry or an incidental cross-reference.
+
+    The match must *begin* within the window's first line, not merely appear
+    somewhere in the joined text — otherwise a window starting at unrelated
+    preceding prose could "absorb" a real heading that actually starts on a later
+    line, silently stealing that line from whichever section it belongs to."""
+    candidates = []
+    for i in range(len(lines)):
+        for span in range(1, _HEADING_WINDOW + 1):
+            joined = " ".join(lines[i : i + span])
+            match = pattern.search(joined)
+            if match and match.start() <= len(lines[i]):
+                candidates.append((i, i + span))
+                break  # shortest matching window for this start line
+    return candidates
+
+
 def extract_paragraphs(html: str) -> list[str]:
     """Flatten a filing's HTML into one string per block-level text node, in document
     order. Each result corresponds to a single original HTML element, so a chunk can
@@ -76,23 +113,34 @@ def extract_mdna_paragraphs(html: str, form: str) -> list[str]:
 
     lines = extract_paragraphs(html)
 
-    start_idx = next((i for i, l in enumerate(lines) if pattern.start.search(l)), None)
-    if start_idx is None:
+    start_candidates = _find_heading_candidates(lines, pattern.start)
+    if not start_candidates:
         raise MdnaNotFoundError(f"Could not locate MD&A start heading for form '{form}'")
 
-    end_idx = None
-    for end_pattern in pattern.end_candidates:
-        match = next(
-            (i for i in range(start_idx + 1, len(lines)) if end_pattern.search(lines[i])),
-            None,
-        )
-        if match is not None and (end_idx is None or match < end_idx):
-            end_idx = match
-
-    if end_idx is None:
+    end_candidates = sorted(
+        span for end_pattern in pattern.end_candidates for span in _find_heading_candidates(lines, end_pattern)
+    )
+    if not end_candidates:
         raise MdnaNotFoundError(f"Could not locate MD&A end heading for form '{form}'")
 
-    return lines[start_idx + 1 : end_idx]
+    # Pair each start candidate with the nearest end candidate strictly after it,
+    # then take the pair with the largest gap — see the module docstring for why
+    # that's what actually distinguishes the real section from a ToC entry once
+    # matching is loosened enough to catch a heading split across text nodes.
+    best: tuple[int, int, int] | None = None  # (gap, body_start, body_end)
+    for _, s_end in start_candidates:
+        e = next(((e_start, e_end) for e_start, e_end in end_candidates if e_start >= s_end), None)
+        if e is None:
+            continue
+        gap = e[0] - s_end
+        if best is None or gap > best[0]:
+            best = (gap, s_end, e[0])
+
+    if best is None:
+        raise MdnaNotFoundError(f"Could not locate MD&A end heading for form '{form}'")
+
+    _, body_start, body_end = best
+    return lines[body_start:body_end]
 
 
 def chunk_mdna(

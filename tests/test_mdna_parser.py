@@ -108,3 +108,71 @@ def test_chunk_mdna_no_chunk_is_a_mid_sentence_fragment(aapl_10k_html):
         stripped = c.text.strip()
         assert stripped == c.text  # no leading/trailing whitespace fragments
         assert stripped[-1] not in ("-",), f"looks mid-word: {stripped!r}"
+
+
+# ---------- split heading (item number and title in separate text nodes) ----------
+#
+# Phase 6's integration-at-scale run found real filers (GOOGL, AMZN) render the
+# *real* body heading exactly the way AAPL/MSFT/NVDA render only their ToC entry —
+# item number and title as separate adjacent nodes, not one combined node. This
+# synthetic fixture reproduces that shape (split ToC entry, then a long real
+# section with a split heading too) without depending on live EDGAR access.
+
+
+def _split_heading_html(body_paragraph_count: int = 60) -> str:
+    body_paragraphs = "".join(
+        f"<p>Real MD&amp;A body sentence number {i} discusses actual results in enough "
+        f"length to look like genuine prose rather than a heading or a page number.</p>"
+        for i in range(body_paragraph_count)
+    )
+    return f"""
+    <html><body>
+      <p>Item&nbsp;7.</p>
+      <p>Management's Discussion and Analysis of Financial Condition and Results of Operations</p>
+      <p>44</p>
+      <p>Item&nbsp;7A.</p>
+      <p>Quantitative and Qualitative Disclosures About Market Risk</p>
+      <p>72</p>
+      <p>Item&nbsp;8.</p>
+      <p>Financial Statements and Supplementary Data</p>
+      <p>73</p>
+
+      <p>Some unrelated intervening section text that is not part of the ToC or the
+      real MD&amp;A, included so the real section isn't merely "whatever comes
+      right after the ToC".</p>
+
+      <p>Item&nbsp;7.</p>
+      <p>Management's Discussion and Analysis of Financial Condition and Results of Operations</p>
+      {body_paragraphs}
+      <p>Item&nbsp;7A.</p>
+      <p>Quantitative and Qualitative Disclosures About Market Risk</p>
+      <p>Real Item 7A content that must not leak into the MD&amp;A section.</p>
+    </body></html>
+    """
+
+
+def test_split_heading_finds_the_real_section_not_the_table_of_contents():
+    paragraphs = extract_mdna_paragraphs(_split_heading_html(), "10-K")
+    assert any("Real MD&A body sentence number 0" in p for p in paragraphs)
+    assert any("Real MD&A body sentence number 59" in p for p in paragraphs)
+
+
+def test_split_heading_excludes_the_toc_page_number_line():
+    paragraphs = extract_mdna_paragraphs(_split_heading_html(), "10-K")
+    assert "44" not in paragraphs
+    assert "72" not in paragraphs
+
+
+def test_split_heading_stops_before_the_real_item_7a():
+    paragraphs = extract_mdna_paragraphs(_split_heading_html(), "10-K")
+    joined = " ".join(paragraphs)
+    assert "Real Item 7A content" not in joined
+
+
+def test_split_heading_with_a_short_real_section_still_prefers_it_over_the_toc():
+    """Even when the real section is shorter than usual, it should still win over
+    the ToC/cross-reference candidates as long as it's the largest gap available —
+    guards against the fix accidentally requiring a hardcoded minimum length."""
+    paragraphs = extract_mdna_paragraphs(_split_heading_html(body_paragraph_count=3), "10-K")
+    assert any("Real MD&A body sentence number 0" in p for p in paragraphs)
+    assert "44" not in paragraphs
