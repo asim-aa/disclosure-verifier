@@ -181,3 +181,42 @@ def test_resolve_periods_ignores_other_concepts():
     current, _comparison = resolve_periods(facts, "Revenues")
     assert current.concept == "Revenues"
     assert (current.period_start, current.period_end) == ("2024-01-01", "2024-12-31")
+
+
+# ---------- concepts added after Phase 6's integration-at-scale run ----------
+#
+# Each maps to a real, standard, non-dimensional us-gaap concept confirmed present
+# in real AAPL/MSFT/NVDA company-facts data (see agents/resolver.py's module
+# docstring) — distinct from the genuinely out-of-scope segment/product metrics
+# (Azure revenue, LinkedIn revenue, ...) that same run also surfaced.
+
+
+@pytest.mark.parametrize(
+    ("metric_text", "concept"),
+    [
+        ("net income", "NetIncomeLoss"),
+        ("diluted earnings per share", "EarningsPerShareDiluted"),
+        ("total assets", "Assets"),
+        ("total liabilities", "Liabilities"),
+        ("total stockholders' equity", "StockholdersEquity"),
+        ("cash and cash equivalents", "CashAndCashEquivalentsAtCarryingValue"),
+        ("research and development expense", "ResearchAndDevelopmentExpense"),
+        ("selling, general and administrative expenses", "SellingGeneralAndAdministrativeExpense"),
+        ("capital expenditures", "PaymentsToAcquirePropertyPlantAndEquipment"),
+        ("commercial remaining performance obligation", "RevenueRemainingPerformanceObligation"),
+        ("remaining performance obligation", "RevenueRemainingPerformanceObligation"),
+        ("interest expense", "InterestExpense"),
+    ],
+)
+def test_resolve_concept_resolves_newly_added_standard_concepts(metric_text, concept):
+    facts = [fact(concept, 100, "2025-01-01", "2025-12-31")]
+    assert resolve_concept(metric_text, facts) == concept
+
+
+def test_resolve_concept_still_declines_a_genuine_segment_level_metric():
+    """The dictionary expansion added real standard concepts; it must not have
+    accidentally widened matching enough to guess at a segment-specific one that
+    was never in scope (see the module docstring's "no dimensional data at all"
+    finding) — "Azure revenue" has no safe candidate to fall back to."""
+    facts = [fact("Revenues", 100, "2025-01-01", "2025-12-31")]
+    assert resolve_concept("azure and other cloud services revenue", facts) is None

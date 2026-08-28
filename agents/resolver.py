@@ -3,25 +3,37 @@ tools.schema.Claim (exact XBRL concept + ISO period dates) that the reconciler c
 check. This is the "later resolution step" explicitly deferred out of Phase 4's
 scope — Phase 5's coordinator needs it for real end-to-end verification.
 
-Honest scope limit: this only resolves metrics with a clean, confident mapping to
-a single standard us-gaap concept. Checking the real labeled dataset's metric
-names (eval/labeled_claims.jsonl) shows most of them are segment/product-level
-figures ("Azure and other cloud services revenue", "Xbox hardware revenue",
-"LinkedIn revenue") that companies disclose only in prose/MD&A, not as top-level
-us-gaap-tagged facts (segment data lives in dimensional XBRL, which this project's
-Filing Retriever doesn't parse). Those correctly come back unresolved rather than
-guessing a wrong concept — a false "verified" claim would be worse than an honest
-"can't check this yet".
+Honest scope limit, now confirmed precisely rather than assumed: this only
+resolves metrics with a clean, confident mapping to a single standard,
+*non-dimensional* us-gaap concept. Phase 6's integration-at-scale run found
+segment/product-level claims ("Azure and other cloud services revenue", "Xbox
+hardware revenue", "LinkedIn revenue", "Data Center revenue") dominate real MD&A
+prose, and inspecting the actual data confirmed why they can't resolve here: SEC's
+company-facts API (what the Filing Retriever uses) returns each data point as a
+flat `{start, end, val, accn, fy, fp, form, filed, frame}` record with *no*
+segment/member/axis field at all — this data source has no per-segment breakdown
+to find, at any level of effort in this file. Reaching it would mean parsing a
+filing's raw XBRL instance document or its rendered financial-statement "R" pages
+instead — a genuinely different data source, out of scope here. Those claims
+correctly come back unresolved rather than guessing a wrong concept — a false
+"verified" claim would be worse than an honest "can't check this yet".
+
+What Phase 6 also showed: some of what looked like segment-specific coverage gaps
+were actually just missing dictionary entries for real, standard, non-dimensional
+concepts ("Commercial remaining performance obligation" is `RevenueRemainingPerformanceObligation`,
+a genuine top-level us-gaap concept, not a segment figure) — those are added below,
+each verified present in real AAPL/MSFT/NVDA company-facts data before being added,
+not guessed from the XBRL taxonomy's existence alone.
 """
 
 from tools.schema import FinancialFact
 
 # metric text (lowercased) -> candidate XBRL concepts in priority order. Verified
-# against real MSFT/NVDA company-facts concept listings, not guessed. Known close
-# variants are listed as their own explicit keys (not handled by fuzzy matching —
-# a naive substring/overlap check here is actively dangerous: "revenue" is a
-# substring of "Azure and other cloud services revenue", so it would resolve a
-# segment-specific claim against *total company* revenue data and produce a
+# against real AAPL/MSFT/NVDA company-facts concept listings, not guessed. Known
+# close variants are listed as their own explicit keys (not handled by fuzzy
+# matching — a naive substring/overlap check here is actively dangerous: "revenue"
+# is a substring of "Azure and other cloud services revenue", so it would resolve
+# a segment-specific claim against *total company* revenue data and produce a
 # confidently wrong verdict. Better to require an exact, deliberate mapping and
 # leave anything else unresolved than to guess.
 METRIC_TO_CONCEPTS: dict[str, list[str]] = {
@@ -39,6 +51,37 @@ METRIC_TO_CONCEPTS: dict[str, list[str]] = {
     "quarterly cash dividend per share": ["CommonStockDividendsPerShareDeclared"],
     "u.s. income before income taxes": ["IncomeLossFromContinuingOperationsBeforeIncomeTaxesDomestic"],
     "foreign income before income taxes": ["IncomeLossFromContinuingOperationsBeforeIncomeTaxesForeign"],
+    # Added after Phase 6's integration-at-scale run — each confirmed present with
+    # real, plausible values in cached AAPL/MSFT/NVDA company-facts data, not added
+    # on the strength of existing in the us-gaap taxonomy alone.
+    "net income": ["NetIncomeLoss"],
+    "diluted earnings per share": ["EarningsPerShareDiluted"],
+    "basic earnings per share": ["EarningsPerShareBasic"],
+    "total assets": ["Assets"],
+    "current assets": ["AssetsCurrent"],
+    "total liabilities": ["Liabilities"],
+    "current liabilities": ["LiabilitiesCurrent"],
+    "total stockholders' equity": ["StockholdersEquity"],
+    "stockholders' equity": ["StockholdersEquity"],
+    "shareholders' equity": ["StockholdersEquity"],
+    "cash and cash equivalents": ["CashAndCashEquivalentsAtCarryingValue"],
+    "research and development expense": ["ResearchAndDevelopmentExpense"],
+    "research and development expenses": ["ResearchAndDevelopmentExpense"],
+    "selling, general and administrative expenses": ["SellingGeneralAndAdministrativeExpense"],
+    "selling, general and administrative expense": ["SellingGeneralAndAdministrativeExpense"],
+    "general and administrative expenses": ["GeneralAndAdministrativeExpense"],
+    "general and administrative expense": ["GeneralAndAdministrativeExpense"],
+    "depreciation and amortization": ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet"],
+    "net cash provided by operating activities": ["NetCashProvidedByUsedInOperatingActivities"],
+    "cash flow from operations": ["NetCashProvidedByUsedInOperatingActivities"],
+    "operating cash flow": ["NetCashProvidedByUsedInOperatingActivities"],
+    "capital expenditures": ["PaymentsToAcquirePropertyPlantAndEquipment"],
+    "purchases of property and equipment": ["PaymentsToAcquirePropertyPlantAndEquipment"],
+    "remaining performance obligation": ["RevenueRemainingPerformanceObligation"],
+    "commercial remaining performance obligation": ["RevenueRemainingPerformanceObligation"],
+    "total remaining performance obligation": ["RevenueRemainingPerformanceObligation"],
+    "total costs and expenses": ["CostsAndExpenses"],
+    "interest expense": ["InterestExpense"],
 }
 
 
