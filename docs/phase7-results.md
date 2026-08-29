@@ -65,6 +65,23 @@ The other results are real, though. The false-consistent rate — the dangerous 
 
 **A plausible reason for the `bps_change` null, not yet confirmed:** `max_steps` stayed fixed at 1,300 while the dataset grew 2.1× (1,612 → 3,403 examples). Even though `bps_change`'s raw training-example count tripled (114 → 350), the fixed step budget means every example — including `bps_change` ones — got proportionally *less* repeated exposure than in the original run. Tripling the numerator didn't help if the denominator (training steps) didn't grow to match. If this hypothesis is right, the experiment actually worth running next is more steps on the bigger dataset, not the reproportioned data alone — flagged as follow-up, not run here.
 
+## Testing the step-budget hypothesis directly
+
+Ran the follow-up flagged above for real: same dataset, same architecture, `max_steps` scaled from 1,300 to **2,730** — matching the 2.1× dataset growth so `bps_change`'s training exposure would be roughly proportional to the original run's, not diluted. Same 706-example held-out split, so this compares directly against the two rows above.
+
+| | base (zero-shot) | 1,300 steps | **2,730 steps** | delta vs. base | 95% noise floor | resolved? |
+|---|---|---|---|---|---|---|
+| **overall accuracy** | 0.820 | 0.858 | **0.865** | +0.045 | ±0.038 | **yes — real** |
+| **false-consistent rate** | 0.108 | 0.020 | **0.024** | −0.084 | ±0.026 | **yes — real, big win** |
+| `absolute` | 0.969 | 0.994 | 0.994 | +0.025 | ±0.021 | yes, real (small, near ceiling) |
+| `absolute_change` | 0.667 | 0.825 | **0.867** | **+0.200** | ±0.104 | **yes — real, the largest clean win yet** |
+| `growth_pct` | 0.858 | 0.893 | 0.876 | +0.018 | ±0.072 | no — inside noise floor |
+| **`bps_change`** | **0.436** | 0.372 | **0.404** | **−0.032** | ±0.141 | **no — still inside the noise floor** |
+
+**The step-budget hypothesis does not hold up.** Doubling the steps moved `bps_change` from 0.372 to 0.404 — numerically closer to base, but that move is itself well inside the noise floor against the 1,300-step run (delta +0.032 vs. a combined half-width of ±0.139), so it isn't a real change from the previous run either. Both trained runs still sit below the zero-shot baseline's 0.436, and neither trained run's delta from base clears its own noise floor. Tripling the step budget did not fix what was wrong — whatever's actually holding `bps_change` back (genuine task difficulty, the quality of the 5 newly-added ratio-pair examples, or a real reasoning ceiling at this model size for two-ratio-then-basis-point arithmetic) isn't simply a matter of more repeated exposure. Reported as a real, if unwelcome, answer rather than left as an open hypothesis that sounded plausible.
+
+Everything else moved the same direction as the first retrain, and more so: accuracy and the false-consistent rate are both real, noise-floor-clearing wins again, and `absolute_change` is now the single largest clean win across all three runs (+0.200, base 0.667 → 0.867).
+
 ## A worked example
 
 Same held-out example (`achg-435`, an `absolute_change` claim about AAPL revenue), both models, greedy decoding. The gold verdict is `consistent` and both models get there — this is presented for reasoning *quality*, not a verdict flip.
