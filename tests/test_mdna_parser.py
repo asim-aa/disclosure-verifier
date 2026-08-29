@@ -5,7 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from tools.mdna_parser import MdnaNotFoundError, chunk_mdna, extract_mdna_paragraphs
+from tools.mdna_parser import (
+    MdnaNotFoundError,
+    chunk_mdna,
+    extract_mdna_paragraphs,
+    extract_paragraphs,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -212,3 +217,62 @@ def test_dash_separated_heading_stops_before_item_7a():
     paragraphs = extract_mdna_paragraphs(_dash_heading_html(), "10-K")
     joined = " ".join(paragraphs)
     assert "Real Item 7A content" not in joined
+
+
+# ---------- inline-styled sentence split across sibling <span> elements ----------
+#
+# Real bug, found via research/specificity_check.py's tech-company control set:
+# CRM's real 10-K renders a full sentence as ONE <div> made of several sibling
+# <span> elements, each wrapping a differently-styled run (plain text, then a
+# highlighted number, repeated) - confirmed against the live filing's actual
+# markup. extract_paragraphs used to call soup.get_text("\n") on the whole
+# document, which inserts its separator between every text node it walks past,
+# including between these sibling *inline* spans - splitting one real sentence
+# into several separate downstream chunks and losing the subject/context for
+# the number in each fragment.
+
+_CRM_EPS_SENTENCE_HTML = """
+<html><body>
+  <div style="padding-left:36pt">
+    <span style="font-weight:700">Net Income per Share:</span>
+    <span> For </span>
+    <span style="background-color:#fff">fiscal 2026</span>
+    <span>, diluted net income per share was </span>
+    <span style="background-color:#fff">$7.80</span>
+    <span> as compared to diluted net income per share of $6.36 from a year ago.</span>
+  </div>
+</body></html>
+"""
+
+
+def test_sentence_split_across_sibling_spans_stays_one_paragraph():
+    lines = extract_paragraphs(_CRM_EPS_SENTENCE_HTML)
+    assert len(lines) == 1
+    assert "$7.80" in lines[0]
+    assert "$6.36" in lines[0]
+    assert "diluted net income per share" in lines[0]
+
+
+def test_sibling_spans_are_joined_with_a_space_not_glued_together():
+    """A naive concatenation (no separator at all) would produce "6.36from a
+    year ago" - real filers rely on the browser's own whitespace between
+    adjacent inline elements that don't include it in their own text."""
+    lines = extract_paragraphs(_CRM_EPS_SENTENCE_HTML)
+    assert "6.36 from a year ago" in lines[0]
+
+
+def test_sibling_divs_still_split_into_separate_paragraphs():
+    """The fix must not over-merge - two DIFFERENT bullet-point <div>s (a real,
+    common MD&A structure) must stay separate paragraphs, only the inline spans
+    *within* one of them should stop being split."""
+    html = """
+    <html><body>
+      <div><span>Bullet one: </span><span>revenue was $10 billion.</span></div>
+      <div><span>Bullet two: </span><span>net income was $2 billion.</span></div>
+    </body></html>
+    """
+    lines = extract_paragraphs(html)
+    assert len(lines) == 2
+    assert "revenue was $10 billion" in lines[0]
+    assert "net income was $2 billion" in lines[1]
+    assert "revenue" not in lines[1]

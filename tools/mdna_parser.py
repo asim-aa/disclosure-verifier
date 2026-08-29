@@ -37,6 +37,13 @@ MDNA_SECTION_NAME = "MD&A"
 
 _MIN_CHUNK_LENGTH = 20  # drops bullet glyphs, bare page numbers, sub-headers
 
+# Elements that mark a real paragraph/cell boundary. A "leaf" element from this
+# set (one with no descendant also in this set) is one text chunk; an inline
+# wrapper (span, b, i, font, a, ...) inside it is glued into that same chunk,
+# not split out on its own - see extract_paragraphs's docstring for why this
+# matters.
+_BLOCK_TAGS = ("div", "p", "li", "td", "th", "tr", "h1", "h2", "h3", "h4", "h5", "h6")
+
 
 @dataclass(frozen=True)
 class _SectionPattern:
@@ -104,12 +111,39 @@ def _find_heading_candidates(lines: list[str], pattern: re.Pattern) -> list[tupl
 
 
 def extract_paragraphs(html: str) -> list[str]:
-    """Flatten a filing's HTML into one string per block-level text node, in document
-    order. Each result corresponds to a single original HTML element, so a chunk can
-    never span a mid-sentence tag boundary the filer didn't already treat as a break."""
+    """Flatten a filing's HTML into one string per *leaf* block-level element
+    (div/p/li/td/th/tr/h1-h6 with no such element nested inside it), in document
+    order.
+
+    Real bug, confirmed against CRM's live 10-K: a single sentence — "For fiscal
+    2026, diluted net income per share was $7.80 as compared to diluted net
+    income per share of $6.36 from a year ago." — renders as ONE <div> made of
+    five sibling <span> elements, each wrapping a differently-styled run (plain
+    text, then a bolded/highlighted number, repeated). The previous version of
+    this function called `soup.get_text("\\n")` on the whole document, which
+    inserts its separator between every distinct text node it walks past -
+    including between sibling *inline* elements, not just between real
+    paragraph boundaries. That split this one sentence into pieces across
+    separate downstream chunks, so extraction saw "$6.36 from a year ago"
+    completely divorced from "diluted net income per share" and any current-
+    period context - a genuine mid-sentence truncation the module's own
+    (previously wrong) docstring claimed couldn't happen.
+
+    Walking BLOCK-level leaf elements and joining each one's own text with a
+    plain space (not a further per-child split) keeps a filer's real paragraph
+    breaks - `extract_mdna_paragraphs`'s heading detection already tolerates a
+    heading rendered across more than one of these leaves (see
+    `_find_heading_candidates`'s window) - while no longer manufacturing a
+    fake break at every inline styling boundary a filer never intended as one."""
     soup = BeautifulSoup(html, "lxml")
-    text = soup.get_text("\n")
-    return [line.strip() for line in text.split("\n") if line.strip()]
+    lines = []
+    for tag in soup.find_all(_BLOCK_TAGS):
+        if tag.find(_BLOCK_TAGS) is not None:
+            continue  # not a leaf - its block-level children are collected separately
+        text = tag.get_text(" ", strip=True)
+        if text:
+            lines.append(text)
+    return lines
 
 
 def extract_mdna_paragraphs(html: str, form: str) -> list[str]:
