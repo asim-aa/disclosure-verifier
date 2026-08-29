@@ -336,10 +336,17 @@ def test_resolve_periods_quarter_hint_prefers_standalone_over_ytd_cumulative():
     assert current.value == 35_082
 
 
-def test_resolve_periods_quarter_hint_not_found_falls_back_to_default():
+def test_resolve_periods_quarter_hint_not_found_raises_instead_of_guessing():
+    """Real bug, confirmed against CSCO's actual MD&A: 'the fourth quarter of
+    fiscal 2025... total revenue increased by 8%' has no standalone Q4 fact
+    (CSCO folds Q4 into the annual 10-K), so this used to silently fall back to
+    comparing against full-year totals - flagging an accurate quarterly claim
+    as wildly inconsistent. A recognized quarter hint with nothing to match is
+    a real data gap, not "couldn't tell" - should raise (caught upstream by
+    RealVerificationAgent as unverifiable), not guess at a different period."""
     facts = [fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3")]
-    current, _ = resolve_periods(facts, "Revenues", period_hint="the fourth quarter")
-    assert current.value == 100  # no Q4 fact - falls back rather than erroring
+    with pytest.raises(ValueError, match="Q4"):
+        resolve_periods(facts, "Revenues", period_hint="the fourth quarter")
 
 
 def test_resolve_periods_unparseable_hint_falls_back_to_default():

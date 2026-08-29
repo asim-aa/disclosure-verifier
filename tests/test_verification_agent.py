@@ -246,6 +246,99 @@ def test_occurrence_one_does_not_apply_to_non_absolute_comparison_types():
     assert outcome.verdict == VERDICT_CONSISTENT
 
 
+# ---------- a relative "a year ago" hint on an absolute claim's own period ----------
+#
+# Real CRM bug, confirmed against the live MD&A: "as compared to diluted net
+# income per share of $6.36 from a year ago." is its OWN standalone chunk (the
+# current-period sentence is in a different one), so there's no sibling claim
+# for `occurrence` to pair it with - the entire claim describes the prior
+# period on its own. resolve_periods already resolves the year-ago fact as
+# `comparison_fact` (its existing "a year ago"/"prior year" comparison-period
+# logic), so this claim just needs to be checked against that instead of
+# `current_fact`.
+
+
+def test_relative_year_ago_period_checks_the_claim_against_the_prior_period():
+    facts = [
+        fact("EarningsPerShareDiluted", 8.0, "2025-02-01", "2026-01-31"),
+        fact("EarningsPerShareDiluted", 6.36, "2024-02-01", "2025-01-31"),
+    ]
+    outcome = AGENT.verify(
+        extracted("diluted net income per share", 6.36, "USD", "absolute", period="a year ago"),
+        "CRM", facts,
+    )
+    assert outcome.verdict == VERDICT_CONSISTENT
+
+
+def test_relative_prior_year_phrasing_also_triggers_the_swap():
+    facts = [
+        fact("NetIncomeLoss", 5_000_000_000, "2025-01-01", "2025-12-31"),
+        fact("NetIncomeLoss", 4_800_000_000, "2024-01-01", "2024-12-31"),
+    ]
+    outcome = AGENT.verify(
+        extracted("net income", 4_800_000_000, "USD", "absolute", period="prior year"), "TXN", facts,
+    )
+    assert outcome.verdict == VERDICT_CONSISTENT
+
+
+def test_relative_year_ago_still_catches_a_genuinely_wrong_claim():
+    facts = [
+        fact("EarningsPerShareDiluted", 8.0, "2025-02-01", "2026-01-31"),
+        fact("EarningsPerShareDiluted", 6.36, "2024-02-01", "2025-01-31"),
+    ]
+    outcome = AGENT.verify(
+        extracted("diluted net income per share", 1.0, "USD", "absolute", period="a year ago"),
+        "CRM", facts,
+    )
+    assert outcome.verdict == VERDICT_INCONSISTENT
+
+
+def test_relative_year_ago_with_no_prior_fact_is_unverifiable_not_wrong():
+    facts = [fact("EarningsPerShareDiluted", 8.0, "2025-02-01", "2026-01-31")]
+    outcome = AGENT.verify(
+        extracted("diluted net income per share", 6.36, "USD", "absolute", period="a year ago"),
+        "CRM", facts,
+    )
+    assert outcome.verdict == VERDICT_UNVERIFIABLE
+
+
+def test_year_over_year_hint_on_a_growth_claim_is_unaffected():
+    """"year-over-year" also matches the relative-year pattern, but on a
+    growth_pct claim (CRM's real RPO case: "increase of 14 percent year-over-
+    year") the claim's own period genuinely IS the current one - only the
+    delta reference is a year ago. Must not trigger the absolute-only swap."""
+    facts = [
+        fact("RevenueRemainingPerformanceObligation", 72_400_000_000, "2026-01-31", "2026-01-31"),
+        fact("RevenueRemainingPerformanceObligation", 63_500_000_000, "2025-01-31", "2025-01-31"),
+    ]
+    # real growth: (72.4-63.5)/63.5*100 = 14.02%
+    outcome = AGENT.verify(
+        extracted("remaining performance obligation", 14.0, "percent", "growth_pct", period="year-over-year"),
+        "CRM", facts,
+    )
+    assert outcome.verdict == VERDICT_CONSISTENT
+
+
+# ---------- a quarter hint with nothing to match ----------
+#
+# Real CSCO bug, confirmed against the live MD&A: "the fourth quarter of fiscal
+# 2025... total revenue increased by 8%" has no standalone Q4 fact (CSCO folds
+# Q4 into the annual 10-K) - resolve_periods used to silently fall back to the
+# most recent (annual) fact and compare a real quarterly claim against
+# full-year totals. Now raises, which RealVerificationAgent's existing
+# try/except ValueError already turns into unverifiable.
+
+
+def test_unmatched_quarter_hint_is_unverifiable_not_compared_against_annual_data():
+    facts = [fact("Revenues", 56_654_000_000, "2025-08-01", "2026-07-31")]
+    outcome = AGENT.verify(
+        extracted("total revenue", 8.0, "percent", "growth_pct", period="the fourth quarter of fiscal 2025"),
+        "CSCO", facts,
+    )
+    assert outcome.verdict == VERDICT_UNVERIFIABLE
+    assert "quarter" in outcome.explanation.lower() or "Q4" in outcome.explanation
+
+
 def test_without_as_of_the_later_filing_wins_documenting_why_it_matters():
     facts = [
         fact(

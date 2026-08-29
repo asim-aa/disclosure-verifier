@@ -240,8 +240,8 @@
   {
     "ticker": "CRM",
     "metric": "diluted net income per share",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "as compared to diluted net income per share of $6.36 from a year ago."
   },
   {
@@ -282,8 +282,8 @@
   {
     "ticker": "CRM",
     "metric": "common stock repurchase amount",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "For fiscal 2026, we repurchased approximately 50 million shares of our common stock for approximately $12.7 billion as compared to 30 million shares for approximately $7.8 billion from a year ago."
   },
   {
@@ -548,8 +548,8 @@
   {
     "ticker": "CSCO",
     "metric": "total revenue",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "unverifiable",
+    "reason_code": null,
     "quote": "total revenue increased by 8%"
   },
   {

@@ -247,6 +247,16 @@ def _similar_length(a: int, b: int) -> bool:
     return abs(a - b) <= _LENGTH_TOLERANCE_DAYS
 
 
+def is_relative_year_ago_hint(period_hint: str) -> bool:
+    """True when `period_hint` is a relative "a year ago"/"prior year"-style
+    phrase (the same pattern `resolve_periods` already uses to pick a precise
+    comparison period). Exposed so a caller checking an *absolute* claim's own
+    period (not a growth/change claim's delta reference) can tell the two
+    apart - see RealVerificationAgent.verify's docstring for why that
+    distinction matters."""
+    return bool(_YEAR_AGO_RE.search(period_hint))
+
+
 def _extract_fiscal_year(period_hint: str) -> int | None:
     match = _FISCAL_YEAR_RE.search(period_hint)
     if match:
@@ -349,7 +359,23 @@ def resolve_periods(
         ]
         if quarter_length_matches:
             quarter_matches = quarter_length_matches
-        current = quarter_matches[0] if quarter_matches else matching[0]
+        if not quarter_matches:
+            # A recognized ordinal-quarter hint with nothing to match is a real
+            # data gap, not "couldn't tell" - many companies (confirmed: CSCO)
+            # only file a standalone 10-Q for Q1-Q3 and fold Q4 into the annual
+            # 10-K without a separately tagged Q4 fact. Silently falling back to
+            # the most recent fact here used to compare a real CSCO claim ("the
+            # fourth quarter of fiscal 2025... total revenue increased by 8%")
+            # against full-year totals instead, making an accurate quarterly
+            # claim look wildly wrong. This was already the documented intent
+            # above ("can still correctly come back unverifiable") - just not
+            # actually implemented that way.
+            raise ValueError(
+                f"No '{hinted_quarter}' fact available for concept '{concept}'"
+                + (f" as of {as_of}" if as_of else "")
+                + " - this company may not separately report this quarter."
+            )
+        current = quarter_matches[0]
     elif hinted_year is not None:
         year_matches = [f for f in matching if f.fiscal_year == hinted_year]
         current = year_matches[0] if year_matches else matching[0]

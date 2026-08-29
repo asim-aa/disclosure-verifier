@@ -7,7 +7,7 @@ bitemporally consistent too — see tools/reconciler.py's `_find_fact` docstring
 
 from typing import Protocol
 
-from agents.resolver import resolve_concept, resolve_periods
+from agents.resolver import is_relative_year_ago_hint, resolve_concept, resolve_periods
 from agents.schema import VerificationOutcome
 from eval.schema import ExtractedClaim
 from tools.reconciler import reconcile
@@ -66,6 +66,32 @@ class RealVerificationAgent:
                     explanation=(
                         f"No prior-period fact available for '{concept}' to check this repeated "
                         "absolute claim (no stated period) against."
+                    ),
+                    citations=[],
+                )
+            current_fact, comparison_fact = comparison_fact, None
+
+        # An absolute claim whose ENTIRE value describes the prior period, not a
+        # comparison pair - real CRM case, confirmed against the live MD&A: "as
+        # compared to diluted net income per share of $6.36 from a year ago." is
+        # its own standalone chunk (the current-period sentence lives in a
+        # different one), so there's no sibling claim for `occurrence` to pair
+        # this with. `resolve_periods` already resolves the correct year-ago
+        # fact as `comparison_fact` here - the hint "a year ago" is exactly what
+        # its own comparison-period logic matches - so the only thing needed is
+        # checking THIS claim's value against that fact instead of `current_fact`.
+        # Distinct from the growth_pct/absolute_change case (excluded via the
+        # comparison_type check): "revenue grew 14% year-over-year" also
+        # contains "year-over-year", but there `current_fact` genuinely IS this
+        # period and the hint correctly describes the delta reference, not the
+        # claim's own period.
+        elif extracted.comparison_type == "absolute" and is_relative_year_ago_hint(extracted.period):
+            if comparison_fact is None:
+                return VerificationOutcome(
+                    verdict=VERDICT_UNVERIFIABLE,
+                    explanation=(
+                        f"No prior-period fact available for '{concept}' to check this "
+                        f"'{extracted.period}' absolute claim against."
                     ),
                     citations=[],
                 )
