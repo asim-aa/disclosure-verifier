@@ -369,6 +369,34 @@ def test_resolve_concept_resolves_newly_added_standard_concepts(metric_text, con
     assert resolve_concept(metric_text, facts) == concept
 
 
+# ---------- concepts added from real unresolved-claim analysis ----------
+#
+# Found by checking which metric texts in eval/labeled_claims*.jsonl actually
+# failed to resolve, not guessed. New concepts confirmed present in real
+# AAPL/MSFT/NVDA/AMZN company-facts data before being added (same discipline
+# as above); wording-variant entries reuse an already-confirmed concept.
+
+
+@pytest.mark.parametrize(
+    ("metric_text", "concept"),
+    [
+        ("net sales", "Revenues"),
+        ("sales", "Revenues"),
+        ("provision for income taxes", "IncomeTaxExpenseBenefit"),
+        ("cash provided by operating activities", "NetCashProvidedByUsedInOperatingActivities"),
+        ("cash used in investing activities", "NetCashProvidedByUsedInInvestingActivities"),
+        ("cash used in financing activities", "NetCashProvidedByUsedInFinancingActivities"),
+        ("long-term debt", "LongTermDebt"),
+        ("interest income", "InvestmentIncomeInterest"),
+        ("other income (expense), net", "OtherNonoperatingIncomeExpense"),
+        ("long-term lease liabilities", "OperatingLeaseLiabilityNoncurrent"),
+    ],
+)
+def test_resolve_concept_resolves_concepts_added_from_unresolved_claim_analysis(metric_text, concept):
+    facts = [fact(concept, 100, "2025-01-01", "2025-12-31")]
+    assert resolve_concept(metric_text, facts) == concept
+
+
 def test_resolve_concept_still_declines_a_genuine_segment_level_metric():
     """The dictionary expansion added real standard concepts; it must not have
     accidentally widened matching enough to guess at a segment-specific one that

@@ -16,6 +16,8 @@ Public companies make thousands of quantitative claims a year in MD&A prose — 
 
 Built as the capstone for the SupportVectors AI Agents Bootcamp, against four required pillars: real MCP tools, a DSPy-optimized prompt with a measured baseline delta, a justified multi-agent architecture, and RLVR/GRPO fine-tuning with a noise-floor-checked before/after result.
 
+**Why now.** SEC's XBRL mandate (phased in 2009–2011, effectively universal today) means the structured ground truth for every claim in this project's scope has always been sitting a few API calls away — cross-checking prose against it by hand just never scaled to thousands of claims a year across thousands of filers. What's changed recently is the cost side: extracting and reasoning through a full filing's worth of claims used to mean either analyst hours or an LLM bill that didn't pencil out at that volume. This project's own Phase 7 result is a small data point for that shift — a 7B-class open model, LoRA fine-tuned on a single consumer GPU, learns the reconciliation-reasoning step well enough (false-consistent rate 0.108→0.020, real and noise-floor-clearing) to make full-filing coverage a cost problem now, not a capability one.
+
 📄 **[Read the full case study (PDF)](docs/case-study.pdf)** — results, a live example, and the real bugs found along the way.
 
 ---
@@ -106,7 +108,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 202 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 212 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 **A real backtest: would this have caught an actual restatement?** Every result above checks the pipeline in the present tense. A sharper question: has this project's own bitemporal `as_of` machinery ever caught something real happening to a real company? SEC 8-K "Item 4.02" filings (a company disclosing its own past financials can't be relied on) supply real ground truth. Scanning real XBRL company-facts data for `(concept, period)` groups where an *amended* filing (`10-K/A`/`10-Q/A`) reports a materially different value than the original found **13,827 real restatement fingerprints across 541 companies** (after rejecting a looser method that was 82% routine reclassification noise, not corrections). Matching those to real prose claims in the original MD&A — via the project's real extraction agent, keeping claims whose metric resolves to the restated concept and whose value is within 5% — found **18 real matches**, all from Discover Financial Services and Rithm Capital Corp. Running the actual `reconcile()` function twice per match (once `as_of` the original filing date, once `as_of` the restated filing date, no LLM calls): **17 of 18 (94%) would have been flagged inconsistent by the time each restatement existed, using only data that existed at each point in time** — 13 as the clean "consistent when made, inconsistent once restated" pattern, 4 already caught by prose-rounding tolerance alone, 1 genuine miss reported rather than hidden. Not a synthetic eval number — a real outcome against two real companies' real regulatory history. Full methodology and honest scope caveats: [`docs/backtest-results.md`](docs/backtest-results.md).
 
@@ -134,7 +136,9 @@ The interesting engineering in this project wasn't writing the happy path — it
 
 - **A named quarter resolved to the wrong duration entirely.** An *ordinal* quarter reference ("the third quarter", "Q3") is safe to resolve — XBRL's own `fiscal_period` field is itself fiscal-quarter-numbered, so "the third quarter" maps directly to `fp="Q3"` with no fiscal-year-end guessing involved, unlike a calendar-named quarter ("the September quarter"). Implementing it surfaced a second, sharper bug before it shipped: a 10-Q commonly tags *both* the standalone 3-month figure and a 6-/9-month year-to-date cumulative with the identical `fiscal_period` and `period_end` — an unfiltered match against real NVDA data returned a $91.166B "Q3" figure that was actually the 9-month cumulative, not the $35.082B standalone quarter. Fixed by preferring the ~91-day-length fact when both exist. [`agents/resolver.py`](agents/resolver.py)
 
-One limitation is still open and documented rather than hidden: a quarter named by *calendar month* ("the September quarter", "the December quarter") still isn't parsed into a specific fiscal period — translating that safely needs the company's own fiscal-year-end, which isn't available at this resolution step, so that case still falls back to the default "most recent" pick rather than guessing. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
+- **A handful of real unresolved claims traced to missing dictionary keys, not missing data.** Checking exactly which metric texts in `eval/labeled_claims*.jsonl` failed to resolve (rather than assuming the gap was all segment-level) found two different things mixed together: genuine segment claims with no fix available, and plain wording variants ("sales" for revenue, "provision for income taxes" for income tax expense) or new-but-standard concepts (`LongTermDebt`, `InvestmentIncomeInterest`, `NetCashProvidedByUsedInFinancingActivities`, `OtherNonoperatingIncomeExpense`, `OperatingLeaseLiabilityNoncurrent`) confirmed present in real AAPL/MSFT/NVDA/AMZN data before being added. Resolution rate on the fresh AMZN/AAPL holdout: **13.6% → 44.1%**. [`agents/resolver.py`](agents/resolver.py)
+
+One limitation is still open and documented rather than hidden: a quarter named by *calendar month* ("the September quarter", "the December quarter") still isn't parsed into a specific fiscal period — translating that safely needs the company's own fiscal-year-end, which isn't available at this resolution step, so that case still falls back to the default "most recent" pick rather than guessing. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. What the resolver's scope actually covers, measured directly against 676 real companies' filings and against real hand-labeled claims rather than left as an implicit gap: [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md#coverage-how-much-of-a-real-filing-is-actually-resolvable). A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in the same doc.
 
 ## Harness: budget and checkpointing
 
@@ -151,7 +155,7 @@ phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scrip
 research/ Real-restatement backtest — find fingerprints, match prose, reconcile bitemporally
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
-tests/    202 tests — 194 unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    212 tests — 204 unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -166,7 +170,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 194 unit tests, no network/LLM required
+pytest -v                 # 204 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

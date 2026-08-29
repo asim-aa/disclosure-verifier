@@ -96,6 +96,28 @@ METRIC_TO_CONCEPTS: dict[str, list[str]] = {
     "total remaining performance obligation": ["RevenueRemainingPerformanceObligation"],
     "total costs and expenses": ["CostsAndExpenses"],
     "interest expense": ["InterestExpense"],
+    # Added from a direct check of what real hand-labeled claims (eval/labeled_claims*.jsonl)
+    # actually failed to resolve on. Two different failure modes, handled differently:
+    # (1) a genuinely new concept, confirmed present in real AAPL/MSFT/NVDA/AMZN
+    # company-facts data before being added, same discipline as the block above;
+    # (2) a plain wording variant of a concept already mapped above - no new
+    # verification needed, since the underlying concept is already confirmed present.
+    "net sales": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],  # AAPL's own term for revenue
+    "sales": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+    "provision for income taxes": ["IncomeTaxExpenseBenefit"],
+    "cash provided by operating activities": ["NetCashProvidedByUsedInOperatingActivities"],
+    "cash used in investing activities": ["NetCashProvidedByUsedInInvestingActivities"],
+    "cash provided by investing activities": ["NetCashProvidedByUsedInInvestingActivities"],
+    "cash flow from investing activities": ["NetCashProvidedByUsedInInvestingActivities"],
+    "cash used in financing activities": ["NetCashProvidedByUsedInFinancingActivities"],
+    "cash provided by financing activities": ["NetCashProvidedByUsedInFinancingActivities"],
+    "cash flow from financing activities": ["NetCashProvidedByUsedInFinancingActivities"],
+    "long-term debt": ["LongTermDebt"],
+    "interest income": ["InvestmentIncomeInterest"],
+    "other income (expense), net": ["OtherNonoperatingIncomeExpense"],
+    "other income (expense)": ["OtherNonoperatingIncomeExpense"],
+    "long-term lease liabilities": ["OperatingLeaseLiabilityNoncurrent"],
+    "operating lease liabilities": ["OperatingLeaseLiabilityNoncurrent"],
 }
 
 

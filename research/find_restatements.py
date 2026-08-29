@@ -23,8 +23,8 @@ detectable value-diff in its XBRL history than a company picked at random) -
 not to determine what was restated. The XBRL diff itself is the ground truth,
 confirmed by construction rather than inferred from prose.
 
-Restricted to concepts in agents.resolver.METRIC_TO_CONCEPTS - the ~33
-concepts this project's resolver can actually check - so Phase B (matching
+Restricted to concepts in agents.resolver.METRIC_TO_CONCEPTS - the concepts
+this project's resolver can actually check - so Phase B (matching
 restated figures to real MD&A prose) isn't wasted on concepts nothing in this
 pipeline could ever verify anyway.
 

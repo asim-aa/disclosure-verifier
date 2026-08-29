@@ -173,6 +173,51 @@ component. There's no judge prompt in the loop for these failure modes to
 attach to. Worth stating rather than leaving the reader to wonder whether it
 was checked.
 
+## Coverage: how much of a real filing is actually resolvable
+
+`agents/resolver.py`'s `METRIC_TO_CONCEPTS` maps 39 distinct XBRL concepts (58
+metric-text phrasings, counting aliases) to real, verified-present us-gaap
+tags — a small, deliberately exact-match-only dictionary, not a fuzzy matcher
+(see the module's own docstring for why fuzzy matching is actively dangerous
+here). What that scope means in practice, measured directly rather than
+estimated:
+
+- **Against a typical company's actual reported data**: across 676 real
+  companies' cached XBRL company-facts (the Phase A restatement-scan sample —
+  a broad, non-cherry-picked set), the median company reports **325 distinct
+  us-gaap concepts**. The resolver's 39 cover a small fraction of that by raw
+  count, but they're concentrated in the concepts that actually get narrated
+  in prose: of the 20 most commonly-reported concepts across all 676
+  companies, the resolver covers 13 (65%) — revenue, net income, operating
+  income, taxes, the core cash-flow lines, total assets/liabilities/equity.
+  The 7 misses among that top 20 (`LiabilitiesAndStockholdersEquity`,
+  `RetainedEarningsAccumulatedDeficit`, `AdditionalPaidInCapital`, ...) are
+  almost universally balance-sheet roll-forward or footnote-table figures a
+  company reports but essentially never states as an MD&A prose claim ("common
+  stock par value was $X") — a gap that doesn't cost real coverage for this
+  project's actual use case, not a gap being quietly ignored.
+- **Against real hand-labeled claims** (the actual, non-hypothetical measure):
+  of the 161 claims in `eval/labeled_claims.jsonl`, **39.8%** resolve to a
+  known concept today; of the 59 claims in the genuinely fresh AMZN/AAPL
+  holdout, **44.1%** do. The remainder splits into two different things, not
+  one: a real data-source limit (segment/product-level claims — "Azure
+  revenue," "iPhone net sales" — that SEC's company-facts API has no
+  dimensional breakdown for at all, confirmed by inspecting the raw data, not
+  assumed) and a genuinely closeable dictionary gap (a metric phrased in words
+  the dictionary didn't have a key for, even though the underlying concept was
+  already mapped — "sales" not "revenue," "provision for income taxes" not
+  "income tax expense"). The 44.1% figure above already reflects closing 10
+  of those gaps found by checking this exact list, up from 13.6% before —
+  each new key confirmed present in real AAPL/MSFT/NVDA/AMZN data first, same
+  discipline as every other entry in the dictionary.
+
+The honest summary: this resolver is not attempting full-taxonomy coverage,
+and stating that as a number is more useful than leaving it implicit. It
+covers the concepts that dominate MD&A prose in practice, and roughly 4 in 10
+real claims resolve today — a number with a known, closeable half (dictionary
+gaps) and a known, structural half (no segment data in the source API at any
+level of effort here).
+
 ## Interpreting "inconsistent" — a known simplification
 
 The Reconciler currently collapses every mismatch into one `inconsistent`
