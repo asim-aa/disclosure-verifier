@@ -1,5 +1,212 @@
 [
   {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-03-31",
+    "claimed_value": 38000000000.0,
+    "original_value": 37868547000,
+    "restated_value": 39699432000,
+    "original_filed": "2022-05-06",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 37868547000,
+      "difference": 0.0034712976972683953,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 39699432000,
+      "difference": 0.042807463844822764,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-06-30",
+    "claimed_value": 35000000000.0,
+    "original_value": 34553847000,
+    "restated_value": 36450189000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 34553847000,
+      "difference": 0.012911818472773813,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 36450189000,
+      "difference": 0.039785500152001954,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-09-30",
+    "claimed_value": 35000000000.0,
+    "original_value": 35334535000,
+    "restated_value": 37282191000,
+    "original_filed": "2022-11-03",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 35334535000,
+      "difference": 0.009467649708705662,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 37282191000,
+      "difference": 0.06121397210802337,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-12-31",
+    "claimed_value": 32500000000.0,
+    "original_value": 32479336000,
+    "restated_value": 34586508000,
+    "original_filed": "2023-02-17",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 32479336000,
+      "difference": 0.0006362199030177218,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 34586508000,
+      "difference": 0.06032722355202786,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-03-31",
+    "claimed_value": 31800000000.0,
+    "original_value": 31818651000,
+    "restated_value": 33898625000,
+    "original_filed": "2023-05-05",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 31818651000,
+      "difference": 0.0005861656422832005,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 33898625000,
+      "difference": 0.06190885323519759,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-06-30",
+    "claimed_value": 33900000000.0,
+    "original_value": 33858079000,
+    "restated_value": 35999288000,
+    "original_filed": "2023-08-04",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 33858079000,
+      "difference": 0.0012381387615050458,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 35999288000,
+      "difference": 0.05831470889090917,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-09-30",
+    "claimed_value": 34700000000.0,
+    "original_value": 34745528000,
+    "restated_value": 36791065000,
+    "original_filed": "2023-11-01",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 34745528000,
+      "difference": 0.0013103269001984946,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 36791065000,
+      "difference": 0.05683621825027354,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-12-31",
+    "claimed_value": 35300000000.0,
+    "original_value": 35311785000,
+    "restated_value": 39717084000,
+    "original_filed": "2024-02-20",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 35311785000,
+      "difference": 0.00033374127079670426,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 39717084000,
+      "difference": 0.11121370340279765,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2024-03-31",
+    "claimed_value": 42100000000.0,
+    "original_value": 42120928000,
+    "restated_value": 47935581000,
+    "original_filed": "2024-05-03",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 42120928000,
+      "difference": 0.0004968551500099903,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 47935581000,
+      "difference": 0.12173798415002,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
     "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
     "concept": "NetIncomeLoss",
     "period_end": "2021-12-31",
@@ -207,208 +414,2393 @@
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2022-03-31",
-    "claimed_value": 38000000000.0,
-    "original_value": 37868547000,
-    "restated_value": 39699432000,
-    "original_filed": "2022-05-06",
-    "restated_filed": "2024-08-12",
+    "entity_name": "DENTSPLY SIRONA Inc.  (XRAY)  (CIK 0000818479)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-12-31",
+    "claimed_value": 421000000.0,
+    "original_value": 421000000,
+    "restated_value": 411000000,
+    "original_filed": "2022-03-01",
+    "restated_filed": "2023-08-07",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 37868547000,
-      "difference": 0.0034712976972683953,
+      "computed_value": 421000000,
+      "difference": 0.0,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 39699432000,
-      "difference": 0.042807463844822764,
+      "computed_value": 411000000,
+      "difference": 0.024330900243309004,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2022-06-30",
-    "claimed_value": 35000000000.0,
-    "original_value": 34553847000,
-    "restated_value": 36450189000,
-    "original_filed": "2022-08-05",
-    "restated_filed": "2024-08-12",
+    "entity_name": "DENTSPLY SIRONA Inc.  (XRAY)  (CIK 0000818479)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2021-12-31",
+    "claimed_value": 1.91,
+    "original_value": 1.91,
+    "restated_value": 1.87,
+    "original_filed": "2022-03-01",
+    "restated_filed": "2023-08-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1.91,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1.87,
+      "difference": 0.0213903743315507,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "SANMINA CORP  (SANM)  (CIK 0000897723)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-01-01",
+    "claimed_value": 20000000.0,
+    "original_value": 20303000,
+    "restated_value": 19568000,
+    "original_filed": "2022-02-02",
+    "restated_filed": "2023-05-22",
     "as_of_original": {
       "verdict": "inconsistent",
-      "computed_value": 34553847000,
-      "difference": 0.012911818472773813,
+      "computed_value": 20303000,
+      "difference": 0.014923902871496824,
       "reason_code": "near_miss"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 36450189000,
-      "difference": 0.039785500152001954,
+      "computed_value": 19568000,
+      "difference": 0.022076860179885527,
       "reason_code": "large_miss"
     },
     "outcome": "already_inconsistent_at_original"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2022-09-30",
-    "claimed_value": 35000000000.0,
-    "original_value": 35334535000,
-    "restated_value": 37282191000,
-    "original_filed": "2022-11-03",
-    "restated_filed": "2024-08-12",
+    "entity_name": "SANMINA CORP  (SANM)  (CIK 0000897723)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-04-02",
+    "claimed_value": 23000000.0,
+    "original_value": 23077000,
+    "restated_value": 21724000,
+    "original_filed": "2022-05-04",
+    "restated_filed": "2023-05-22",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 35334535000,
-      "difference": 0.009467649708705662,
+      "computed_value": 23077000,
+      "difference": 0.0033366555444815185,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 37282191000,
-      "difference": 0.06121397210802337,
+      "computed_value": 21724000,
+      "difference": 0.058736880869084886,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2022-12-31",
-    "claimed_value": 32500000000.0,
-    "original_value": 32479336000,
-    "restated_value": 34586508000,
-    "original_filed": "2023-02-17",
-    "restated_filed": "2024-08-12",
+    "entity_name": "SANMINA CORP  (SANM)  (CIK 0000897723)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-04-02",
+    "claimed_value": 43000000.0,
+    "original_value": 43380000,
+    "restated_value": 41292000,
+    "original_filed": "2022-05-04",
+    "restated_filed": "2023-05-22",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 32479336000,
-      "difference": 0.0006362199030177218,
+      "computed_value": 43380000,
+      "difference": 0.00875979714153988,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 34586508000,
-      "difference": 0.06032722355202786,
+      "computed_value": 41292000,
+      "difference": 0.04136394458975104,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2023-03-31",
-    "claimed_value": 31800000000.0,
-    "original_value": 31818651000,
-    "restated_value": 33898625000,
-    "original_filed": "2023-05-05",
-    "restated_filed": "2024-08-12",
+    "entity_name": "SANMINA CORP  (SANM)  (CIK 0000897723)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-04-02",
+    "claimed_value": 44000000.0,
+    "original_value": 43380000,
+    "restated_value": 41292000,
+    "original_filed": "2022-05-04",
+    "restated_filed": "2023-05-22",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 43380000,
+      "difference": 0.01429230059935454,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 41292000,
+      "difference": 0.06558171074300106,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "SANMINA CORP  (SANM)  (CIK 0000897723)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-07-02",
+    "claimed_value": 46000000.0,
+    "original_value": 45606000,
+    "restated_value": 42835000,
+    "original_filed": "2022-08-03",
+    "restated_filed": "2023-05-22",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 31818651000,
-      "difference": 0.0005861656422832005,
+      "computed_value": 45606000,
+      "difference": 0.00863921413849055,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 33898625000,
-      "difference": 0.06190885323519759,
+      "computed_value": 42835000,
+      "difference": 0.0738881755573713,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
+    "entity_name": "Lyft, Inc.  (LYFT)  (CIK 0001759509)",
+    "concept": "CostsAndExpenses",
+    "period_end": "2021-09-30",
+    "claimed_value": 1000000000.0,
+    "original_value": 1041266000,
+    "restated_value": 1069441000,
+    "original_filed": "2021-11-04",
+    "restated_filed": "2022-04-29",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 1041266000,
+      "difference": 0.03963060351533614,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1069441000,
+      "difference": 0.06493205328765214,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Lyft, Inc.  (LYFT)  (CIK 0001759509)",
+    "concept": "CostsAndExpenses",
+    "period_end": "2021-12-31",
+    "claimed_value": 4300000000.0,
+    "original_value": 4290755000,
+    "restated_value": 4343540000,
+    "original_filed": "2022-02-28",
+    "restated_filed": "2022-04-29",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 4290755000,
+      "difference": 0.0021546324597885454,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 4343540000,
+      "difference": 0.010024081739779074,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "First Savings Financial Group, Inc.  (FSFG)  (CIK 0001435508)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2019-06-30",
+    "claimed_value": 5200000.0,
+    "original_value": 5235000,
+    "restated_value": 4392000,
+    "original_filed": "2019-08-09",
+    "restated_filed": "2019-12-04",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 5235000,
+      "difference": 0.0066857688634192934,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 4392000,
+      "difference": 0.18397085610200364,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "First Savings Financial Group, Inc.  (FSFG)  (CIK 0001435508)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2019-06-30",
+    "claimed_value": 2.21,
+    "original_value": 2.21,
+    "restated_value": 1.85,
+    "original_filed": "2019-08-09",
+    "restated_filed": "2019-12-04",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 2.21,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1.85,
+      "difference": 0.19459459459459452,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "First Savings Financial Group, Inc.  (FSFG)  (CIK 0001435508)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2019-12-31",
+    "claimed_value": 1.44,
+    "original_value": 1.44,
+    "restated_value": 0.48,
+    "original_filed": "2020-02-10",
+    "restated_filed": "2023-02-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1.44,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.48,
+      "difference": 2.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "First Savings Financial Group, Inc.  (FSFG)  (CIK 0001435508)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2020-12-31",
+    "claimed_value": 4.16,
+    "original_value": 4.16,
+    "restated_value": 1.39,
+    "original_filed": "2021-02-11",
+    "restated_filed": "2023-02-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 4.16,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1.39,
+      "difference": 1.992805755395684,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
     "period_end": "2023-06-30",
-    "claimed_value": 33900000000.0,
-    "original_value": 33858079000,
-    "restated_value": 35999288000,
-    "original_filed": "2023-08-04",
-    "restated_filed": "2024-08-12",
+    "claimed_value": 625000.0,
+    "original_value": 625000,
+    "restated_value": 5634000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 33858079000,
-      "difference": 0.0012381387615050458,
+      "computed_value": 625000,
+      "difference": 0.0,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 35999288000,
-      "difference": 0.05831470889090917,
+      "computed_value": 5634000,
+      "difference": 0.8890663826766063,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2023-06-30",
+    "claimed_value": 625000.0,
+    "original_value": 625000,
+    "restated_value": 2950000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 625000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 2950000,
+      "difference": 0.788135593220339,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2023-06-30",
+    "claimed_value": 625000.0,
+    "original_value": 625000,
+    "restated_value": 5634000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 625000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 5634000,
+      "difference": 0.8890663826766063,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2023-06-30",
+    "claimed_value": 625000.0,
+    "original_value": 625000,
+    "restated_value": 2950000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 625000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 2950000,
+      "difference": 0.788135593220339,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-06-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 1586000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1586000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-06-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 863000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 863000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-06-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 1586000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1586000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-06-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 863000,
+    "original_filed": "2023-08-10",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 863000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
     "period_end": "2023-09-30",
-    "claimed_value": 34700000000.0,
-    "original_value": 34745528000,
-    "restated_value": 36791065000,
-    "original_filed": "2023-11-01",
-    "restated_filed": "2024-08-12",
+    "claimed_value": 577000.0,
+    "original_value": 577000,
+    "restated_value": 3251000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 34745528000,
-      "difference": 0.0013103269001984946,
+      "computed_value": 577000,
+      "difference": 0.0,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 36791065000,
-      "difference": 0.05683621825027354,
+      "computed_value": 3251000,
+      "difference": 0.8225161488772685,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2023-09-30",
+    "claimed_value": 577000.0,
+    "original_value": 577000,
+    "restated_value": 3251000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 577000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 3251000,
+      "difference": 0.8225161488772685,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-09-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 4703000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 4703000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-09-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 3117000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 3117000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-09-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 4703000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 4703000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CIM Opportunity Zone Fund, L.P.  (CIK 0001765107)",
+    "concept": "InterestExpense",
+    "period_end": "2022-09-30",
+    "claimed_value": 0.0,
+    "original_value": 0,
+    "restated_value": 3117000,
+    "original_filed": "2023-11-14",
+    "restated_filed": "2024-04-22",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 3117000,
+      "difference": 1.0,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Emergent BioSolutions Inc.  (EBS)  (CIK 0001367644)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-12-31",
+    "claimed_value": 2100000.0,
+    "original_value": 2100000,
+    "restated_value": -7400000,
+    "original_filed": "2023-03-01",
+    "restated_filed": "2023-12-11",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 2100000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": -7400000,
+      "difference": 1.2837837837837838,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Emergent BioSolutions Inc.  (EBS)  (CIK 0001367644)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-12-31",
+    "claimed_value": 2200000.0,
+    "original_value": 2100000,
+    "restated_value": -7400000,
+    "original_filed": "2023-03-01",
+    "restated_filed": "2023-12-11",
+    "as_of_original": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "as_of_restated": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "outcome": "other(unverifiable->unverifiable)"
+  },
+  {
+    "entity_name": "System1, Inc.  (SST, SST-WT)  (CIK 0001805833)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-06-30",
+    "claimed_value": 17862386.0,
+    "original_value": 17862386,
+    "restated_value": 18515000,
+    "original_filed": "2021-08-23",
+    "restated_filed": "2023-06-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 17862386,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 18515000,
+      "difference": 0.0352478530920875,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "System1, Inc.  (SST, SST-WT)  (CIK 0001805833)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-09-30",
+    "claimed_value": 6099689.0,
+    "original_value": 6099689,
+    "restated_value": 11368000,
+    "original_filed": "2021-11-16",
+    "restated_filed": "2023-06-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 6099689,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 11368000,
+      "difference": 0.4634334095707248,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "System1, Inc.  (SST, SST-WT)  (CIK 0001805833)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-09-30",
+    "claimed_value": 23962075.0,
+    "original_value": 23962075,
+    "restated_value": 29883000,
+    "original_filed": "2021-11-16",
+    "restated_filed": "2023-06-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 23962075,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 29883000,
+      "difference": 0.19813690057892447,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "System1, Inc.  (SST, SST-WT)  (CIK 0001805833)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-09-30",
+    "claimed_value": 23962075.0,
+    "original_value": 23962075,
+    "restated_value": 29883000,
+    "original_filed": "2021-11-16",
+    "restated_filed": "2023-06-06",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 23962075,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 29883000,
+      "difference": 0.19813690057892447,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "COMPASS MINERALS INTERNATIONAL INC  (CMP)  (CIK 0001227654)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2021-03-31",
+    "claimed_value": 12600000.0,
+    "original_value": 12600000,
+    "restated_value": 16000000,
+    "original_filed": "2021-05-07",
+    "restated_filed": "2021-09-03",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 12600000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 16000000,
+      "difference": 0.2125,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "COMPASS MINERALS INTERNATIONAL INC  (CMP)  (CIK 0001227654)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2021-03-31",
+    "claimed_value": 12600000.0,
+    "original_value": 12600000,
+    "restated_value": 16000000,
+    "original_filed": "2021-05-07",
+    "restated_filed": "2021-09-03",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 12600000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 16000000,
+      "difference": 0.2125,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "COMPASS MINERALS INTERNATIONAL INC  (CMP)  (CIK 0001227654)",
+    "concept": "GrossProfit",
+    "period_end": "2021-09-30",
+    "claimed_value": 33400000.0,
+    "original_value": 33100000,
+    "restated_value": 31400000,
+    "original_filed": "2022-12-14",
+    "restated_filed": "2024-10-29",
+    "as_of_original": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "as_of_restated": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "outcome": "other(unverifiable->unverifiable)"
+  },
+  {
+    "entity_name": "COMPASS MINERALS INTERNATIONAL INC  (CMP)  (CIK 0001227654)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2023-09-30",
+    "claimed_value": 0.37,
+    "original_value": 0.37,
+    "restated_value": 0.25,
+    "original_filed": "2023-11-29",
+    "restated_filed": "2024-10-29",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.37,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.25,
+      "difference": 0.48,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "COMPASS MINERALS INTERNATIONAL INC  (CMP)  (CIK 0001227654)",
+    "concept": "InterestExpense",
+    "period_end": "2020-12-31",
+    "claimed_value": 71200000.0,
+    "original_value": 71200000,
+    "restated_value": 62700000,
+    "original_filed": "2021-02-26",
+    "restated_filed": "2021-09-03",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 71200000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 62700000,
+      "difference": 0.13556618819776714,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2021-12-31",
+    "claimed_value": 88600000.0,
+    "original_value": 88609000,
+    "restated_value": 83434000,
+    "original_filed": "2022-02-08",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 88609000,
+      "difference": 0.00010156981796431514,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 83434000,
+      "difference": 0.0619172040175468,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2021-12-31",
+    "claimed_value": 4600000.0,
+    "original_value": 4585000,
+    "restated_value": 3317000,
+    "original_filed": "2022-02-08",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 4585000,
+      "difference": 0.003271537622682661,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 3317000,
+      "difference": 0.3867952969550799,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-12-31",
+    "claimed_value": 16700000.0,
+    "original_value": 16707000,
+    "restated_value": 12800000,
+    "original_filed": "2022-02-08",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 16707000,
+      "difference": 0.0004189860537499252,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 12800000,
+      "difference": 0.3046875,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2022-03-31",
+    "claimed_value": 122500000.0,
+    "original_value": 122460000,
+    "restated_value": 115561000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 122460000,
+      "difference": 0.00032663726931242854,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 115561000,
+      "difference": 0.06004620936128971,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-03-31",
+    "claimed_value": 11800000.0,
+    "original_value": 11810000,
+    "restated_value": 10109000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 11810000,
+      "difference": 0.000846740050804403,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 10109000,
+      "difference": 0.16727668414284302,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-03-31",
+    "claimed_value": 35800000.0,
+    "original_value": 35818000,
+    "restated_value": 30620000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 35818000,
+      "difference": 0.0005025406220336144,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 30620000,
+      "difference": 0.16917047681254083,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2022-03-31",
+    "claimed_value": 211100000.0,
+    "original_value": 211069000,
+    "restated_value": 198995000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 211069000,
+      "difference": 0.00014687140224286846,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 198995000,
+      "difference": 0.060830674137541146,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-03-31",
+    "claimed_value": 16400000.0,
+    "original_value": 16395000,
+    "restated_value": 13426000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 16395000,
+      "difference": 0.0003049710277523635,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 13426000,
+      "difference": 0.22151050201102337,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-03-31",
+    "claimed_value": 52500000.0,
+    "original_value": 52525000,
+    "restated_value": 43420000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 52525000,
+      "difference": 0.00047596382674916705,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 43420000,
+      "difference": 0.209120221096269,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2022-06-30",
+    "claimed_value": 126400000.0,
+    "original_value": 126387000,
+    "restated_value": 123236000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 126387000,
+      "difference": 0.00010285868008576831,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 123236000,
+      "difference": 0.025674315946638968,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-06-30",
+    "claimed_value": 9600000.0,
+    "original_value": 9556000,
+    "restated_value": 8745000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 9556000,
+      "difference": 0.0046044370029300966,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 8745000,
+      "difference": 0.09777015437392796,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-06-30",
+    "claimed_value": 27500000.0,
+    "original_value": 27476000,
+    "restated_value": 25136000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 27476000,
+      "difference": 0.0008734895909157083,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 25136000,
+      "difference": 0.09404837683004456,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2022-06-30",
+    "claimed_value": 337500000.0,
+    "original_value": 337456000,
+    "restated_value": 322231000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 337456000,
+      "difference": 0.0001303873690199611,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 322231000,
+      "difference": 0.047385260884272466,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-06-30",
+    "claimed_value": 26000000.0,
+    "original_value": 25951000,
+    "restated_value": 22171000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 25951000,
+      "difference": 0.0018881738661323264,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 22171000,
+      "difference": 0.17270308060078482,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-06-30",
+    "claimed_value": 80000000.0,
+    "original_value": 80001000,
+    "restated_value": 68556000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 80001000,
+      "difference": 1.24998437519531e-05,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 68556000,
+      "difference": 0.16692922574245872,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2022-12-31",
+    "claimed_value": 47600000.0,
+    "original_value": 47579000,
+    "restated_value": 42187000,
+    "original_filed": "2023-02-09",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 47579000,
+      "difference": 0.00044137119317345886,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 42187000,
+      "difference": 0.12830966885533457,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2023-03-31",
+    "claimed_value": 108200000.0,
+    "original_value": 108173000,
+    "restated_value": 110874000,
+    "original_filed": "2023-05-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 108173000,
+      "difference": 0.00024960017749345954,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 110874000,
+      "difference": 0.024117466673882065,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2023-03-31",
+    "claimed_value": 155800000.0,
+    "original_value": 155752000,
+    "restated_value": 153061000,
+    "original_filed": "2023-05-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 155752000,
+      "difference": 0.0003081822384303251,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 153061000,
+      "difference": 0.01789482624574516,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2023-03-31",
+    "claimed_value": -2700000.0,
+    "original_value": -2662000,
+    "restated_value": -3406000,
+    "original_filed": "2023-05-05",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": -2662000,
+      "difference": 0.014274981217129978,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": -3406000,
+      "difference": 0.20728126834997063,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "SellingGeneralAndAdministrativeExpense",
+    "period_end": "2023-06-30",
+    "claimed_value": 73700000.0,
+    "original_value": 73650000,
+    "restated_value": 72490000,
+    "original_filed": "2023-08-09",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 73650000,
+      "difference": 0.0006788866259334691,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 72490000,
+      "difference": 0.01669195751138088,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2023-06-30",
+    "claimed_value": 288000000.0,
+    "original_value": 287952000,
+    "restated_value": 284975000,
+    "original_filed": "2023-08-09",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 287952000,
+      "difference": 0.0001666944490748458,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 284975000,
+      "difference": 0.010614966225107466,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2023-06-30",
+    "claimed_value": 10600000.0,
+    "original_value": 10605000,
+    "restated_value": 9810000,
+    "original_filed": "2023-08-09",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 10605000,
+      "difference": 0.0004714757190004715,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 9810000,
+      "difference": 0.08053007135575943,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-06-30",
+    "claimed_value": 25300000.0,
+    "original_value": 25312000,
+    "restated_value": 23130000,
+    "original_filed": "2023-08-09",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 25312000,
+      "difference": 0.0004740834386852086,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 23130000,
+      "difference": 0.09381755296152183,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "IncomeTaxExpenseBenefit",
     "period_end": "2023-12-31",
-    "claimed_value": 35300000000.0,
-    "original_value": 35311785000,
-    "restated_value": 39717084000,
-    "original_filed": "2024-02-20",
-    "restated_filed": "2024-08-12",
+    "claimed_value": 16900000.0,
+    "original_value": 16888000,
+    "restated_value": 16676000,
+    "original_filed": "2024-02-07",
+    "restated_filed": "2024-06-14",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 35311785000,
-      "difference": 0.00033374127079670426,
+      "computed_value": 16888000,
+      "difference": 0.0007105637138796779,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 39717084000,
-      "difference": 0.11121370340279765,
+      "computed_value": 16676000,
+      "difference": 0.013432477812425042,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-12-31",
+    "claimed_value": 25700000.0,
+    "original_value": 25719000,
+    "restated_value": 25148000,
+    "original_filed": "2024-02-07",
+    "restated_filed": "2024-06-14",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 25719000,
+      "difference": 0.0007387534507562502,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 25148000,
+      "difference": 0.021950055670431047,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"
   },
   {
-    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
-    "concept": "Assets",
-    "period_end": "2024-03-31",
-    "claimed_value": 42100000000.0,
-    "original_value": 42120928000,
-    "restated_value": 47935581000,
-    "original_filed": "2024-05-03",
-    "restated_filed": "2024-08-12",
+    "entity_name": "AZEK Co Inc.  (AZEK)  (CIK 0001782754)",
+    "concept": "GrossProfit",
+    "period_end": "2021-09-30",
+    "claimed_value": 390000000.0,
+    "original_value": 389951000,
+    "restated_value": 384307000,
+    "original_filed": "2021-11-23",
+    "restated_filed": "2024-06-14",
     "as_of_original": {
       "verdict": "consistent",
-      "computed_value": 42120928000,
-      "difference": 0.0004968551500099903,
+      "computed_value": 389951000,
+      "difference": 0.00012565681329192643,
       "reason_code": "match"
     },
     "as_of_restated": {
       "verdict": "inconsistent",
-      "computed_value": 47935581000,
-      "difference": 0.12173798415002,
+      "computed_value": 384307000,
+      "difference": 0.014813677606705057,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.62,
+    "original_value": 0.61,
+    "restated_value": 0.79,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.61,
+      "difference": 0.016393442622950834,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.79,
+      "difference": 0.21518987341772156,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.62,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.62,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.10144927536231878,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.65,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.62,
+      "difference": 0.04838709677419359,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.05797101449275352,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.62,
+    "original_value": 0.61,
+    "restated_value": 0.78,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.61,
+      "difference": 0.016393442622950834,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.78,
+      "difference": 0.20512820512820515,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.62,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.62,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.10144927536231878,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.65,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.62,
+      "difference": 0.04838709677419359,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.05797101449275352,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.61,
+    "original_value": 0.61,
+    "restated_value": 0.79,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.61,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.79,
+      "difference": 0.22784810126582283,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.61,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.62,
+      "difference": 0.01612903225806453,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.11594202898550719,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.61,
+    "original_value": 0.61,
+    "restated_value": 0.78,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.61,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.78,
+      "difference": 0.21794871794871798,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-10-01",
+    "claimed_value": 0.61,
+    "original_value": 0.62,
+    "restated_value": 0.69,
+    "original_filed": "2016-11-07",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 0.62,
+      "difference": 0.01612903225806453,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.69,
+      "difference": 0.11594202898550719,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-12-31",
+    "claimed_value": 0.83,
+    "original_value": 0.83,
+    "restated_value": 0.79,
+    "original_filed": "2017-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.83,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.79,
+      "difference": 0.050632911392404965,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-12-31",
+    "claimed_value": 0.82,
+    "original_value": 0.82,
+    "restated_value": 0.78,
+    "original_filed": "2017-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.82,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.78,
+      "difference": 0.05128205128205118,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2016-12-31",
+    "claimed_value": 1.44,
+    "original_value": 1.44,
+    "restated_value": 1.58,
+    "original_filed": "2017-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1.44,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1.58,
+      "difference": 0.08860759493670893,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2016-12-31",
+    "claimed_value": 1.43,
+    "original_value": 1.43,
+    "restated_value": 1.57,
+    "original_filed": "2017-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1.43,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1.57,
+      "difference": 0.08917197452229307,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2017-09-30",
+    "claimed_value": -0.2,
+    "original_value": -0.2,
+    "restated_value": -0.4,
+    "original_filed": "2017-10-26",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": -0.2,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": -0.4,
+      "difference": 0.5,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2017-12-30",
+    "claimed_value": 0.78,
+    "original_value": 0.78,
+    "restated_value": 0.44,
+    "original_filed": "2018-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.78,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.44,
+      "difference": 0.7727272727272728,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareBasic",
+    "period_end": "2017-12-30",
+    "claimed_value": 0.59,
+    "original_value": 0.59,
+    "restated_value": 0.04,
+    "original_filed": "2018-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.59,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.04,
+      "difference": 13.749999999999998,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Seneca Foods Corp  (SENEA, SENEB, SENEL, SENEM)  (CIK 0000088948)",
+    "concept": "EarningsPerShareDiluted",
+    "period_end": "2017-12-30",
+    "claimed_value": 0.58,
+    "original_value": 0.58,
+    "restated_value": 0.04,
+    "original_filed": "2018-01-25",
+    "restated_filed": "2018-09-07",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 0.58,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 0.04,
+      "difference": 13.499999999999998,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-12-31",
+    "claimed_value": 73000000.0,
+    "original_value": 73858000,
+    "restated_value": 68923000,
+    "original_filed": "2022-02-28",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "as_of_restated": {
+      "verdict": "unverifiable",
+      "computed_value": null,
+      "difference": null,
+      "reason_code": "missing_comparison_context"
+    },
+    "outcome": "other(unverifiable->unverifiable)"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2022-03-31",
+    "claimed_value": 6200000.0,
+    "original_value": 6195000,
+    "restated_value": 6818000,
+    "original_filed": "2022-05-10",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 6195000,
+      "difference": 0.0008071025020177562,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 6818000,
+      "difference": 0.09064241713112349,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-12-31",
+    "claimed_value": 50500000.0,
+    "original_value": 49049000,
+    "restated_value": 45171000,
+    "original_filed": "2023-03-01",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 49049000,
+      "difference": 0.02958266223572346,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 45171000,
+      "difference": 0.11797392132120166,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-12-31",
+    "claimed_value": 49300000.0,
+    "original_value": 49049000,
+    "restated_value": 45171000,
+    "original_filed": "2023-03-01",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 49049000,
+      "difference": 0.005117331647943893,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 45171000,
+      "difference": 0.09140820437891567,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2021-03-31",
+    "claimed_value": 6800000.0,
+    "original_value": 6776000,
+    "restated_value": 8067000,
+    "original_filed": "2021-05-07",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 6776000,
+      "difference": 0.0035419126328217238,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 8067000,
+      "difference": 0.15705962563530432,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Astrana Health, Inc.  (ASTH)  (CIK 0001083446)",
+    "concept": "IncomeTaxExpenseBenefit",
+    "period_end": "2023-03-31",
+    "claimed_value": 5100000.0,
+    "original_value": 5102000,
+    "restated_value": 6921000,
+    "original_filed": "2023-05-10",
+    "restated_filed": "2023-08-09",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 5102000,
+      "difference": 0.0003920031360250882,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 6921000,
+      "difference": 0.2631122670134374,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "AssetsCurrent",
+    "period_end": "2022-12-31",
+    "claimed_value": 1223429.0,
+    "original_value": 1223429,
+    "restated_value": 18950740,
+    "original_filed": "2023-03-17",
+    "restated_filed": "2024-08-26",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1223429,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 18950740,
+      "difference": 0.9354416239154777,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "LiabilitiesCurrent",
+    "period_end": "2022-12-31",
+    "claimed_value": 17831042.0,
+    "original_value": 17831042,
+    "restated_value": 25290333,
+    "original_filed": "2023-03-17",
+    "restated_filed": "2024-08-26",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 17831042,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 25290333,
+      "difference": 0.294946333842263,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2022-12-31",
+    "claimed_value": 4979824.0,
+    "original_value": 4979824,
+    "restated_value": 33712332,
+    "original_filed": "2023-03-17",
+    "restated_filed": "2024-08-26",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 4979824,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 33712332,
+      "difference": 0.8522847959613117,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2023-03-31",
+    "claimed_value": 1465121.0,
+    "original_value": 1465121,
+    "restated_value": 8224845,
+    "original_filed": "2023-05-15",
+    "restated_filed": "2025-04-30",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1465121,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 8224845,
+      "difference": 0.8218664303096289,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2023-06-30",
+    "claimed_value": 2160367.0,
+    "original_value": 2160367,
+    "restated_value": 8721877,
+    "original_filed": "2023-08-11",
+    "restated_filed": "2025-04-30",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 2160367,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 8721877,
+      "difference": 0.7523048077839208,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "GeneralAndAdministrativeExpense",
+    "period_end": "2023-06-30",
+    "claimed_value": 2125630.0,
+    "original_value": 2125630,
+    "restated_value": 3456900,
+    "original_filed": "2023-08-11",
+    "restated_filed": "2025-04-30",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 2125630,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 3456900,
+      "difference": 0.38510515201481094,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-06-30",
+    "claimed_value": 1920781.0,
+    "original_value": 1920781,
+    "restated_value": -1276012,
+    "original_filed": "2023-08-11",
+    "restated_filed": "2025-04-30",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1920781,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": -1276012,
+      "difference": 2.5053001068955463,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2023-06-30",
+    "claimed_value": 3625488.0,
+    "original_value": 3625488,
+    "restated_value": 16946722,
+    "original_filed": "2023-08-11",
+    "restated_filed": "2025-04-30",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 3625488,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 16946722,
+      "difference": 0.7860655293690426,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2022-09-30",
+    "claimed_value": 1380232.0,
+    "original_value": 1380232,
+    "restated_value": 9153867,
+    "original_filed": "2022-11-14",
+    "restated_filed": "2024-08-26",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1380232,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 9153867,
+      "difference": 0.8492186963170866,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "CAMBER ENERGY, INC.  (CEIN)  (CIK 0001309082)",
+    "concept": "OperatingExpenses",
+    "period_end": "2022-09-30",
+    "claimed_value": 3675066.0,
+    "original_value": 3675066,
+    "restated_value": 25558367,
+    "original_filed": "2022-11-14",
+    "restated_filed": "2024-08-26",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 3675066,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 25558367,
+      "difference": 0.8562088884630227,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Concrete Pumping Holdings, Inc.  (BBCP)  (CIK 0001703956)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2019-07-31",
+    "claimed_value": 2800000.0,
+    "original_value": 2762000,
+    "restated_value": 7318000,
+    "original_filed": "2019-09-16",
+    "restated_filed": "2021-06-11",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 2762000,
+      "difference": 0.013758146270818247,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 7318000,
+      "difference": 0.617381798305548,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Concrete Pumping Holdings, Inc.  (BBCP)  (CIK 0001703956)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2020-07-31",
+    "claimed_value": 3000000.0,
+    "original_value": 2981000,
+    "restated_value": 247000,
+    "original_filed": "2020-09-09",
+    "restated_filed": "2021-06-11",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 2981000,
+      "difference": 0.00637370010063737,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 247000,
+      "difference": 11.145748987854251,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Veritone, Inc.  (VERI)  (CIK 0001615165)",
+    "concept": "Revenues",
+    "period_end": "2025-09-30",
+    "claimed_value": 29100000.0,
+    "original_value": 29118000,
+    "restated_value": 26632000,
+    "original_filed": "2025-11-07",
+    "restated_filed": "2026-04-15",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 29118000,
+      "difference": 0.000618174325159695,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 26632000,
+      "difference": 0.09267047161309702,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Veritone, Inc.  (VERI)  (CIK 0001615165)",
+    "concept": "Revenues",
+    "period_end": "2025-09-30",
+    "claimed_value": 75600000.0,
+    "original_value": 75594000,
+    "restated_value": 72288000,
+    "original_filed": "2025-11-07",
+    "restated_filed": "2026-04-15",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 75594000,
+      "difference": 7.937137868084769e-05,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 72288000,
+      "difference": 0.045816733067729085,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Veritone, Inc.  (VERI)  (CIK 0001615165)",
+    "concept": "Revenues",
+    "period_end": "2025-09-30",
+    "claimed_value": 29100000.0,
+    "original_value": 29118000,
+    "restated_value": 26632000,
+    "original_filed": "2025-11-07",
+    "restated_filed": "2026-04-15",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 29118000,
+      "difference": 0.000618174325159695,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 26632000,
+      "difference": 0.09267047161309702,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Veritone, Inc.  (VERI)  (CIK 0001615165)",
+    "concept": "Revenues",
+    "period_end": "2025-09-30",
+    "claimed_value": 75600000.0,
+    "original_value": 75594000,
+    "restated_value": 72288000,
+    "original_filed": "2025-11-07",
+    "restated_filed": "2026-04-15",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 75594000,
+      "difference": 7.937137868084769e-05,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 72288000,
+      "difference": 0.045816733067729085,
       "reason_code": "large_miss"
     },
     "outcome": "expected_flip"

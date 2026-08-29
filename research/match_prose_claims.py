@@ -73,7 +73,7 @@ EXTRACTION_TIMEOUT_SECONDS = 45  # hard per-chunk backstop - see module docstrin
 # Discover Financial Services and Rithm Capital Corp - the two companies that
 # produced all 18 real matches before the first full run was killed after
 # stalling past 2 hours. None = full MAX_COMPANIES scan.
-TARGET_CIKS: list[str] | None = ["0001393612", "0001556593"]
+TARGET_CIKS: list[str] | None = None
 
 # metric text (lowercased) -> concept, inverted from METRIC_TO_CONCEPTS for a
 # direct "does this concept have ANY known metric-text phrasing" check.
