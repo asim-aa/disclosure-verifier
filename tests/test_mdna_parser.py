@@ -176,3 +176,39 @@ def test_split_heading_with_a_short_real_section_still_prefers_it_over_the_toc()
     paragraphs = extract_mdna_paragraphs(_split_heading_html(body_paragraph_count=3), "10-K")
     assert any("Real MD&A body sentence number 0" in p for p in paragraphs)
     assert "44" not in paragraphs
+
+
+def _dash_heading_html() -> str:
+    """Real heading text confirmed against INTU's live FY2025 10-K: 'ITEM 7 -
+    MANAGEMENT'S...' with a dash separator and no period, not the '.'-separated
+    form (AAPL/MSFT/etc.) the parser was originally built against."""
+    body = "".join(
+        f"<p>Real MD&amp;A body sentence number {i} discusses actual results in enough "
+        f"length to look like genuine prose rather than a heading or a page number.</p>"
+        for i in range(30)
+    )
+    return f"""
+    <html><body>
+      <p>ITEM 7 - MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL</p>
+      <p>CONDITION AND RESULTS OF OPERATIONS</p>
+      {body}
+      <p>ITEM 7A - QUANTITATIVE AND QUALITATIVE DISCLOSURES ABOUT MARKET</p>
+      <p>RISK</p>
+      <p>Real Item 7A content that must not leak into the MD&amp;A section.</p>
+    </body></html>
+    """
+
+
+def test_dash_separated_heading_is_found():
+    """Real bug, found via research/specificity_check.py's tech-company control
+    set: INTU's real 10-K returned zero MD&A chunks because the heading regex
+    only tolerated an optional period between the item number and its title, not
+    a dash - and INTU's real heading uses a dash with no period at all."""
+    paragraphs = extract_mdna_paragraphs(_dash_heading_html(), "10-K")
+    assert any("Real MD&A body sentence number 0" in p for p in paragraphs)
+
+
+def test_dash_separated_heading_stops_before_item_7a():
+    paragraphs = extract_mdna_paragraphs(_dash_heading_html(), "10-K")
+    joined = " ".join(paragraphs)
+    assert "Real Item 7A content" not in joined

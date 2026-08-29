@@ -12,9 +12,17 @@ Switched to large tech/software names — ADBE, CRM, ORCL, CSCO, INTU, IBM, QCOM
 
 ## What came back
 
-126 claims across 8 tickers (all succeeded; INTU and IBM had no locatable MD&A within budget, a smaller instance of the same coverage gap): **102 unverifiable, 18 consistent, 6 inconsistent.**
+126 claims across 8 tickers (all succeeded; INTU and IBM initially had no locatable MD&A within budget): **102 unverifiable, 18 consistent, 6 inconsistent.**
 
 An apparent false-positive rate of 6/24 = 25% among resolved verdicts — a number worth investigating before reporting, not reporting at face value. It traces to two distinct root causes, only one of which is this project's own bug.
+
+## A third real bug, found by narrowing scope: INTU's dash-separated heading
+
+Investigating why INTU returned zero claims (rather than assuming it was the same coverage gap as the financials/consumer-staples batch) found a second, unrelated, and cleanly fixable bug. `tools/mdna_parser.py`'s heading regex only tolerated an optional *period* between an Item number and its title (`Item\s*7\.?...`) — but INTU's real FY2025 10-K heading is **`ITEM 7 - MANAGEMENT'S DISCUSSION AND ANALYSIS...`**, dash-separated with no period at all, so the regex never matched at all. Confirmed against the live filing (1,000+ lines of genuine MD&A prose sitting right after the unmatched heading) before fixing. **Fixed** by allowing an optional dash (hyphen, en dash, or em dash) as an alternative separator, with regression tests built from the real heading text. Re-verified: INTU now returns 280 real MD&A chunks (up from 0) and 11 real extracted claims (up from 0) on the next specificity run.
+
+IBM's zero claims turned out to be a *different* thing entirely, not a bug: IBM's real 10-K literally states *"Refer to pages 6 through 38 of IBM's 2025 Annual Report to Stockholders, which are incorporated herein by reference"* — the MD&A isn't in this document at all, a real and legitimate SEC filing pattern (large filers incorporating MD&A by reference to a separate annual-report exhibit rather than repeating it in the 10-K body). Reaching that would mean fetching and parsing a second, separately-filed document — a real, different, and larger piece of work than a heading-regex fix, not attempted here. Correctly distinguishing "not present in this document" from "present but unparsed" is itself a real, if smaller, remaining gap: the parser currently returns a degenerate 1-line pseudo-section for IBM rather than raising `MdnaNotFoundError`, which happens not to affect any verdict here (0 claims either way) but is worth closing later.
+
+With the fix, the aggregate moved to **137 claims, still 24 resolved verdicts** (INTU's 11 new claims were all unverifiable — genuine content, but segment-heavy prose that hit the extraction-call budget before reaching a claim the resolver's concept dictionary covers, the same pattern seen with JNJ and V in the first control-set attempt). The false-positive rate itself didn't move on this run, but the underlying bug fix is real and permanent — every future run against INTU, not just this one, benefits from it.
 
 ## Root cause 1: a real, previously-undiscovered resolver bug — found and fixed
 
@@ -49,7 +57,7 @@ Given the maker/checker separation this project is built around (`docs/robustnes
 
 ## Honest scope
 
-8 tickers, 126 claims, 24 resolved verdicts — a real but small sample, and one candidate set (financials/consumer-staples) turned up an MD&A-detection coverage gap before any specificity signal could be measured at all. The extraction root cause for CSCO and CRM's remaining misses is a reasoned hypothesis from the visible quote, not independently confirmed the way TXN's three cases were.
+8 tickers, 137 claims (after the dash-heading fix), 24 resolved verdicts — a real but small sample, and one candidate set (financials/consumer-staples) turned up an MD&A-detection coverage gap before any specificity signal could be measured at all. The extraction root cause for CSCO and CRM's remaining misses is a reasoned hypothesis from the visible quote, not independently confirmed the way TXN's three cases were. IBM's "incorporated by reference" case remains genuinely unaddressed — a different, larger piece of work than anything fixed here.
 
 ## Reproducing
 

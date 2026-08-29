@@ -44,18 +44,27 @@ class _SectionPattern:
     end_candidates: tuple[re.Pattern, ...]
 
 
+# The separator between an Item number and its title varies by filer - most use a
+# bare period ("Item 7. Management's..."), but some (confirmed against real INTU
+# 10-K data) use a dash instead ("ITEM 7 - MANAGEMENT'S..."), with no period at
+# all. `\.?` alone only tolerated an optional period; this also tolerates an
+# optional dash (hyphen-minus, en dash, or em dash) in its place, with whitespace
+# freely around either. Still requires the title text itself to follow, so this
+# doesn't loosen the match enough to catch unrelated "Item 7" cross-references.
+_ITEM_SEPARATOR = r"[\s\xa0]*[.\-–—]?[\s\xa0]*"
+
 # MD&A lives at a different Item number in a 10-K (Item 7) vs a 10-Q (Item 2).
 _SECTION_PATTERNS: dict[str, _SectionPattern] = {
     "10-K": _SectionPattern(
-        start=re.compile(r"Item\s*7\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.IGNORECASE),
+        start=re.compile(r"Item\s*7" + _ITEM_SEPARATOR + r"Management.{0,3}s\s+Discussion", re.IGNORECASE),
         end_candidates=(
-            re.compile(r"Item\s*7A\.?[\s\xa0]*Quantitative", re.IGNORECASE),
-            re.compile(r"Item\s*8\.?[\s\xa0]*Financial\s+Statements", re.IGNORECASE),
+            re.compile(r"Item\s*7A" + _ITEM_SEPARATOR + r"Quantitative", re.IGNORECASE),
+            re.compile(r"Item\s*8" + _ITEM_SEPARATOR + r"Financial\s+Statements", re.IGNORECASE),
         ),
     ),
     "10-Q": _SectionPattern(
-        start=re.compile(r"Item\s*2\.?[\s\xa0]*Management.{0,3}s\s+Discussion", re.IGNORECASE),
-        end_candidates=(re.compile(r"Item\s*3\.?[\s\xa0]*Quantitative", re.IGNORECASE),),
+        start=re.compile(r"Item\s*2" + _ITEM_SEPARATOR + r"Management.{0,3}s\s+Discussion", re.IGNORECASE),
+        end_candidates=(re.compile(r"Item\s*3" + _ITEM_SEPARATOR + r"Quantitative", re.IGNORECASE),),
     ),
 }
 
