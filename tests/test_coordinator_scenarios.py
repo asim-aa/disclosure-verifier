@@ -9,12 +9,13 @@ from agents.coordinator import Coordinator
 from agents.extraction_agent import MockExtractionAgent
 from agents.retrieval_agent import MockRetrievalAgent
 from agents.schema import VerificationOutcome
-from agents.verification_agent import MockVerificationAgent
+from agents.verification_agent import MockVerificationAgent, RealVerificationAgent
 from eval.schema import ExtractedClaim
 from tools.schema import (
     VERDICT_CONSISTENT,
     VERDICT_INCONSISTENT,
     VERDICT_UNVERIFIABLE,
+    FinancialFact,
     TextChunk,
 )
 
@@ -83,6 +84,91 @@ def test_scenario_claim_cannot_be_verified_missing_data(tmp_path):
     vc = report.verified_claims[0]
     assert vc.verdict == VERDICT_UNVERIFIABLE
     assert vc.citations == []
+
+
+# ---------- end-to-end: the real "compared with" bug, through the real pipeline ----------
+#
+# Real bug, found via research/specificity_check.py against TXN's actual FY2025
+# 10-K. Uses the real RealVerificationAgent (no LLM - extraction is mocked with
+# the exact real quote), so this exercises Coordinator.run's actual occurrence-
+# numbering logic end to end, not just RealVerificationAgent in isolation.
+
+
+def _txn_fact(value, period_start, period_end):
+    return FinancialFact(
+        ticker="TXN", cik="0000097476", concept="NetIncomeLoss", label="Net Income (Loss)",
+        value=value, unit="USD", period_start=period_start, period_end=period_end,
+        fiscal_year=2025, fiscal_period="FY", form="10-K", filed="2026-02-06", accession_number="a",
+    )
+
+
+def test_real_txn_compared_with_sentence_both_claims_verify_correctly(tmp_path):
+    """Real quote from TXN's FY2025 10-K MD&A: 'Net income was $5.00 billion
+    compared with $4.80 billion.' Extraction (confirmed against the live
+    extractor, not mocked here) correctly produces two absolute claims with the
+    right values; before this fix, both resolved against the same current-period
+    fact and the true $4.80B prior-year claim came back inconsistent."""
+    chunk = TextChunk(
+        ticker="TXN", cik="0000097476", accession_number="a", form="10-K",
+        filing_date="2026-02-06", section="MD&A", chunk_index=0,
+        text="Net income was $5.00 billion compared with $4.80 billion.",
+    )
+    quote = "Net income was $5.00 billion compared with $4.80 billion."
+    claims = [
+        ExtractedClaim(metric="net income", value=5_000_000_000.0, value_unit="USD", period="", comparison_type="absolute", quote=quote),
+        ExtractedClaim(metric="net income", value=4_800_000_000.0, value_unit="USD", period="", comparison_type="absolute", quote=quote),
+    ]
+    facts = [_txn_fact(5_000_000_000, "2025-01-01", "2025-12-31"), _txn_fact(4_800_000_000, "2024-01-01", "2024-12-31")]
+
+    retrieval = MockRetrievalAgent(chunks=[chunk], facts=facts)
+    extraction = MockExtractionAgent(canned={chunk.text: claims})
+    report = Coordinator(retrieval, extraction, RealVerificationAgent(), checkpoint_dir=tmp_path).run("TXN")
+
+    assert len(report.verified_claims) == 2
+    assert [vc.verdict for vc in report.verified_claims] == [VERDICT_CONSISTENT, VERDICT_CONSISTENT]
+
+
+def _operating_income_fact(value, period_start, period_end):
+    return FinancialFact(
+        ticker="TXN", cik="0000097476", concept="OperatingIncomeLoss", label="Operating Income (Loss)",
+        value=value, unit="USD", period_start=period_start, period_end=period_end,
+        fiscal_year=2025, fiscal_period="FY", form="10-K", filed="2026-02-06", accession_number="a",
+    )
+
+
+def test_real_txn_interleaved_dollar_and_percent_claims_pair_correctly(tmp_path):
+    """Real quote from TXN's FY2025 10-K MD&A: 'Operating profit was $6.02
+    billion, or 34.1% of revenue, compared with $5.47 billion, or 34.9% of
+    revenue.' Confirmed against the live extractor (not mocked here): this
+    produces 4 claims for the SAME metric text, interleaved USD/percent, and
+    without different sub-quotes per claim - so occurrence must be numbered per
+    (metric, value_unit), not (metric, quote), or the second $ claim keeps
+    resolving against the current period instead of the prior one. The two
+    percent claims are separately caught by the percent/dollar-concept guard
+    (OperatingIncomeLoss is a dollar concept, not a ratio) - unverifiable, not
+    wrong, either way."""
+    chunk = TextChunk(
+        ticker="TXN", cik="0000097476", accession_number="a", form="10-K",
+        filing_date="2026-02-06", section="MD&A", chunk_index=0,
+        text="Operating profit was $6.02 billion, or 34.1% of revenue, compared with $5.47 billion, or 34.9% of revenue.",
+    )
+    claims = [
+        ExtractedClaim(metric="Operating profit", value=6_020_000_000.0, value_unit="USD", period="", comparison_type="absolute", quote="Operating profit was $6.02 billion, or 34.1% of revenue, compared with $5.47 billion, or 34.9% of revenue."),
+        ExtractedClaim(metric="Operating profit", value=5_470_000_000.0, value_unit="USD", period="", comparison_type="absolute", quote="compared with $5.47 billion"),
+        ExtractedClaim(metric="Operating profit", value=34.1, value_unit="percent", period="", comparison_type="absolute", quote="or 34.1% of revenue"),
+        ExtractedClaim(metric="Operating profit", value=34.9, value_unit="percent", period="", comparison_type="absolute", quote="or 34.9% of revenue"),
+    ]
+    facts = [
+        _operating_income_fact(6_020_000_000, "2025-01-01", "2025-12-31"),
+        _operating_income_fact(5_470_000_000, "2024-01-01", "2024-12-31"),
+    ]
+
+    retrieval = MockRetrievalAgent(chunks=[chunk], facts=facts)
+    extraction = MockExtractionAgent(canned={chunk.text: claims})
+    report = Coordinator(retrieval, extraction, RealVerificationAgent(), checkpoint_dir=tmp_path).run("TXN")
+
+    verdicts = [vc.verdict for vc in report.verified_claims]
+    assert verdicts == [VERDICT_CONSISTENT, VERDICT_CONSISTENT, VERDICT_UNVERIFIABLE, VERDICT_UNVERIFIABLE]
 
 
 # ---------- routing / aggregation correctness ----------

@@ -800,8 +800,8 @@
   {
     "ticker": "TXN",
     "metric": "gross profit margin",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "unverifiable",
+    "reason_code": null,
     "quote": "As a percentage of revenue, gross profit decreased to 57.0% from 58.1%."
   },
   {
@@ -849,22 +849,22 @@
   {
     "ticker": "TXN",
     "metric": "Operating profit",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "compared with $5.47 billion"
   },
   {
     "ticker": "TXN",
     "metric": "Operating profit",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "unverifiable",
+    "reason_code": null,
     "quote": "or 34.1% of revenue"
   },
   {
     "ticker": "TXN",
     "metric": "Operating profit",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "unverifiable",
+    "reason_code": null,
     "quote": "or 34.9% of revenue"
   },
   {
@@ -905,8 +905,8 @@
   {
     "ticker": "TXN",
     "metric": "provision for income taxes",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "Our provision for income taxes was $709 million compared with $654 million."
   },
   {
@@ -926,8 +926,8 @@
   {
     "ticker": "TXN",
     "metric": "effective tax rate",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "Our effective tax rate, which includes discrete tax items, was 12.4% in 2025 compared with 12.0% in 2024."
   },
   {
@@ -940,8 +940,8 @@
   {
     "ticker": "TXN",
     "metric": "Net income",
-    "verdict": "inconsistent",
-    "reason_code": "large_miss",
+    "verdict": "consistent",
+    "reason_code": "match",
     "quote": "Net income was $5.00 billion compared with $4.80 billion."
   },
   {

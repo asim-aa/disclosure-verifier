@@ -255,6 +255,32 @@ def test_resolve_periods_period_hint_recognizes_fy_shorthand():
     assert current.value == 180
 
 
+def test_resolve_periods_period_hint_recognizes_a_bare_year():
+    """Real bug, confirmed against TXN's actual MD&A: '...was 12.4% in 2025
+    compared with 12.0% in 2024.' extracts with period="2024" (just the year,
+    no "fiscal"/"FY" prefix) - _FISCAL_YEAR_RE required that prefix and missed
+    it, silently falling back to the most recent fact instead."""
+    facts = [
+        fact("EffectiveIncomeTaxRateContinuingOperations", 0.124, "2025-01-01", "2025-12-31", unit="pure", fiscal_year=2025),
+        fact("EffectiveIncomeTaxRateContinuingOperations", 0.12, "2024-01-01", "2024-12-31", unit="pure", fiscal_year=2024),
+    ]
+    current, _ = resolve_periods(facts, "EffectiveIncomeTaxRateContinuingOperations", period_hint="2024")
+    assert current.value == 0.12
+
+
+def test_resolve_periods_bare_year_hint_does_not_match_inside_longer_text():
+    """A bare-year match must be anchored to the whole hint string, not a
+    substring search - "fiscal year 2024 results" contains "2024" but isn't
+    itself just a year, and matching loosely here could pick up an unrelated
+    4-digit number from a longer, unparsed period description."""
+    facts = [
+        fact("Revenues", 200, "2025-01-01", "2025-12-31", fiscal_year=2025),
+        fact("Revenues", 180, "2024-01-01", "2024-12-31", fiscal_year=2024),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="page 2024 of the annual report")
+    assert current.value == 200  # falls back to default (most recent), not the bare-year match
+
+
 def test_resolve_periods_period_hint_recognizes_ordinal_quarter():
     facts = [
         fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3"),

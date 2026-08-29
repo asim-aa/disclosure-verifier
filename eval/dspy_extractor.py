@@ -23,6 +23,14 @@ class ExtractClaims(dspy.Signature):
     SEC filing. A claim is a specific assertion tying a number to a metric and a
     period. Ignore purely qualitative statements with no number attached.
 
+    A sentence stating two absolute values side by side with no computed delta
+    ("Net income was $5.00 billion compared with $4.80 billion") is TWO absolute
+    claims, not one — the FIRST value is the current-period figure, the SECOND is
+    the prior-period comparison figure being cited for context. This applies no
+    matter which connective word joins them ("from", "compared with", "compared
+    to", "versus", "up from") — never drop the first value and keep only the
+    second, and never compute or report a delta the text itself doesn't state.
+
     When your reasoning mentions a dollar amount, always write out the fully
     expanded number there too (e.g. "$215.9 billion" -> 215900000000), not the
     abbreviated form — the structured `value` field must match a number that

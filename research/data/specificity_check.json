@@ -15,13 +15,13 @@
     "failed_tickers": [],
     "total_claims_verified": 137,
     "by_verdict": {
-      "unverifiable": 113,
-      "consistent": 18,
-      "inconsistent": 6
+      "unverifiable": 102,
+      "consistent": 26,
+      "inconsistent": 9
     },
-    "n_resolved_verdicts": 24,
-    "n_inconsistent": 6,
-    "apparent_false_positive_rate": 0.25
+    "n_resolved_verdicts": 35,
+    "n_inconsistent": 9,
+    "apparent_false_positive_rate": 0.2571428571428571
   },
   "runs": [
     {
@@ -42,13 +42,13 @@
           "verification": 34
         },
         "n_reasoning_steps": 67,
-        "time_to_first_action_seconds": 3.3564865589141846e-06,
-        "total_elapsed_seconds": 2.038938108831644,
+        "time_to_first_action_seconds": 3.536231815814972e-06,
+        "total_elapsed_seconds": 2.0616290774196386,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 2.2823969423770905
+      "elapsed_seconds": 2.3043396351858974
     },
     {
       "ticker": "CRM",
@@ -58,8 +58,8 @@
         "ticker": "CRM",
         "n_claims": 16,
         "by_verdict": {
-          "unverifiable": 14,
-          "inconsistent": 2
+          "inconsistent": 7,
+          "unverifiable": 9
         },
         "n_tool_calls": 58,
         "tool_calls_by_agent": {
@@ -68,12 +68,28 @@
           "verification": 16
         },
         "n_reasoning_steps": 48,
-        "time_to_first_action_seconds": 4.41819429397583e-06,
-        "total_elapsed_seconds": 0.34037307742983103,
+        "time_to_first_action_seconds": 6.231479346752167e-06,
+        "total_elapsed_seconds": 0.3616163767874241,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [
+        {
+          "metric": "diluted net income per share",
+          "claimed_value": 6.36,
+          "period": "a year ago",
+          "quote": "as compared to diluted net income per share of $6.36 from a year ago.",
+          "explanation": "Claimed EarningsPerShareDiluted=6; EDGAR reports 8 for the period ending 2026-01-31 (relative difference 18.46%).",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "Cash provided by operations",
+          "claimed_value": 15000000000.0,
+          "period": "fiscal 2026",
+          "quote": "Cash provided by operations for fiscal 2026 was $15.0 billion",
+          "explanation": "Claimed NetCashProvidedByUsedInOperatingActivities=15,000,000,000; EDGAR reports 9,532,000,000 for the period ending 2025-10-31 (relative difference 57.36%).",
+          "reason_code": "large_miss"
+        },
         {
           "metric": "revenue",
           "claimed_value": 72400000000.0,
@@ -89,9 +105,33 @@
           "quote": "$72.4 billion, an increase of 14 percent year-over-year",
           "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax growth of 14.00%; EDGAR data implies 9.58% (37,895,000,000 -> 41,525,000,000), a difference of 4.42 percentage points.",
           "reason_code": "large_miss"
+        },
+        {
+          "metric": "common stock repurchase amount",
+          "claimed_value": 12700000000.0,
+          "period": "fiscal 2026",
+          "quote": "For fiscal 2026, we repurchased approximately 50 million shares of our common stock for approximately $12.7 billion as compared to 30 million shares for approximately $7.8 billion from a year ago.",
+          "explanation": "Claimed PaymentsForRepurchaseOfCommonStock=12,700,000,000; EDGAR reports 8,659,000,000 for the period ending 2025-10-31 (relative difference 46.67%).",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "common stock repurchase amount",
+          "claimed_value": 7800000000.0,
+          "period": "a year ago",
+          "quote": "For fiscal 2026, we repurchased approximately 50 million shares of our common stock for approximately $12.7 billion as compared to 30 million shares for approximately $7.8 billion from a year ago.",
+          "explanation": "Claimed PaymentsForRepurchaseOfCommonStock=7,800,000,000; EDGAR reports 12,596,000,000 for the period ending 2026-01-31 (relative difference 38.08%).",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "Total revenues",
+          "claimed_value": 1.0,
+          "period": "fiscal year ended January 31, 2026",
+          "quote": "Total revenues in the fiscal year ended January 31, 2026 was positively impacted by approximately one percent in foreign currency fluctuations compared to the fiscal year ended January 31, 2025.",
+          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax growth of 1.00%; EDGAR data implies 9.58% (37,895,000,000 -> 41,525,000,000), a difference of 8.58 percentage points.",
+          "reason_code": "large_miss"
         }
       ],
-      "elapsed_seconds": 0.7320897467434406
+      "elapsed_seconds": 0.7595492275431752
     },
     {
       "ticker": "ORCL",
@@ -110,13 +150,13 @@
           "verification": 10
         },
         "n_reasoning_steps": 49,
-        "time_to_first_action_seconds": 1.7229467630386353e-06,
-        "total_elapsed_seconds": 0.3348170518875122,
+        "time_to_first_action_seconds": 1.862645149230957e-06,
+        "total_elapsed_seconds": 0.3438937235623598,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.8892824407666922
+      "elapsed_seconds": 0.8979540262371302
     },
     {
       "ticker": "CSCO",
@@ -126,8 +166,9 @@
         "ticker": "CSCO",
         "n_claims": 27,
         "by_verdict": {
-          "unverifiable": 26,
-          "inconsistent": 1
+          "consistent": 1,
+          "unverifiable": 24,
+          "inconsistent": 2
         },
         "n_tool_calls": 69,
         "tool_calls_by_agent": {
@@ -136,12 +177,20 @@
           "verification": 27
         },
         "n_reasoning_steps": 64,
-        "time_to_first_action_seconds": 3.0463561415672302e-06,
-        "total_elapsed_seconds": 0.3420083113014698,
+        "time_to_first_action_seconds": 3.5669654607772827e-06,
+        "total_elapsed_seconds": 0.3643186632543802,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [
+        {
+          "metric": "total revenue",
+          "claimed_value": 8.0,
+          "period": "the fourth quarter of fiscal 2025",
+          "quote": "total revenue increased by 8%",
+          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax growth of 8.00%; EDGAR data implies 5.30% (53,803,000,000 -> 56,654,000,000), a difference of 2.70 percentage points.",
+          "reason_code": "large_miss"
+        },
         {
           "metric": "Diluted earnings per share",
           "claimed_value": 19.0,
@@ -151,7 +200,7 @@
           "reason_code": "large_miss"
         }
       ],
-      "elapsed_seconds": 0.8454184858128428
+      "elapsed_seconds": 0.8748989971354604
     },
     {
       "ticker": "INTU",
@@ -170,13 +219,13 @@
           "verification": 11
         },
         "n_reasoning_steps": 51,
-        "time_to_first_action_seconds": 2.154149115085602e-06,
-        "total_elapsed_seconds": 52.025320316664875,
+        "time_to_first_action_seconds": 2.483837306499481e-06,
+        "total_elapsed_seconds": 0.3450719742104411,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 52.465278236195445
+      "elapsed_seconds": 0.7899021944031119
     },
     {
       "ticker": "IBM",
@@ -191,13 +240,13 @@
           "retrieval": 2
         },
         "n_reasoning_steps": 2,
-        "time_to_first_action_seconds": 2.9243528842926025e-06,
-        "total_elapsed_seconds": 1.0097399353981018e-05,
+        "time_to_first_action_seconds": 2.985820174217224e-06,
+        "total_elapsed_seconds": 9.758397936820984e-06,
         "partial": false,
         "partial_reason": null
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.3509884886443615
+      "elapsed_seconds": 0.36492085829377174
     },
     {
       "ticker": "QCOM",
@@ -216,13 +265,13 @@
           "verification": 4
         },
         "n_reasoning_steps": 45,
-        "time_to_first_action_seconds": 3.887340426445007e-06,
-        "total_elapsed_seconds": 0.3349269162863493,
+        "time_to_first_action_seconds": 3.0258670449256897e-06,
+        "total_elapsed_seconds": 0.3423547809943557,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.7165716970339417
+      "elapsed_seconds": 0.5365913528949022
     },
     {
       "ticker": "TXN",
@@ -232,9 +281,8 @@
         "ticker": "TXN",
         "n_claims": 35,
         "by_verdict": {
-          "consistent": 11,
-          "unverifiable": 21,
-          "inconsistent": 3
+          "consistent": 18,
+          "unverifiable": 17
         },
         "n_tool_calls": 77,
         "tool_calls_by_agent": {
@@ -243,38 +291,13 @@
           "verification": 35
         },
         "n_reasoning_steps": 68,
-        "time_to_first_action_seconds": 2.04332172870636e-06,
-        "total_elapsed_seconds": 0.3598618321120739,
+        "time_to_first_action_seconds": 2.594664692878723e-06,
+        "total_elapsed_seconds": 0.38075030501931906,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
-      "inconsistent_claims": [
-        {
-          "metric": "provision for income taxes",
-          "claimed_value": 654000000.0,
-          "period": "",
-          "quote": "Our provision for income taxes was $709 million compared with $654 million.",
-          "explanation": "Claimed IncomeTaxExpenseBenefit=654,000,000; EDGAR reports 709,000,000 for the period ending 2025-12-31 (relative difference 7.76%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "effective tax rate",
-          "claimed_value": 12.0,
-          "period": "2024",
-          "quote": "Our effective tax rate, which includes discrete tax items, was 12.4% in 2025 compared with 12.0% in 2024.",
-          "explanation": "Claimed EffectiveIncomeTaxRateContinuingOperations=0; EDGAR reports 0 for the period ending 2025-12-31 (relative difference 3.23%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "Net income",
-          "claimed_value": 4800000000.0,
-          "period": "",
-          "quote": "Net income was $5.00 billion compared with $4.80 billion.",
-          "explanation": "Claimed NetIncomeLoss=4,800,000,000; EDGAR reports 5,001,000,000 for the period ending 2025-12-31 (relative difference 4.02%).",
-          "reason_code": "large_miss"
-        }
-      ],
-      "elapsed_seconds": 0.5532420640811324
+      "inconsistent_claims": [],
+      "elapsed_seconds": 0.7592632127925754
     }
   ]
 }

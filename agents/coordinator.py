@@ -107,11 +107,37 @@ class Coordinator:
                     "decision", "coordinator", "skip_empty_chunk", f"chunk {chunk.chunk_index} yielded no claims"
                 )
             else:
+                # A chunk's own claims can repeat the same metric via one "[current]
+                # ... compared with [prior]" sentence extracted as two separate
+                # absolute claims (see RealVerificationAgent.verify's `occurrence`
+                # docstring). Numbering repeats by (metric, value_unit) - real TXN
+                # case, confirmed against the live extractor: "Operating profit was
+                # $6.02 billion, or 34.1% of revenue, compared with $5.47 billion,
+                # or 34.9% of revenue." produces 4 claims for the SAME metric text
+                # ("Operating profit" x4), but the model doesn't always give same-
+                # pair claims an identical `quote` span (some get a truncated
+                # sub-quote), so keying on (metric, quote) missed this pair
+                # entirely and left the $5.47B claim unswapped. Splitting by
+                # value_unit too keeps the interleaved USD pair (6.02B, 5.47B) and
+                # percent pair (34.1, 34.9) numbered independently regardless of
+                # extraction order, so one doesn't shift the other's occurrence
+                # index. The residual risk - two genuinely unrelated current-period
+                # mentions of the same metric/unit within one chunk with no stated
+                # period - is judged low at this pipeline's paragraph-level
+                # chunking granularity, and bounded: occurrence >= 2 still falls
+                # back to unswapped default behavior rather than guessing further.
+                seen_absolute_no_period: dict[tuple[str, str], int] = {}
                 for claim in claims:
+                    occurrence = 0
+                    if claim.comparison_type == "absolute" and not claim.period:
+                        key = (claim.metric.strip().lower(), claim.value_unit)
+                        occurrence = seen_absolute_no_period.get(key, 0)
+                        seen_absolute_no_period[key] = occurrence + 1
+
                     tracer.record(
                         "tool_call", "verification", "verify", f"{claim.metric}={claim.value}{claim.value_unit}"
                     )
-                    outcome = self.verification.verify(claim, ticker, facts, as_of=chunk.filing_date)
+                    outcome = self.verification.verify(claim, ticker, facts, as_of=chunk.filing_date, occurrence=occurrence)
                     report.verified_claims.append(
                         VerifiedClaim(
                             source=chunk,

@@ -173,6 +173,16 @@ def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | N
 # free-text period.
 _FISCAL_YEAR_RE = re.compile(r"fiscal\s+(?:year\s+)?(\d{4})|\bFY\s?(\d{4})\b", re.IGNORECASE)
 
+# A period hint that's *just* a bare 4-digit year ("2024", nothing else) - real
+# case, confirmed against TXN's actual MD&A: "...was 12.4% in 2025 compared with
+# 12.0% in 2024." extracts as an absolute claim with period="2024", but
+# _FISCAL_YEAR_RE requires a "fiscal"/"FY" prefix, so this fell through to the
+# default (most recent) fact and got checked against 2025's real number instead.
+# Anchored to the whole string (not `search`) so this never fires on a longer,
+# ambiguous hint that merely contains a year among other words - only a period
+# extracted as literally nothing but a year is unambiguous enough to trust.
+_BARE_YEAR_RE = re.compile(r"^\s*(\d{4})\s*$")
+
 # Matches an *ordinal* quarter reference - "third quarter", "Q3", "3rd fiscal
 # quarter" - which maps directly and unambiguously to XBRL's own fiscal_period
 # field ("Q1".."Q4", from the source data's `fp`), since that field is itself
@@ -239,9 +249,10 @@ def _similar_length(a: int, b: int) -> bool:
 
 def _extract_fiscal_year(period_hint: str) -> int | None:
     match = _FISCAL_YEAR_RE.search(period_hint)
-    if not match:
-        return None
-    return int(match.group(1) or match.group(2))
+    if match:
+        return int(match.group(1) or match.group(2))
+    bare = _BARE_YEAR_RE.match(period_hint)
+    return int(bare.group(1)) if bare else None
 
 
 def _extract_fiscal_quarter(period_hint: str) -> str | None:

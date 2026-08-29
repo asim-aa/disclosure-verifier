@@ -16,18 +16,36 @@ from tools.schema import VERDICT_UNVERIFIABLE, Claim, FinancialFact
 
 class VerificationAgent(Protocol):
     def verify(
-        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None
+        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None,
+        occurrence: int = 0,
     ) -> VerificationOutcome: ...
 
 
 class RealVerificationAgent:
     def verify(
-        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None
+        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None,
+        occurrence: int = 0,
     ) -> VerificationOutcome:
         """`as_of` should be the filing_date of the filing the claim's source
         paragraph came from — see resolve_periods for why this cutoff matters
         (without it, a claim from an older 10-K can get compared against a
-        newer 10-Q's quarterly figures instead of that 10-K's own annual ones)."""
+        newer 10-Q's quarterly figures instead of that 10-K's own annual ones).
+
+        `occurrence` numbers repeated (metric, quote) claims within one chunk
+        (see Coordinator.run) — real bug, confirmed against TXN's actual MD&A
+        (research/specificity_check.py): a sentence like "Net income was $5.00
+        billion compared with $4.80 billion." extracts correctly as TWO absolute
+        claims, but neither states an explicit period, so both independently
+        resolve_periods to the SAME current fact — the true, accurate $4.80B
+        prior-year claim then gets checked against the current year's number and
+        wrongly flagged inconsistent. When occurrence == 1 (the second same-
+        metric/same-quote absolute claim with no stated period) check it against
+        the *comparison* fact resolve_periods already found for the first
+        occurrence instead. occurrence >= 2 (a third+ repeat, not seen in any
+        real chunk this project has inspected) falls back to default behavior —
+        resolve_periods only returns one comparison fact, so there's no third
+        period to check a third repeat against without deeper resolver changes,
+        and guessing wrong would be worse than an honest, unfixed gap."""
         concept = resolve_concept(extracted.metric, facts, as_of=as_of)
         if concept is None:
             return VerificationOutcome(
@@ -41,11 +59,44 @@ class RealVerificationAgent:
         except ValueError as exc:
             return VerificationOutcome(verdict=VERDICT_UNVERIFIABLE, explanation=str(exc), citations=[])
 
+        if occurrence == 1 and extracted.comparison_type == "absolute" and not extracted.period:
+            if comparison_fact is None:
+                return VerificationOutcome(
+                    verdict=VERDICT_UNVERIFIABLE,
+                    explanation=(
+                        f"No prior-period fact available for '{concept}' to check this repeated "
+                        "absolute claim (no stated period) against."
+                    ),
+                    citations=[],
+                )
+            current_fact, comparison_fact = comparison_fact, None
+
         needs_comparison = extracted.comparison_type != "absolute"
         if needs_comparison and comparison_fact is None:
             return VerificationOutcome(
                 verdict=VERDICT_UNVERIFIABLE,
                 explanation=f"No comparison period available for '{concept}' to check a {extracted.comparison_type} claim.",
+                citations=[],
+            )
+
+        # A metric-text mapping can point at a real concept that's still the wrong
+        # *kind* of fact for the claim - e.g. "gross profit margin" (a stated
+        # percentage) mapped to GrossProfit, which XBRL reports as a raw dollar
+        # figure, never a ratio. That's not a real inconsistency, it's a claim the
+        # dictionary can't actually check: no numeric comparison between a percent
+        # and a dollar amount can ever be meaningful. Confirmed against real TXN
+        # data (research/specificity_check.py): "gross profit decreased to 57.0%
+        # from 58.1%" claimed 57 against GrossProfit's real $10.083B, a 100%
+        # "difference" that isn't a mismatch at all, just an incompatible unit.
+        # A percent claim can only be checked against a "pure" (decimal-fraction)
+        # fact - anything else means unverifiable, not automatically wrong.
+        if extracted.comparison_type == "absolute" and extracted.value_unit == "percent" and current_fact.unit != "pure":
+            return VerificationOutcome(
+                verdict=VERDICT_UNVERIFIABLE,
+                explanation=(
+                    f"'{concept}' is reported in {current_fact.unit!r}, not a percentage/ratio — "
+                    "can't check a percent claim against it."
+                ),
                 citations=[],
             )
 
@@ -91,7 +142,8 @@ class MockVerificationAgent:
         self._i = 0
 
     def verify(
-        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None
+        self, extracted: ExtractedClaim, ticker: str, facts: list[FinancialFact], as_of: str | None = None,
+        occurrence: int = 0,
     ) -> VerificationOutcome:
         outcome = self._outcomes[self._i]
         self._i += 1
