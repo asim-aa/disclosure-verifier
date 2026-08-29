@@ -55,6 +55,14 @@ Given the maker/checker separation this project is built around (`docs/robustnes
 - **Reconciler false-positive rate, given correct inputs: 0/24 (0%).** Every one of the 24 resolved verdicts is either a real match (18 consistent) or a real mismatch the reconciler correctly caught — 8 because of the period-selection bug found and fixed here, 6 because extraction handed it a wrong number. In no case did the reconciler produce an incorrect verdict against an accurate claim and correctly-resolved data.
 - **System-level apparent false-positive rate: 6/24 (25%)**, entirely attributable to extraction, not verification.
 
+## Narrowing further: what was actually in the "unverifiable" bucket
+
+The 24 resolved verdicts above are a small fraction of the 137 real claims this control set produced — 113 came back `unverifiable`, and the same lesson that motivated the period-selection fix applied again: that bucket had never actually been inspected, just assumed to be genuinely out-of-scope (segment/product-level prose the concept dictionary was never meant to cover).
+
+[`research/unresolved_claims_audit.py`](../research/unresolved_claims_audit.py) captures metric text, verdict, and reason code for *every* claim (not just the inconsistent ones) from the same 8-ticker control set, and tallies the unverifiable ones by metric text. Most of the 113 were confirmed genuinely out of scope on inspection — ADBE's segment ARR breakdowns, CSCO's per-geography and per-product-line revenue splits, one-off restructuring and non-GAAP reconciliation figures — the same class of "no dimensional data in the company-facts API" gap already documented above. But a real, repeated cluster wasn't: `operating profit`, `total revenue`/`total revenues`, `total gross margin`/`gross profit margin`, `diluted net income per share`, `cash provided by operations`, `common stock repurchase amount`, and `interest and debt expense` — either plain wording variants of concepts already in `METRIC_TO_CONCEPTS`, or (for `interest and debt expense`) a genuinely distinct XBRL tag, confirmed present in TXN's real company-facts data before being added.
+
+Added all seven to the dictionary and re-ran the same 8-ticker audit: **113 → 99 unverifiable claims (24 → 38 resolved verdicts)**, a real, measured 14-claim improvement — resolution rate on this control set moved from 17.5% to 27.7%. `total gross margin` still shows up twice in the post-fix unverifiable tally, a useful negative result: the metric-text mapping resolved correctly, but the reconciler still couldn't verify those two specific claims for a different reason (a data-availability gap in that company's own reported facts, not a dictionary gap) — the fix earns credit only for what it actually moved, not everything left in the bucket.
+
 ## Honest scope
 
 8 tickers, 137 claims (after the dash-heading fix), 24 resolved verdicts — a real but small sample, and one candidate set (financials/consumer-staples) turned up an MD&A-detection coverage gap before any specificity signal could be measured at all. The extraction root cause for CSCO and CRM's remaining misses is a reasoned hypothesis from the visible quote, not independently confirmed the way TXN's three cases were. IBM's "incorporated by reference" case remains genuinely unaddressed — a different, larger piece of work than anything fixed here.
@@ -62,5 +70,6 @@ Given the maker/checker separation this project is built around (`docs/robustnes
 ## Reproducing
 
 ```bash
-uv run python -m research.specificity_check   # ~15-20 min, real EDGAR + LLM calls, no GPU needed
+uv run python -m research.specificity_check          # ~15-20 min, real EDGAR + LLM calls, no GPU needed
+uv run python -m research.unresolved_claims_audit     # same control set, full detail on every claim (not just inconsistent ones)
 ```

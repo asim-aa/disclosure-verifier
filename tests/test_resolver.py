@@ -430,6 +430,33 @@ def test_resolve_concept_resolves_concepts_added_from_unresolved_claim_analysis(
     assert resolve_concept(metric_text, facts) == concept
 
 
+# ---------- concepts added from the tech-vertical "unverifiable" bucket audit ----------
+#
+# research/unresolved_claims_audit.py tallied 113 unverifiable claims across 8 real
+# tech-company filings by metric text. Wording-variant entries reuse an already-
+# confirmed concept; "interest and debt expense" is a genuinely distinct concept,
+# confirmed present in TXN's real company-facts data before being added.
+
+
+@pytest.mark.parametrize(
+    ("metric_text", "concept"),
+    [
+        ("operating profit", "OperatingIncomeLoss"),
+        ("total revenue", "Revenues"),
+        ("total revenues", "Revenues"),
+        ("total gross margin", "GrossProfit"),
+        ("gross profit margin", "GrossProfit"),
+        ("diluted net income per share", "EarningsPerShareDiluted"),
+        ("cash provided by operations", "NetCashProvidedByUsedInOperatingActivities"),
+        ("common stock repurchase amount", "PaymentsForRepurchaseOfCommonStock"),
+        ("interest and debt expense", "InterestAndDebtExpense"),
+    ],
+)
+def test_resolve_concept_resolves_concepts_added_from_unresolved_claims_audit(metric_text, concept):
+    facts = [fact(concept, 100, "2025-01-01", "2025-12-31")]
+    assert resolve_concept(metric_text, facts) == concept
+
+
 def test_resolve_concept_still_declines_a_genuine_segment_level_metric():
     """The dictionary expansion added real standard concepts; it must not have
     accidentally widened matching enough to guess at a segment-specific one that

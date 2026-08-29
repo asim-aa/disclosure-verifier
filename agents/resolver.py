@@ -113,6 +113,20 @@ METRIC_TO_CONCEPTS: dict[str, list[str]] = {
     "cash provided by financing activities": ["NetCashProvidedByUsedInFinancingActivities"],
     "cash flow from financing activities": ["NetCashProvidedByUsedInFinancingActivities"],
     "long-term debt": ["LongTermDebt"],
+    # Added from research/unresolved_claims_audit.py's tally of the tech-vertical
+    # specificity check's "unverifiable" bucket (113 of 137 claims) - same discipline
+    # as above: wording variants of already-mapped concepts need no new verification;
+    # "interest and debt expense" is a genuinely distinct concept, confirmed present
+    # in TXN's real company-facts data (separate from plain InterestExpense).
+    "operating profit": ["OperatingIncomeLoss"],
+    "total revenue": ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax"],
+    "total revenues": ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax"],
+    "total gross margin": ["GrossProfit"],
+    "gross profit margin": ["GrossProfit"],
+    "diluted net income per share": ["EarningsPerShareDiluted"],
+    "cash provided by operations": ["NetCashProvidedByUsedInOperatingActivities"],
+    "common stock repurchase amount": ["PaymentsForRepurchaseOfCommonStock"],
+    "interest and debt expense": ["InterestAndDebtExpense"],
     "interest income": ["InvestmentIncomeInterest"],
     "other income (expense), net": ["OtherNonoperatingIncomeExpense"],
     "other income (expense)": ["OtherNonoperatingIncomeExpense"],
