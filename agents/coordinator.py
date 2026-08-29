@@ -99,7 +99,26 @@ class Coordinator:
                     break
 
             tracer.record("tool_call", "extraction", "extract", f"chunk {chunk.chunk_index}")
-            claims = self.extraction.extract(chunk.text)
+            try:
+                claims = self.extraction.extract(chunk.text)
+            except Exception as exc:  # noqa: BLE001 - one bad LLM response (empty/malformed output,
+                # timeout) shouldn't crash the whole run and lose every other chunk's already-
+                # verified claims. Real bug: research/specificity_check.py's ADBE run failed
+                # outright on a single chunk's AdapterParseError ("The LM returned an empty or
+                # null response") - reproducible in the full sequential run but NOT when the
+                # same chunk's exact text was retried in isolation, pointing to a transient
+                # backend hiccup under sustained load, not bad input. eval/run_comparison.py
+                # already has this exact safeguard for the same reason; the Coordinator - the
+                # thing every real caller (this research script, run_backtest.py, production
+                # runs) goes through - didn't. Deliberately NOT added to `processed`: a
+                # transient failure should be retried on the next checkpoint-resumed run,
+                # not silently and permanently treated as "this chunk has no claims".
+                n_extraction_calls_this_call += 1
+                tracer.record(
+                    "decision", "coordinator", "extraction_failed",
+                    f"chunk {chunk.chunk_index}: {type(exc).__name__}: {exc}",
+                )
+                continue
             n_extraction_calls_this_call += 1
 
             if not claims:

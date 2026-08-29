@@ -220,3 +220,80 @@ def test_checkpoint_survives_reconstruction_with_reconciliation_result(tmp_path)
     assert restored_claim.verdict == VERDICT_CONSISTENT
     assert restored_claim.reconciliation is not None
     assert restored_claim.reconciliation.claim.metric == "Revenues"
+
+
+# ---------- extraction resilience: one bad chunk shouldn't crash the run ----------
+#
+# Real bug: research/specificity_check.py's ADBE run failed outright on a single
+# chunk's AdapterParseError ("The LM returned an empty or null response") -
+# reproducible in the full sequential run but not when that exact chunk's text
+# was retried in isolation, pointing to a transient backend hiccup under
+# sustained load, not bad input. eval/run_comparison.py already guards against
+# this per-example; the Coordinator - the thing every real caller goes through -
+# didn't, so one flaky LLM call could lose an entire ticker's already-verified
+# claims for every OTHER chunk in the same run.
+
+
+class FlakyExtractionAgent:
+    """Raises on chunks whose paragraph text is in `fails_on`, succeeds (via a
+    wrapped MockExtractionAgent) on everything else."""
+
+    def __init__(self, canned: dict, fails_on: set[str]):
+        self._inner = MockExtractionAgent(canned)
+        self._fails_on = fails_on
+        self.call_count = 0
+
+    def extract(self, paragraph: str):
+        self.call_count += 1
+        if paragraph in self._fails_on:
+            raise RuntimeError("The LM returned an empty or null response.")
+        return self._inner.extract(paragraph)
+
+
+def test_a_failed_chunk_does_not_crash_the_run_or_lose_other_chunks(tmp_path):
+    chunk_0 = make_chunk(0, text="Chunk zero, extraction will fail.")
+    chunk_1 = make_chunk(1, text="Revenue was $200.")
+    chunk_2 = make_chunk(2, text="Revenue was $300.")
+    claim_1 = make_claim(2)
+    claim_2 = make_claim(3)
+    retrieval = MockRetrievalAgent(chunks=[chunk_0, chunk_1, chunk_2], facts=[])
+    extraction = FlakyExtractionAgent(
+        {chunk_1.text: [claim_1], chunk_2.text: [claim_2]}, fails_on={chunk_0.text}
+    )
+    verification = MockVerificationAgent(
+        outcomes=[
+            VerificationOutcome(verdict=VERDICT_CONSISTENT, explanation="ok", citations=[]),
+            VerificationOutcome(verdict=VERDICT_CONSISTENT, explanation="ok", citations=[]),
+        ]
+    )
+    coordinator = Coordinator(retrieval, extraction, verification, checkpoint_dir=tmp_path)
+
+    report = coordinator.run("ACME", resume=False)
+
+    assert extraction.call_count == 3  # all 3 chunks were attempted, not stopped at chunk 0
+    assert len(report.verified_claims) == 2  # chunk 1 and chunk 2's claims both made it through
+    failure_events = [e for e in report.trace if e.detail.startswith("chunk 0:")]
+    assert failure_events and failure_events[0].action == "extraction_failed"
+
+
+def test_a_failed_chunk_is_retried_on_the_next_resumed_run(tmp_path):
+    """The failed chunk must NOT be marked processed - a transient failure
+    should be retried next time, not silently and permanently treated as "this
+    chunk has no claims"."""
+    chunk_0 = make_chunk(0, text="Chunk zero, fails the first time.")
+    claim = make_claim(1)
+
+    flaky = FlakyExtractionAgent({}, fails_on={chunk_0.text})
+    retrieval = MockRetrievalAgent(chunks=[chunk_0], facts=[])
+    coordinator = Coordinator(retrieval, flaky, MockVerificationAgent(outcomes=[]), checkpoint_dir=tmp_path)
+    report = coordinator.run("ACME", resume=False)
+    assert report.verified_claims == []
+
+    # second attempt (e.g. a resumed real run): the same chunk index is retried,
+    # not skipped as already-processed, and now succeeds.
+    recovered = FlakyExtractionAgent({chunk_0.text: [claim]}, fails_on=set())
+    coordinator2 = Coordinator(retrieval, recovered, MockVerificationAgent(
+        outcomes=[VerificationOutcome(verdict=VERDICT_CONSISTENT, explanation="ok", citations=[])]
+    ), checkpoint_dir=tmp_path)
+    report2 = coordinator2.run("ACME", resume=True)
+    assert len(report2.verified_claims) == 1
