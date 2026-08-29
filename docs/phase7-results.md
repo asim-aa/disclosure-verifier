@@ -44,6 +44,27 @@ Same discipline as `eval/run_comparison.py` applies to Pillar 2 — a delta only
 - **`growth_pct` stratum** (n=100): delta +0.060 vs. ±0.101 — does not clear the noise floor on its own, though directionally positive.
 - **`bps_change` stratum** (n=30): delta +0.167 vs. ±0.231 — does not clear the noise floor at this small n. But it's worth noting this is no longer the exact null the 150-step run produced (7/30 both before and after, identical) — the 1,300-step run moved it to 12/30. Real movement, just not provable at n=30. `bps_change` is also the smallest and hardest category in the training set (two ratios, then a basis-point difference) — the most likely place a longer run or oversampled training data would help next.
 
+## Retraining on the fixed `bps_change` dataset
+
+`bps_change` stayed the weakest category through the run above (0.233 → 0.400), and [`phase7/build_dataset.py`](../phase7/build_dataset.py)'s data was the traced cause, not the model's reasoning: the generator only had 2 real distinct ratios to draw from (gross margin and operating margin — 2 of its original 4 "pairs" were the same ratio under a company's alternate revenue tag, not a second ratio), making `bps_change` 8.7% of training data against 43.3% for `absolute`. Fixed by adding 5 more ratio pairs (net margin, R&D intensity, SG&A ratio, cost ratio, opex ratio) built from concepts already verified present in real company data — `bps_change`'s share rose to 13.0%, raw count 114 → 350, total dataset 1,612 → 3,403 examples.
+
+Retrained on the same box, same architecture, same 1,300 GRPO steps, evaluated on a fresh 706-example held-out split of the larger dataset (not comparable row-for-row to the 304-example table above — different split, different size):
+
+| | base (zero-shot) | trained (1,300 steps) | delta | 95% noise floor | resolved? |
+|---|---|---|---|---|---|
+| **overall accuracy** | 0.820 | 0.858 | +0.038 | ±0.038 | right at the edge |
+| **false-consistent rate** | 0.108 | 0.020 | **−0.088** | ±0.025 | **yes — real, big win** |
+| `absolute` | 0.969 | 0.994 | +0.025 | ±0.021 | yes, real (small, near ceiling) |
+| `absolute_change` | 0.667 | 0.825 | **+0.158** | ±0.108 | **yes — real, substantial** |
+| `growth_pct` | 0.858 | 0.893 | +0.035 | ±0.070 | no — inside noise floor |
+| **`bps_change`** | **0.436** | **0.372** | **−0.064** | ±0.140 | **no — inside noise floor, wrong direction** |
+
+**The honest headline: the `bps_change` dataset fix did not produce a measurable win in this run.** The number moved down slightly (0.436 → 0.372), though well inside the noise floor at this small stratum (n=94) — not proven worse either, just not proven better, despite the effort that went into tracing and fixing the underlying data bug.
+
+The other results are real, though. The false-consistent rate — the dangerous failure mode, a model confidently endorsing a wrong claim — dropped from 10.8% to 2.0% on this independent run, a real, noise-floor-clearing improvement that echoes the first run's finding. `absolute_change` also improved substantially and really (+0.158).
+
+**A plausible reason for the `bps_change` null, not yet confirmed:** `max_steps` stayed fixed at 1,300 while the dataset grew 2.1× (1,612 → 3,403 examples). Even though `bps_change`'s raw training-example count tripled (114 → 350), the fixed step budget means every example — including `bps_change` ones — got proportionally *less* repeated exposure than in the original run. Tripling the numerator didn't help if the denominator (training steps) didn't grow to match. If this hypothesis is right, the experiment actually worth running next is more steps on the bigger dataset, not the reproportioned data alone — flagged as follow-up, not run here.
+
 ## A worked example
 
 Same held-out example (`achg-435`, an `absolute_change` claim about AAPL revenue), both models, greedy decoding. The gold verdict is `consistent` and both models get there — this is presented for reasoning *quality*, not a verdict flip.

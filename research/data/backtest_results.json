@@ -1,0 +1,416 @@
+[
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2021-12-31",
+    "claimed_value": 5400000000.0,
+    "original_value": 5449000000,
+    "restated_value": 5388000000,
+    "original_filed": "2022-02-24",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 5449000000,
+      "difference": 0.008992475683611672,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "consistent",
+      "computed_value": 5388000000,
+      "difference": 0.0022271714922048997,
+      "reason_code": "match"
+    },
+    "outcome": "restatement_too_small_for_tolerance"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-03-31",
+    "claimed_value": 1200000000.0,
+    "original_value": 1242000000,
+    "restated_value": 1219000000,
+    "original_filed": "2022-04-28",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 1242000000,
+      "difference": 0.033816425120772944,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1219000000,
+      "difference": 0.015586546349466776,
+      "reason_code": "near_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-06-30",
+    "claimed_value": 1100000000.0,
+    "original_value": 1111000000,
+    "restated_value": 1088000000,
+    "original_filed": "2022-07-27",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 1111000000,
+      "difference": 0.009900990099009901,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 1088000000,
+      "difference": 0.011029411764705883,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2022-12-31",
+    "claimed_value": 4400000000.0,
+    "original_value": 4392000000,
+    "restated_value": 4316000000,
+    "original_filed": "2023-02-23",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 4392000000,
+      "difference": 0.0018214936247723133,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 4316000000,
+      "difference": 0.019462465245597776,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-03-31",
+    "claimed_value": 1000000000.0,
+    "original_value": 976000000,
+    "restated_value": 955000000,
+    "original_filed": "2023-04-25",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 976000000,
+      "difference": 0.02459016393442623,
+      "reason_code": "large_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 955000000,
+      "difference": 0.04712041884816754,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-06-30",
+    "claimed_value": 901000000.0,
+    "original_value": 901000000,
+    "restated_value": 889000000,
+    "original_filed": "2023-07-28",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 901000000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 889000000,
+      "difference": 0.013498312710911136,
+      "reason_code": "near_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-09-30",
+    "claimed_value": 683000000.0,
+    "original_value": 683000000,
+    "restated_value": 586000000,
+    "original_filed": "2023-10-26",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 683000000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 586000000,
+      "difference": 0.16552901023890784,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2023-12-31",
+    "claimed_value": 2900000000.0,
+    "original_value": 2940000000,
+    "restated_value": 2796000000,
+    "original_filed": "2024-02-23",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 2940000000,
+      "difference": 0.013605442176870748,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 2796000000,
+      "difference": 0.03719599427753934,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+    "concept": "NetIncomeLoss",
+    "period_end": "2024-03-31",
+    "claimed_value": 308000000.0,
+    "original_value": 308000000,
+    "restated_value": 851000000,
+    "original_filed": "2024-05-01",
+    "restated_filed": "2024-12-23",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 308000000,
+      "difference": 0.0,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 851000000,
+      "difference": 0.6380728554641598,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-03-31",
+    "claimed_value": 38000000000.0,
+    "original_value": 37868547000,
+    "restated_value": 39699432000,
+    "original_filed": "2022-05-06",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 37868547000,
+      "difference": 0.0034712976972683953,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 39699432000,
+      "difference": 0.042807463844822764,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-06-30",
+    "claimed_value": 35000000000.0,
+    "original_value": 34553847000,
+    "restated_value": 36450189000,
+    "original_filed": "2022-08-05",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "inconsistent",
+      "computed_value": 34553847000,
+      "difference": 0.012911818472773813,
+      "reason_code": "near_miss"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 36450189000,
+      "difference": 0.039785500152001954,
+      "reason_code": "large_miss"
+    },
+    "outcome": "already_inconsistent_at_original"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-09-30",
+    "claimed_value": 35000000000.0,
+    "original_value": 35334535000,
+    "restated_value": 37282191000,
+    "original_filed": "2022-11-03",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 35334535000,
+      "difference": 0.009467649708705662,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 37282191000,
+      "difference": 0.06121397210802337,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2022-12-31",
+    "claimed_value": 32500000000.0,
+    "original_value": 32479336000,
+    "restated_value": 34586508000,
+    "original_filed": "2023-02-17",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 32479336000,
+      "difference": 0.0006362199030177218,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 34586508000,
+      "difference": 0.06032722355202786,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-03-31",
+    "claimed_value": 31800000000.0,
+    "original_value": 31818651000,
+    "restated_value": 33898625000,
+    "original_filed": "2023-05-05",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 31818651000,
+      "difference": 0.0005861656422832005,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 33898625000,
+      "difference": 0.06190885323519759,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-06-30",
+    "claimed_value": 33900000000.0,
+    "original_value": 33858079000,
+    "restated_value": 35999288000,
+    "original_filed": "2023-08-04",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 33858079000,
+      "difference": 0.0012381387615050458,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 35999288000,
+      "difference": 0.05831470889090917,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-09-30",
+    "claimed_value": 34700000000.0,
+    "original_value": 34745528000,
+    "restated_value": 36791065000,
+    "original_filed": "2023-11-01",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 34745528000,
+      "difference": 0.0013103269001984946,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 36791065000,
+      "difference": 0.05683621825027354,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2023-12-31",
+    "claimed_value": 35300000000.0,
+    "original_value": 35311785000,
+    "restated_value": 39717084000,
+    "original_filed": "2024-02-20",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 35311785000,
+      "difference": 0.00033374127079670426,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 39717084000,
+      "difference": 0.11121370340279765,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  },
+  {
+    "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+    "concept": "Assets",
+    "period_end": "2024-03-31",
+    "claimed_value": 42100000000.0,
+    "original_value": 42120928000,
+    "restated_value": 47935581000,
+    "original_filed": "2024-05-03",
+    "restated_filed": "2024-08-12",
+    "as_of_original": {
+      "verdict": "consistent",
+      "computed_value": 42120928000,
+      "difference": 0.0004968551500099903,
+      "reason_code": "match"
+    },
+    "as_of_restated": {
+      "verdict": "inconsistent",
+      "computed_value": 47935581000,
+      "difference": 0.12173798415002,
+      "reason_code": "large_miss"
+    },
+    "outcome": "expected_flip"
+  }
+]

@@ -94,7 +94,7 @@ Reward-shaping design for Phase 7 was recorded in [`docs/phase7-reward-design.md
 | false-consistent rate (dangerous case) | 0.148 | **0.036** |
 | format failures | 1/304 | **0/304** |
 
-At n=304, the accuracy delta (+0.089) clears its 95% noise floor (±0.062) and the false-consistent-rate drop (−0.112) clears its own (±0.045) — both are real, not sampling noise. The `absolute_change` claim category shows the largest, also noise-floor-clearing gain (0.589→0.821). `bps_change` — the hardest category (two ratios, then a basis-point difference) — moved (0.233→0.400) but not provably at its small n=30. Full breakdown, a worked before/after example, and the three real upstream packaging bugs found getting here: [`docs/phase7-results.md`](docs/phase7-results.md).
+At n=304, the accuracy delta (+0.089) clears its 95% noise floor (±0.062) and the false-consistent-rate drop (−0.112) clears its own (±0.045) — both are real, not sampling noise. The `absolute_change` claim category shows the largest, also noise-floor-clearing gain (0.589→0.821). `bps_change` — the hardest category (two ratios, then a basis-point difference) — moved (0.233→0.400) but not provably at its small n=30, traced to a data-generator bug: the training set only had 2 real distinct ratios to draw from. Fixed (5 more ratio pairs added, `bps_change`'s share of the dataset 8.7%→13.0%) and retrained for real on the larger dataset — the honest result there is a **null**, not a win: on a fresh 706-example holdout, `bps_change` moved from 0.436→0.372, inside its own noise floor either direction, most plausibly because the GRPO step budget (still 1,300 steps) didn't scale with the 2.1×-larger dataset. The false-consistent rate improved again on this second run (0.108→0.020, real), and `absolute_change` improved substantially again (0.667→0.825, real) — the dataset fix just didn't move the one number it targeted. Full breakdown, both runs, a worked before/after example, and the three real upstream packaging bugs found getting here: [`docs/phase7-results.md`](docs/phase7-results.md).
 
 **A real, current end-to-end run** (NVDA's FY2026 10-K, live EDGAR + live LLM, no cached answers):
 
@@ -107,6 +107,8 @@ unverifiable   Data Center revenue                  68.0% growth      (segment-l
 ```
 
 **Engineering rigor:** 176 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+
+**A real backtest: would this have caught an actual restatement?** Every result above checks the pipeline in the present tense. A sharper question: has this project's own bitemporal `as_of` machinery ever caught something real happening to a real company? SEC 8-K "Item 4.02" filings (a company disclosing its own past financials can't be relied on) supply real ground truth. Scanning real XBRL company-facts data for `(concept, period)` groups where an *amended* filing (`10-K/A`/`10-Q/A`) reports a materially different value than the original found **13,827 real restatement fingerprints across 541 companies** (after rejecting a looser method that was 82% routine reclassification noise, not corrections). Matching those to real prose claims in the original MD&A — via the project's real extraction agent, keeping claims whose metric resolves to the restated concept and whose value is within 5% — found **18 real matches**, all from Discover Financial Services and Rithm Capital Corp. Running the actual `reconcile()` function twice per match (once `as_of` the original filing date, once `as_of` the restated filing date, no LLM calls): **17 of 18 (94%) would have been flagged inconsistent by the time each restatement existed, using only data that existed at each point in time** — 13 as the clean "consistent when made, inconsistent once restated" pattern, 4 already caught by prose-rounding tolerance alone, 1 genuine miss reported rather than hidden. Not a synthetic eval number — a real outcome against two real companies' real regulatory history. Full methodology and honest scope caveats: [`docs/backtest-results.md`](docs/backtest-results.md).
 
 ## What actually broke, and how it got caught
 
@@ -144,6 +146,7 @@ eval/     DSPy signature, hand-labeled test set, baseline-vs-optimized harness (
 agents/   Coordinator + retrieval/extraction/verification agents, budget, checkpointing (Pillar 3)
 phase6/   End-to-end integration-at-scale run (real Coordinator, 5 companies, no mocks)
 phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scripts (Pillar 4, GPU-only)
+research/ Real-restatement backtest — find fingerprints, match prose, reconcile bitemporally
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
 tests/    168 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)

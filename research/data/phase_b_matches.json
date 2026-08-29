@@ -1,0 +1,560 @@
+[
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2021-01-01",
+      "period_end": "2021-12-31",
+      "original_value": 5449000000,
+      "original_filed": "2022-02-24",
+      "original_accn": "0001393612-22-000007",
+      "original_form": "10-K",
+      "restated_value": 5388000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.01119471462653698
+    },
+    "claim": {
+      "metric": "net income",
+      "value": 5400000000.0,
+      "value_unit": "USD",
+      "period": "year ended December 31, 2021",
+      "comparison_type": "absolute",
+      "quote": "net income was $5.4 billion"
+    },
+    "source_chunk_text": "For the year ended December 31, 2021, net income was $5.4 billion, or $17.83 per diluted share, compared to $1.1 billion, or $3.60 per diluted share, for the prior year. In comparing to the prior year, we saw an increase in sales volume, as well as increases in total loans and credit card loans. We also reduced our allowance for credit losses at December 31, 2021 as compared to December 31, 2020. Refer to \u201c\u2014 Loan Quality \u2014 Provision and Allowance for Credit Losses\u201d for more details on the current period allowance for credit losses.",
+    "source_accession": "0001393612-22-000007",
+    "source_filing_date": "2022-02-24",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2022-01-01",
+      "period_end": "2022-03-31",
+      "original_value": 1242000000,
+      "original_filed": "2022-04-28",
+      "original_accn": "0001393612-22-000016",
+      "original_form": "10-Q",
+      "restated_value": 1219000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.018518518518518517
+    },
+    "claim": {
+      "metric": "net income",
+      "value": 1200000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $1.2 billion"
+    },
+    "source_chunk_text": "Net income was $1.2 billion, or $4.22 per diluted share, compared to net income of $1.6 billion, or $5.04 earnings per diluted share, in the prior year.",
+    "source_accession": "0001393612-22-000016",
+    "source_filing_date": "2022-04-28",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2022-04-01",
+      "period_end": "2022-06-30",
+      "original_value": 1111000000,
+      "original_filed": "2022-07-27",
+      "original_accn": "0001393612-22-000029",
+      "original_form": "10-Q",
+      "restated_value": 1088000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.020702070207020702
+    },
+    "claim": {
+      "metric": "net income",
+      "value": 1100000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $1.1 billion"
+    },
+    "source_chunk_text": "Net income was $1.1 billion, or $3.96 per diluted share, compared to net income of $1.7 billion, or $5.55 earnings per diluted share, in the prior year.",
+    "source_accession": "0001393612-22-000029",
+    "source_filing_date": "2022-07-27",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2022-01-01",
+      "period_end": "2022-12-31",
+      "original_value": 4392000000,
+      "original_filed": "2023-02-23",
+      "original_accn": "0001393612-23-000007",
+      "original_form": "10-K",
+      "restated_value": 4316000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.017304189435336976
+    },
+    "claim": {
+      "metric": "Net income",
+      "value": 4400000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $4.4 billion"
+    },
+    "source_chunk_text": "Net income was $4.4 billion, or $15.50 per diluted share, compared to net income of $5.4 billion, or $17.83 per diluted share, in the prior year.",
+    "source_accession": "0001393612-23-000007",
+    "source_filing_date": "2023-02-23",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2023-01-01",
+      "period_end": "2023-03-31",
+      "original_value": 976000000,
+      "original_filed": "2023-04-25",
+      "original_accn": "0001393612-23-000031",
+      "original_form": "10-Q",
+      "restated_value": 955000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.02151639344262295
+    },
+    "claim": {
+      "metric": "Net income",
+      "value": 1000000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $1.0 billion, or $3.58 per diluted share, compared to net income of $1.2 billion, or $4.22 per diluted share, in the prior year."
+    },
+    "source_chunk_text": "Net income was $1.0 billion, or $3.58 per diluted share, compared to net income of $1.2 billion, or $4.22 per diluted share, in the prior year.",
+    "source_accession": "0001393612-23-000031",
+    "source_filing_date": "2023-04-25",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2023-04-01",
+      "period_end": "2023-06-30",
+      "original_value": 901000000,
+      "original_filed": "2023-07-28",
+      "original_accn": "0001393612-23-000041",
+      "original_form": "10-Q",
+      "restated_value": 889000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.013318534961154272
+    },
+    "claim": {
+      "metric": "Net income",
+      "value": 901000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $901 million, or $3.54 per diluted share,"
+    },
+    "source_chunk_text": "Net income was $901 million, or $3.54 per diluted share, compared to net income of $1.1 billion, or $3.93 per diluted share, in the prior year.",
+    "source_accession": "0001393612-23-000041",
+    "source_filing_date": "2023-07-28",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2023-07-01",
+      "period_end": "2023-09-30",
+      "original_value": 683000000,
+      "original_filed": "2023-10-26",
+      "original_accn": "0001393612-23-000052",
+      "original_form": "10-Q",
+      "restated_value": 586000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.14202049780380674
+    },
+    "claim": {
+      "metric": "Net income",
+      "value": 683000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "$683 million"
+    },
+    "source_chunk_text": "Net income was $683 million, or $2.59 per diluted share, compared to net income of $1.0 billion, or $3.56 per diluted share, in the prior year.",
+    "source_accession": "0001393612-23-000052",
+    "source_filing_date": "2023-10-26",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2023-01-01",
+      "period_end": "2023-12-31",
+      "original_value": 2940000000,
+      "original_filed": "2024-02-23",
+      "original_accn": "0001393612-24-000010",
+      "original_form": "10-K",
+      "restated_value": 2796000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000073",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.04897959183673469
+    },
+    "claim": {
+      "metric": "Net income",
+      "value": 2900000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $2.9 billion"
+    },
+    "source_chunk_text": "Net income was $2.9 billion, or $11.26 per diluted share, compared to net income of $4.4 billion, or $15.44 per diluted share, in the prior year.",
+    "source_accession": "0001393612-24-000010",
+    "source_filing_date": "2024-02-23",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001393612",
+      "entity_name": "Discover Financial Services  (DFS)  (CIK 0001393612)",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "period_start": "2024-01-01",
+      "period_end": "2024-03-31",
+      "original_value": 308000000,
+      "original_filed": "2024-05-01",
+      "original_accn": "0001393612-24-000032",
+      "original_form": "10-Q",
+      "restated_value": 851000000,
+      "restated_filed": "2024-12-23",
+      "restated_accn": "0001393612-24-000074",
+      "restated_form": "10-Q/A",
+      "relative_diff": 1.7629870129870129
+    },
+    "claim": {
+      "metric": "net income",
+      "value": 308000000.0,
+      "value_unit": "USD",
+      "period": "",
+      "comparison_type": "absolute",
+      "quote": "Net income was $308 million"
+    },
+    "source_chunk_text": "Net income was $308 million, or $1.10 per diluted share, compared to net income of $1.0 billion, or $3.55 per diluted share, in the prior year.",
+    "source_accession": "0001393612-24-000032",
+    "source_filing_date": "2024-05-01",
+    "ticker": "CIK0001393612"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2022-03-31",
+      "original_value": 37868547000,
+      "original_filed": "2022-05-06",
+      "original_accn": "0001556593-22-000017",
+      "original_form": "10-Q",
+      "restated_value": 39699432000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.04834843544432798
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 38000000000.0,
+      "value_unit": "USD",
+      "period": "As of March 31, 2022",
+      "comparison_type": "absolute",
+      "quote": "we had approximately $38 billion in total assets"
+    },
+    "source_chunk_text": "As of March\u00a031, 2022, we had approximately $38 billion in total assets and 11,324 employees employed by our operating entities.",
+    "source_accession": "0001556593-22-000017",
+    "source_filing_date": "2022-05-06",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2022-06-30",
+      "original_value": 34553847000,
+      "original_filed": "2022-08-05",
+      "original_accn": "0001556593-22-000036",
+      "original_form": "10-Q",
+      "restated_value": 36450189000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.05488077781903705
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 35000000000.0,
+      "value_unit": "USD",
+      "period": "June 30, 2022",
+      "comparison_type": "absolute",
+      "quote": "we had approximately $35 billion in total assets"
+    },
+    "source_chunk_text": "As of June\u00a030, 2022, we had approximately $35 billion in total assets and 9,862 employees, including those employed by our operating entities.",
+    "source_accession": "0001556593-22-000036",
+    "source_filing_date": "2022-08-05",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2022-09-30",
+      "original_value": 35334535000,
+      "original_filed": "2022-11-03",
+      "original_accn": "0001556593-22-000050",
+      "original_form": "10-Q",
+      "restated_value": 37282191000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.055120465006826894
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 35000000000.0,
+      "value_unit": "USD",
+      "period": "September\u00a030,\u00a02022",
+      "comparison_type": "absolute",
+      "quote": "As of September\u00a030, 2022, we had approximately $35 billion in total assets"
+    },
+    "source_chunk_text": "As of September\u00a030, 2022, we had approximately $35 billion in total assets and 7,330 employees, including those employed by our operating entities.",
+    "source_accession": "0001556593-22-000050",
+    "source_filing_date": "2022-11-03",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2022-12-31",
+      "original_value": 32479336000,
+      "original_filed": "2023-02-17",
+      "original_accn": "0001556593-23-000012",
+      "original_form": "10-K",
+      "restated_value": 34586508000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.0648773115312456
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 32500000000.0,
+      "value_unit": "USD",
+      "period": "December 31, 2022",
+      "comparison_type": "absolute",
+      "quote": "As of December 31, 2022, we had $32.5 billion in total assets"
+    },
+    "source_chunk_text": "As of December 31, 2022, we had $32.5 billion in total assets and 5,763 employees, including those individuals employed by our operating entities.",
+    "source_accession": "0001556593-23-000012",
+    "source_filing_date": "2023-02-17",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2023-03-31",
+      "original_value": 31818651000,
+      "original_filed": "2023-05-05",
+      "original_accn": "0001556593-23-000019",
+      "original_form": "10-Q",
+      "restated_value": 33898625000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.06536964750642633
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 31800000000.0,
+      "value_unit": "USD",
+      "period": "March 31, 2023",
+      "comparison_type": "absolute",
+      "quote": "As of March 31, 2023, we had approximately $31.8 billion in total assets"
+    },
+    "source_chunk_text": "As of March\u00a031, 2023, we had approximately $31.8 billion in total assets and approximately 5,400 employees, including those individuals employed by our operating entities.",
+    "source_accession": "0001556593-23-000019",
+    "source_filing_date": "2023-05-05",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2023-06-30",
+      "original_value": 33858079000,
+      "original_filed": "2023-08-04",
+      "original_accn": "0001556593-23-000026",
+      "original_form": "10-Q",
+      "restated_value": 35999288000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.06324071132328565
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 33900000000.0,
+      "value_unit": "USD",
+      "period": "As of June 30, 2023",
+      "comparison_type": "absolute",
+      "quote": "As of June\u00a030, 2023, we had approximately $33.9 billion in total assets"
+    },
+    "source_chunk_text": "As of June\u00a030, 2023, we had approximately $33.9 billion in total assets and approximately 5,870 employees, including those individuals employed by our operating entities.",
+    "source_accession": "0001556593-23-000026",
+    "source_filing_date": "2023-08-04",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2023-09-30",
+      "original_value": 34745528000,
+      "original_filed": "2023-11-01",
+      "original_accn": "0001556593-23-000031",
+      "original_form": "10-Q",
+      "restated_value": 36791065000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.058871950370131085
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 34700000000.0,
+      "value_unit": "USD",
+      "period": "As of September 30, 2023",
+      "comparison_type": "absolute",
+      "quote": "approximately $34.7 billion in total assets"
+    },
+    "source_chunk_text": "As of September\u00a030, 2023, we had approximately $34.7 billion in total assets and approximately 6,098 employees, including those individuals employed by our operating entities.",
+    "source_accession": "0001556593-23-000031",
+    "source_filing_date": "2023-11-01",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2023-12-31",
+      "original_value": 35311785000,
+      "original_filed": "2024-02-20",
+      "original_accn": "0001556593-24-000007",
+      "original_form": "10-K",
+      "restated_value": 39717084000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000027",
+      "restated_form": "10-K/A",
+      "relative_diff": 0.12475435608820115
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 35300000000.0,
+      "value_unit": "USD",
+      "period": "December 31, 2023",
+      "comparison_type": "absolute",
+      "quote": "we had $35.3 billion in total assets"
+    },
+    "source_chunk_text": "As of December 31, 2023, we had $35.3 billion in total assets, approximately $32.8\u00a0billion in AUM and 6,570 employees, including those individuals employed by our operating entities.",
+    "source_accession": "0001556593-24-000007",
+    "source_filing_date": "2024-02-20",
+    "ticker": "RITM-PD"
+  },
+  {
+    "fingerprint": {
+      "cik": "0001556593",
+      "entity_name": "Rithm Capital Corp.  (RITM, RITM-PA, RITM-PB, RITM-PC, RITM-PD)  (CIK 0001556593)",
+      "concept": "Assets",
+      "unit": "USD",
+      "period_start": null,
+      "period_end": "2024-03-31",
+      "original_value": 42120928000,
+      "original_filed": "2024-05-03",
+      "original_accn": "0001556593-24-000013",
+      "original_form": "10-Q",
+      "restated_value": 47935581000,
+      "restated_filed": "2024-08-12",
+      "restated_accn": "0001556593-24-000028",
+      "restated_form": "10-Q/A",
+      "relative_diff": 0.13804664987438073
+    },
+    "claim": {
+      "metric": "total assets",
+      "value": 42100000000.0,
+      "value_unit": "USD",
+      "period": "March\u00a031, 2024",
+      "comparison_type": "absolute",
+      "quote": "As of March\u00a031, 2024, we had approximately $42.1 billion in total assets"
+    },
+    "source_chunk_text": "As of March\u00a031, 2024, we had approximately $42.1 billion in total assets and approximately $32.3\u00a0billion in assets under management (\u201cAUM\u201d).",
+    "source_accession": "0001556593-24-000013",
+    "source_filing_date": "2024-05-03",
+    "ticker": "RITM-PD"
+  }
+]
