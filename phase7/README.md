@@ -6,8 +6,11 @@ Reconciler itself as the RLVR reward oracle. See
 [`docs/phase7-reward-design.md`](../docs/phase7-reward-design.md) for the reward
 design decided before any of this was built,
 [`docs/phase7-results.md`](../docs/phase7-results.md) for what actually happened
-when it ran (accuracy 0.766→0.855, false-consistent rate 0.148→0.036, both
-clearing the noise floor at n=304), and
+when it ran (two runs: an initial one at accuracy 0.766→0.855, false-consistent
+rate 0.148→0.036 at n=304, then a retrain on a fixed `bps_change` dataset at
+accuracy 0.820→0.858, false-consistent rate 0.108→0.020 at n=706 — both runs'
+false-consistent-rate drop clears its own noise floor; `bps_change` itself did
+not, on either run), and
 [`docs/robustness-and-scope.md`](../docs/robustness-and-scope.md) for the
 Reconciler's own pre-flight audit (0 false-"consistent" results, precision
 ceiling of 1.000 at current extraction quality) that this reward depends on.
