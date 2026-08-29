@@ -102,6 +102,39 @@ def test_resolve_periods_picks_most_recent_as_current():
     assert (comparison.period_start, comparison.period_end) == ("2023-01-01", "2023-12-31")
 
 
+def test_resolve_periods_default_comparison_skips_a_ytd_fact_between_current_and_prior_year():
+    """Reproduces a real bug found via research/specificity_check.py against live
+    TXN data: a Q3 10-Q's 9-month year-to-date revenue fact (period_end 3 months
+    before the fiscal year end) sorted ahead of the correct prior full year in
+    the plain "next distinct period" pick, because that pick never checked
+    duration - only period_end recency. A genuinely accurate claim ("increased
+    $2.04B, or 13.0%, compared to fiscal 2024") read as wildly inconsistent
+    (implied 33% growth) as a result. The comparison must prefer a period whose
+    length matches current's, not just whichever is chronologically closest."""
+    facts = [
+        fact("Revenues", 17_682_000_000, "2025-01-01", "2025-12-31"),  # current: FY2025
+        fact("Revenues", 13_259_000_000, "2025-01-01", "2025-09-30"),  # Q3 2025 9-month YTD - a decoy
+        fact("Revenues", 15_641_000_000, "2024-01-01", "2024-12-31"),  # correct: FY2024
+    ]
+    current, comparison = resolve_periods(facts, "Revenues")
+    assert current.value == 17_682_000_000
+    assert comparison.value == 15_641_000_000
+
+
+def test_resolve_periods_default_comparison_falls_back_when_no_similar_length_period_exists():
+    """If the only prior data available is a different length than current (e.g.
+    a company's first annual figure with only quarterly history before it), the
+    old "closest distinct period" behavior is still the right fallback - better
+    than returning no comparison at all."""
+    facts = [
+        fact("Revenues", 100, "2024-01-01", "2024-12-31"),  # current: annual
+        fact("Revenues", 20, "2023-10-01", "2023-12-31"),  # only a quarter exists before it
+    ]
+    current, comparison = resolve_periods(facts, "Revenues")
+    assert current.value == 100
+    assert comparison.value == 20
+
+
 def test_resolve_periods_skips_duplicate_repeated_period_for_comparison():
     facts = [
         fact("Revenues", 100, "2024-01-01", "2024-12-31", accn="new"),

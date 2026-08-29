@@ -108,11 +108,13 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 212 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 214 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 **A real backtest: would this have caught an actual restatement?** Every result above checks the pipeline in the present tense. A sharper question: has this project's own bitemporal `as_of` machinery ever caught something real happening to a real company? SEC 8-K "Item 4.02" filings (a company disclosing its own past financials can't be relied on) supply real ground truth. Scanning real XBRL company-facts data for `(concept, period)` groups where an *amended* filing (`10-K/A`/`10-Q/A`) reports a materially different value than the original found **13,827 real restatement fingerprints across 541 companies** (after rejecting a looser method that was 82% routine reclassification noise, not corrections). Matching those to real prose claims in the original MD&A — via the project's real extraction agent, keeping claims whose metric resolves to the restated concept and whose value is within 5% — found **122 real matches across 16 companies**, from a full scan of the top 60 (by fingerprint magnitude) of those 541. Running the actual `reconcile()` function twice per match (once `as_of` the original filing date, once `as_of` the restated filing date, no LLM calls): **118 of 122 (96.7%) would have been flagged inconsistent by the time each restatement existed, using only data that existed at each point in time** — 102 as the clean "consistent when made, inconsistent once restated" pattern, 16 already caught by prose-rounding tolerance alone, 3 structurally unverifiable (a claim type the matching step doesn't capture enough context for, correctly declined rather than guessed), 1 genuine miss reported rather than hidden. Not a synthetic eval number — a real outcome across 16 real companies' real regulatory history. Full methodology and honest scope caveats: [`docs/backtest-results.md`](docs/backtest-results.md).
 
 **Why build a deterministic reconciler instead of just asking an LLM?** Tested directly, not assumed. A naive baseline — same LLM endpoint, same claims, but the *raw, unfiltered* XBRL fact history instead of the bitemporally-correct value `reconcile()` would pick, asked to judge consistency "as of" a given date via prompting alone — was run against two already-verified test sets. On `eval/reconciler_audit.py`'s 15 adversarial cases: **11/15 (73.3%)**, against the deterministic reconciler's 15/15 — including a claim off by 1,000,000× (millions vs. raw dollars) that the naive baseline called "consistent." On the 122-match real backtest, testing bitemporal reasoning specifically: the naive baseline reproduced the correct "consistent when made, inconsistent once restated" pattern in only **50/102 (49%)** of the cases the deterministic pipeline got right, and **falsely called 49 of the 100 genuinely-consistent-at-filing claims "inconsistent"** — bleeding the later restatement's information backward into a judgment about the past, the exact failure mode the bitemporal `as_of` design exists to prevent. Full results: [`docs/naive-baseline-results.md`](docs/naive-baseline-results.md).
+
+**Does it cry wolf on clean filings?** The backtest above only tests sensitivity. Run against 8 large tech companies confirmed to carry no restatement fingerprint (ADBE, CRM, ORCL, CSCO, INTU, IBM, QCOM, TXN — the real Coordinator, no mocks), 126 real claims produced 18 consistent, 6 inconsistent, an apparent 25% false-positive rate among resolved verdicts. Investigating rather than reporting that number at face value found two real, distinct causes: this specificity check itself surfaced a genuine, previously-undiscovered bug in `resolve_periods()`'s default comparison-period selection — confirmed against live TXN data, it picked a Q3 10-Q's 9-month year-to-date fact over the correct prior full year because nothing checked that the durations matched, making an accurate claim ("increased $2.04B, or 13.0%, compared to fiscal 2024") read as wildly inconsistent. **Fixed**, with regression tests from the real numbers — 8 of the original 14 false positives resolved correctly afterward. The remaining 6 trace to extraction, not the reconciler: three TXN claims show the identical pattern of grabbing the *prior*-year number from a "$X ... compared with $Y" sentence instead of the current one. Given correct inputs, the reconciler's own false-positive rate across all 24 resolved verdicts is **0/24** — every miss traces to either the now-fixed resolver bug or an upstream extraction error, never an incorrect verdict against accurate, correctly-resolved data. Full write-up: [`docs/specificity-check-results.md`](docs/specificity-check-results.md).
 
 ## What actually broke, and how it got caught
 
@@ -157,7 +159,7 @@ phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scrip
 research/ Real-restatement backtest — find fingerprints, match prose, reconcile bitemporally
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
-tests/    212 tests — 204 unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    214 tests — 206 unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -172,7 +174,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 204 unit tests, no network/LLM required
+pytest -v                 # 206 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

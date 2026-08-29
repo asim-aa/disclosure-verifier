@@ -337,9 +337,33 @@ def resolve_periods(
     def _is_distinct(f: FinancialFact) -> bool:
         return (f.period_start, f.period_end) != (current.period_start, current.period_end)
 
-    default_comparison = next((f for f in older if _is_distinct(f)), None)
-
     current_length = _period_length_days(current)
+
+    # The plain "next distinct period, sorted by period_end descending" pick
+    # below is unsafe on its own: a company that's filed a 10-Q since the
+    # current annual fact reports a same-concept year-to-date cumulative fact
+    # whose period_end falls between current's and the true prior-year fact's -
+    # e.g. a Q3 10-Q's 9-month-YTD revenue sorts ahead of the correct prior
+    # full year. Confirmed against real TXN data via research/specificity_check.py:
+    # current = FY2025 revenue ($17.682B, period_end 2025-12-31); the naive
+    # "next distinct" pick grabbed a $13.259B *9-month* YTD fact (period_end
+    # 2025-09-30, from a 10-Q) instead of the correct $15.641B FY2024 annual
+    # figure, making a genuinely accurate claim ("increased $2.04B, or 13.0%,
+    # compared to fiscal 2024") read as wildly inconsistent. Prefer a distinct
+    # older period whose duration matches current's (same discipline already
+    # used for the "sequentially"/"a year ago" hinted paths below); only fall
+    # back to the unfiltered pick when no similar-length candidate exists at
+    # all (e.g. a company with only quarterly history to compare an annual
+    # figure against).
+    same_length_older = [
+        f for f in older
+        if _is_distinct(f) and current_length is not None
+        and (length := _period_length_days(f)) is not None and _similar_length(length, current_length)
+    ]
+    default_comparison = same_length_older[0] if same_length_older else next(
+        (f for f in older if _is_distinct(f)), None
+    )
+
     comparison = default_comparison
 
     if _SEQUENTIAL_RE.search(period_hint) and current_length is not None:
