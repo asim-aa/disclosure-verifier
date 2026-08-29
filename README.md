@@ -106,7 +106,7 @@ inconsistent   Income tax expense (FY2025 figure)  $11,100,000,000    (compared 
 unverifiable   Data Center revenue                  68.0% growth      (segment-level, no top-level XBRL tag — correctly declined, not guessed)
 ```
 
-**Engineering rigor:** 176 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
+**Engineering rigor:** 202 automated tests (unit + live-network + live-LLM tiers), green on every push via GitHub Actions.
 
 **A real backtest: would this have caught an actual restatement?** Every result above checks the pipeline in the present tense. A sharper question: has this project's own bitemporal `as_of` machinery ever caught something real happening to a real company? SEC 8-K "Item 4.02" filings (a company disclosing its own past financials can't be relied on) supply real ground truth. Scanning real XBRL company-facts data for `(concept, period)` groups where an *amended* filing (`10-K/A`/`10-Q/A`) reports a materially different value than the original found **13,827 real restatement fingerprints across 541 companies** (after rejecting a looser method that was 82% routine reclassification noise, not corrections). Matching those to real prose claims in the original MD&A — via the project's real extraction agent, keeping claims whose metric resolves to the restated concept and whose value is within 5% — found **18 real matches**, all from Discover Financial Services and Rithm Capital Corp. Running the actual `reconcile()` function twice per match (once `as_of` the original filing date, once `as_of` the restated filing date, no LLM calls): **17 of 18 (94%) would have been flagged inconsistent by the time each restatement existed, using only data that existed at each point in time** — 13 as the clean "consistent when made, inconsistent once restated" pattern, 4 already caught by prose-rounding tolerance alone, 1 genuine miss reported rather than hidden. Not a synthetic eval number — a real outcome against two real companies' real regulatory history. Full methodology and honest scope caveats: [`docs/backtest-results.md`](docs/backtest-results.md).
 
@@ -132,7 +132,9 @@ The interesting engineering in this project wasn't writing the happy path — it
 
 - **A claim's own stated period was being ignored entirely.** `resolve_periods()` always picked the globally most-recent fact as "current," regardless of what the claim's `period` text actually said — so two claims from the same sentence naming two different fiscal years ("Income tax expense was $21.4 billion and $11.1 billion for fiscal years 2026 and 2025, respectively") both resolved to the *same* (current, comparison) pair, and the FY2025 claim ended up checked against the FY2026 fact. Confirmed against this exact live NVDA sentence: without a hint, the FY2025 claim's "current" resolved to the FY2026 annual figure ($21.38B) against a $13.9B quarterly comparison — nonsensical. Fixed by threading the claim's own period text through as a hint: an explicit fiscal year ("fiscal year 2025", "FY2025") now picks that year's fact as current; "sequentially" vs. "a year ago"/"year-over-year" now correctly select the immediately-preceding period vs. the same period ~12 months back for `growth_pct` claims, instead of always picking "next most recent" regardless of which the text meant. Re-run against the same live sentence: both the FY2026 and FY2025 income-tax claims now independently resolve `consistent` against their own correct periods. [`agents/resolver.py`](agents/resolver.py)
 
-One limitation is still open and documented rather than hidden: a *named quarter* in prose ("the September quarter", "the third quarter") still isn't parsed into a specific fiscal period — real filings name quarters inconsistently (calendar month vs. fiscal quarter number) in ways that risk a wrong-but-confident match, so that case still falls back to the default "most recent" pick rather than guessing. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
+- **A named quarter resolved to the wrong duration entirely.** An *ordinal* quarter reference ("the third quarter", "Q3") is safe to resolve — XBRL's own `fiscal_period` field is itself fiscal-quarter-numbered, so "the third quarter" maps directly to `fp="Q3"` with no fiscal-year-end guessing involved, unlike a calendar-named quarter ("the September quarter"). Implementing it surfaced a second, sharper bug before it shipped: a 10-Q commonly tags *both* the standalone 3-month figure and a 6-/9-month year-to-date cumulative with the identical `fiscal_period` and `period_end` — an unfiltered match against real NVDA data returned a $91.166B "Q3" figure that was actually the 9-month cumulative, not the $35.082B standalone quarter. Fixed by preferring the ~91-day-length fact when both exist. [`agents/resolver.py`](agents/resolver.py)
+
+One limitation is still open and documented rather than hidden: a quarter named by *calendar month* ("the September quarter", "the December quarter") still isn't parsed into a specific fiscal period — translating that safely needs the company's own fiscal-year-end, which isn't available at this resolution step, so that case still falls back to the default "most recent" pick rather than guessing. Flagged in [`agents/resolver.py`](agents/resolver.py) as follow-up, not silently left broken. A fuller accounting of what's explicitly in and out of scope — maker/checker independence, idempotency, why doom-loop detection doesn't apply here — is in [`docs/robustness-and-scope.md`](docs/robustness-and-scope.md).
 
 ## Harness: budget and checkpointing
 
@@ -149,7 +151,7 @@ phase7/   RLVR/GRPO fine-tuning — dataset builder, reward, training/eval scrip
 research/ Real-restatement backtest — find fingerprints, match prose, reconcile bitemporally
 docs/     Design docs — reward design, results, robustness & scope
 data/     Local cache / checkpoints (gitignored)
-tests/    168 tests — unit (always run) + 8 live-network/live-LLM (opt-in via -m)
+tests/    202 tests — 194 unit (always run) + 8 live-network/live-LLM (opt-in via -m)
 ```
 
 ## Setup
@@ -164,7 +166,7 @@ cp .env.example .env  # then fill in EDGAR_USER_AGENT and LLM_* config
 ## Test
 
 ```bash
-pytest -v                 # 188 unit tests, no network/LLM required
+pytest -v                 # 194 unit tests, no network/LLM required
 pytest -v -m network       # + live SEC EDGAR checks
 pytest -v -m llm           # + live LLM checks (requires LLM_BASE_URL reachable)
 ```

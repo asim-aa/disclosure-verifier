@@ -222,6 +222,67 @@ def test_resolve_periods_period_hint_recognizes_fy_shorthand():
     assert current.value == 180
 
 
+def test_resolve_periods_period_hint_recognizes_ordinal_quarter():
+    facts = [
+        fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3"),
+        fact("Revenues", 90, "2026-04-01", "2026-06-30", fiscal_period="Q2"),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="the third quarter")
+    assert current.value == 100
+
+
+def test_resolve_periods_period_hint_recognizes_q_shorthand():
+    facts = [
+        fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3"),
+        fact("Revenues", 90, "2026-04-01", "2026-06-30", fiscal_period="Q2"),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="Q3 results")
+    assert current.value == 100
+
+
+def test_resolve_periods_period_hint_combines_quarter_and_fiscal_year():
+    facts = [
+        fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_year=2026, fiscal_period="Q3"),
+        fact("Revenues", 80, "2025-07-01", "2025-09-30", fiscal_year=2025, fiscal_period="Q3"),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="the third quarter of fiscal 2025")
+    assert current.value == 80
+
+
+def test_resolve_periods_calendar_named_quarter_still_declines_to_guess():
+    """'the September quarter' names a quarter by calendar month, not fiscal
+    ordinal - translating that safely needs the company's fiscal-year-end,
+    which isn't available here, so it must fall back to the plain "most
+    recent" default rather than incorrectly matching the Q3 fact just because
+    the hint contains the word "quarter"."""
+    facts = [
+        fact("Revenues", 200, "2026-01-01", "2026-12-31", fiscal_period="FY"),  # most recent
+        fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3"),  # older
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="the September quarter")
+    assert current.value == 200  # unchanged default: most recent, not the Q3 fact
+
+
+def test_resolve_periods_quarter_hint_prefers_standalone_over_ytd_cumulative():
+    """A 10-Q commonly tags both the standalone 3-month figure and the 6-/9-month
+    year-to-date cumulative with the identical fiscal_period and period_end -
+    'the third quarter' must resolve to the standalone one, not the YTD total.
+    Reproduces a real bug found against live NVDA data: an unfiltered match
+    picked a $91.166B 9-month cumulative instead of the $35.082B Q3 figure."""
+    facts = [
+        fact("Revenues", 91_166, "2024-01-29", "2024-10-27", fiscal_year=2025, fiscal_period="Q3"),  # 9-month YTD
+        fact("Revenues", 35_082, "2024-07-29", "2024-10-27", fiscal_year=2025, fiscal_period="Q3"),  # standalone
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="the third quarter of fiscal 2025")
+    assert current.value == 35_082
+
+
+def test_resolve_periods_quarter_hint_not_found_falls_back_to_default():
+    facts = [fact("Revenues", 100, "2026-07-01", "2026-09-30", fiscal_period="Q3")]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="the fourth quarter")
+    assert current.value == 100  # no Q4 fact - falls back rather than erroring
+
+
 def test_resolve_periods_unparseable_hint_falls_back_to_default():
     facts = [
         fact("Revenues", 200, "2025-01-01", "2025-12-31"),

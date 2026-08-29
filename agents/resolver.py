@@ -30,9 +30,11 @@ limitation rather than fixed for several phases: it now reads the claim's own
 free-text period (`ExtractedClaim.period`) instead of ignoring it, so two
 claims from the same sentence naming two different fiscal years ("fiscal
 years 2026 and 2025, respectively") resolve to two different, correct period
-pairs instead of silently both resolving to the same one. See its docstring
-for what "sequentially" vs. "a year ago" now does, and what's still not
-attempted (named quarters in prose).
+pairs instead of silently both resolving to the same one. It also now
+resolves an *ordinal* named quarter ("the third quarter", "Q3") against
+XBRL's own fiscal-quarter field. See its docstring for what "sequentially"
+vs. "a year ago" now does, and what's still not attempted (a quarter named
+by calendar month, e.g. "the September quarter" - see resolve_periods).
 """
 
 import re
@@ -132,12 +134,22 @@ def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | N
 
 
 # Matches "fiscal year 2025", "fiscal 2025", or "FY2025"/"FY 2025" in a claim's
-# free-text period. Deliberately does NOT try to parse a named quarter ("the
-# September quarter", "Q3") into a specific fiscal_period - real filing prose
-# names quarters inconsistently enough (calendar month vs. fiscal quarter
-# number vs. "the December quarter") that guessing wrong would silently pick
-# the wrong period instead of the honest "couldn't tell, use the default."
+# free-text period.
 _FISCAL_YEAR_RE = re.compile(r"fiscal\s+(?:year\s+)?(\d{4})|\bFY\s?(\d{4})\b", re.IGNORECASE)
+
+# Matches an *ordinal* quarter reference - "third quarter", "Q3", "3rd fiscal
+# quarter" - which maps directly and unambiguously to XBRL's own fiscal_period
+# field ("Q1".."Q4", from the source data's `fp`), since that field is itself
+# fiscal-quarter-numbered, not calendar-numbered. Deliberately does NOT match a
+# quarter named by calendar month ("the September quarter", "the December
+# quarter") - that mapping needs the company's fiscal-year-end to translate
+# safely (a September-ending Q1 for one company is another's Q3), which isn't
+# available at this resolution step, and guessing wrong here would silently
+# pick the wrong period instead of the honest "couldn't tell, use the default."
+_QUARTER_WORDS = {"first": "Q1", "second": "Q2", "third": "Q3", "fourth": "Q4"}
+_QUARTER_RE = re.compile(
+    r"\b(first|second|third|fourth)\s+(?:fiscal\s+)?quarter\b|\bQ([1-4])\b", re.IGNORECASE
+)
 
 # "sequentially" / "sequential" signals the comparison period is the immediately
 # preceding period of the SAME length (e.g. prior quarter), not a year prior.
@@ -167,6 +179,17 @@ _YEAR_AGO_TOLERANCE_DAYS = 60
 # full year - so it can't accidentally match a quarter against either.
 _LENGTH_TOLERANCE_DAYS = 20
 
+# Reference duration for "one standalone fiscal quarter" - used to disambiguate
+# a quarter-hint match from a same-fiscal_period cumulative year-to-date fact.
+# 10-Qs commonly report a flow concept (Revenues, NetIncomeLoss, ...) twice for
+# the same quarter: once as the standalone 3-month figure, once as the 6- or
+# 9-month year-to-date cumulative - both tagged with the identical fiscal_period
+# ("Q2", "Q3") and the identical period_end, distinguished only by a shorter
+# vs. longer period_start. Confirmed against real NVDA data: an unfiltered
+# fiscal_period="Q3" match returned a $91.166B "Q3" figure - actually the
+# 9-month year-to-date cumulative, not the ~$35B standalone quarter.
+_QUARTER_LENGTH_DAYS = 91
+
 
 def _period_length_days(fact: FinancialFact) -> int | None:
     if fact.period_start is None:
@@ -183,6 +206,14 @@ def _extract_fiscal_year(period_hint: str) -> int | None:
     if not match:
         return None
     return int(match.group(1) or match.group(2))
+
+
+def _extract_fiscal_quarter(period_hint: str) -> str | None:
+    match = _QUARTER_RE.search(period_hint)
+    if not match:
+        return None
+    word, digit = match.group(1), match.group(2)
+    return _QUARTER_WORDS[word.lower()] if word else f"Q{digit}"
 
 
 def resolve_periods(
@@ -232,11 +263,21 @@ def resolve_periods(
     actually meant. An empty, unparseable, or non-matching hint falls back to
     the original default behavior unchanged.
 
-    Known limitation, still not attempted: a named quarter in prose ("the
-    September quarter", "the third quarter") isn't parsed into a specific
-    fiscal_period - real filings name quarters inconsistently (calendar month
-    vs. fiscal quarter number) in ways that risk a wrong-but-confident match.
-    Left unresolved-by-default rather than guessed.
+    `period_hint` also now resolves an *ordinal* named quarter ("the third
+    quarter", "Q3") against XBRL's own fiscal_period field ("Q1".."Q4", from
+    the source data's `fp`) - safe because that field is itself fiscal-quarter
+    numbered, not calendar-numbered, so no fiscal-year-end knowledge is needed
+    to interpret it. Combines with an explicit fiscal year when both are
+    present ("the third quarter of fiscal 2025"). Still not attempted: a
+    quarter named by calendar month ("the September quarter", "the December
+    quarter") - translating that safely needs the company's fiscal-year-end,
+    which isn't available here, and guessing wrong would silently pick the
+    wrong period instead of the honest "couldn't tell, use the default." Also
+    worth knowing rather than assuming fixed: many companies only file a
+    standalone 10-Q for Q1-Q3 and cover Q4 inside the annual 10-K, so a
+    "fourth quarter" hint can still correctly come back unverifiable if no
+    discrete Q4 fact was ever separately tagged - not a bug in this parsing,
+    a real gap in what some companies report.
     """
     eligible = facts if as_of is None else [f for f in facts if f.filed <= as_of]
     matching = sorted(
@@ -246,7 +287,23 @@ def resolve_periods(
         raise ValueError(f"No facts available for concept '{concept}'" + (f" as of {as_of}" if as_of else ""))
 
     hinted_year = _extract_fiscal_year(period_hint)
-    if hinted_year is not None:
+    hinted_quarter = _extract_fiscal_quarter(period_hint)
+    if hinted_quarter is not None:
+        quarter_matches = [f for f in matching if f.fiscal_period == hinted_quarter]
+        if hinted_year is not None:
+            quarter_matches = [f for f in quarter_matches if f.fiscal_year == hinted_year] or quarter_matches
+        # Prefer the standalone ~quarter-length fact over a same-fiscal_period
+        # cumulative year-to-date one, when both exist - see _QUARTER_LENGTH_DAYS.
+        # Instant (point-in-time) facts have no period_start/length at all and
+        # aren't affected by this filter (no YTD-vs-quarter ambiguity for those).
+        quarter_length_matches = [
+            f for f in quarter_matches
+            if (length := _period_length_days(f)) is not None and _similar_length(length, _QUARTER_LENGTH_DAYS)
+        ]
+        if quarter_length_matches:
+            quarter_matches = quarter_length_matches
+        current = quarter_matches[0] if quarter_matches else matching[0]
+    elif hinted_year is not None:
         year_matches = [f for f in matching if f.fiscal_year == hinted_year]
         current = year_matches[0] if year_matches else matching[0]
     else:
