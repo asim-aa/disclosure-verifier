@@ -35,7 +35,21 @@ class ExtractClaims(dspy.Signature):
     expanded number there too (e.g. "$215.9 billion" -> 215900000000), not the
     abbreviated form — the structured `value` field must match a number that
     already appears fully expanded in your reasoning, not one you expand only
-    at the last step."""
+    at the last step.
+
+    A sentence stating a metric "was positively/negatively impacted by X%" (or
+    "benefited/hurt by X%", "contributed X percentage points") by some named
+    factor (foreign currency, an acquisition, a one-time item) is NOT a
+    growth_pct claim for that metric — it states only that factor's partial
+    contribution to some other, separately-stated total change, not the
+    metric's own total movement. ("Total revenues ... was positively impacted
+    by approximately one percent in foreign currency fluctuations" does NOT
+    mean revenue grew 1% — it means currency effects contributed about 1
+    percentage point to revenue's real growth, a completely different, larger
+    number stated elsewhere or not at all in this text.) There is no
+    checkable claim to extract from a bare factor-contribution sentence like
+    this — skip it, the same as any other qualitative statement with no
+    directly checkable metric value."""
 
     paragraph: str = dspy.InputField()
     claims: list[ExtractedClaim] = dspy.OutputField()

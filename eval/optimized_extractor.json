@@ -6,8 +6,16 @@
       {
         "augmented": true,
         "paragraph": "Commercial remaining performance obligation increased 84% to $678 billion.",
-        "reasoning": "The paragraph states that the commercial remaining performance obligation increased 84 percent to $678 billion. This provides two specific, checkable claims: the new dollar amount of the obligation and the percent growth that led to that amount.",
+        "reasoning": "The paragraph states two distinct quantitative facts about the same metric: an 84% increase and the resulting absolute figure of $678 billion. According to the extraction rules, each distinct numerical claim (even if they refer to the same metric) should be captured separately. Therefore we have:\n1. A growth‐percentage claim: the metric “Commercial remaining performance obligation” grew by 84 percent from the prior period.  \n2. An absolute‐value claim: the updated amount of the metric is $678 billion.  \n\nWe record each claim with its own `comparison_type`, `value`, `value_unit`, and the exact text span that supports the claim. The period is unspecified in the passage, so it is left empty.",
         "claims": [
+          {
+            "metric": "Commercial remaining performance obligation",
+            "value": 84.0,
+            "value_unit": "percent",
+            "period": "",
+            "comparison_type": "growth_pct",
+            "quote": "Commercial remaining performance obligation increased 84%"
+          },
           {
             "metric": "Commercial remaining performance obligation",
             "value": 678000000000.0,
@@ -15,21 +23,13 @@
             "period": "",
             "comparison_type": "absolute",
             "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
-          },
-          {
-            "metric": "Commercial remaining performance obligation",
-            "value": 84.0,
-            "value_unit": "percent",
-            "period": "",
-            "comparison_type": "growth_pct",
-            "quote": "Commercial remaining performance obligation increased 84% to $678 billion."
           }
         ]
       },
       {
         "augmented": true,
         "paragraph": "Microsoft 365 Commercial cloud revenue increased 17%.",
-        "reasoning": "The paragraph states that Microsoft 365 Commercial cloud revenue increased by 17 %. The text gives no specific fiscal period, so the period field is left empty. The claim is a percentage change, so the comparison type is `growth_pct`, the value is 17.0, and the unit is `percent`.",
+        "reasoning": "The paragraph states that Microsoft 365 Commercial cloud revenue increased by 17%. This is a growth percentage (\"growth_pct\") claim for the metric \"Microsoft 365 Commercial cloud revenue\". No specific period is mentioned, so the period field remains empty. The exact quoted text is “Microsoft 365 Commercial cloud revenue increased 17%.”",
         "claims": [
           {
             "metric": "Microsoft 365 Commercial cloud revenue",
@@ -44,7 +44,7 @@
       {
         "augmented": true,
         "paragraph": "Microsoft 365 Consumer cloud revenue increased 28%.",
-        "reasoning": "The paragraph states that Microsoft 365 Consumer cloud revenue increased by 28 percent.  This is a numeric claim of percent growth for a specific metric, with no explicit period given.  The claim is therefore a growth_pct comparison of the metric “Microsoft 365 Consumer cloud revenue” with value 28 and unit “percent”.",
+        "reasoning": "The sentence “Microsoft 365 Consumer cloud revenue increased 28%.” states that the metric *Microsoft 365 Consumer cloud revenue* grew by a percentage that is explicitly given as 28%.  This is a percent‑change claim about a particular metric; no period is specified other than the current period implied by “increased.”  Therefore the claim is a growth_pct type with value 28.0 percent.",
         "claims": [
           {
             "metric": "Microsoft 365 Consumer cloud revenue",
@@ -52,28 +52,28 @@
             "value_unit": "percent",
             "period": "",
             "comparison_type": "growth_pct",
-            "quote": "Microsoft 365 Consumer cloud revenue increased 28%"
+            "quote": "Microsoft 365 Consumer cloud revenue increased 28%."
           }
         ]
       },
       {
         "augmented": true,
         "paragraph": "LinkedIn revenue increased 11%.",
-        "reasoning": "The paragraph states only that LinkedIn revenue increased by 11%, with no specific fiscal or calendar period mentioned. The claim thus describes a percent growth in revenue relative to the prior period, and the period field is left empty because the text does not specify it.",
+        "reasoning": "The paragraph states that LinkedIn revenue rose by 11%. This is a single quantitative growth claim expressed as a percentage change.",
         "claims": [
           {
-            "metric": "revenue",
+            "metric": "LinkedIn revenue",
             "value": 11.0,
             "value_unit": "percent",
             "period": "",
             "comparison_type": "growth_pct",
-            "quote": "LinkedIn revenue increased 11%"
+            "quote": "LinkedIn revenue increased 11%."
           }
         ]
       }
     ],
     "signature": {
-      "instructions": "Extract discrete, checkable financial claims from a paragraph of a company's\nSEC filing. A claim is a specific assertion tying a number to a metric and a\nperiod. Ignore purely qualitative statements with no number attached.\n\nWhen your reasoning mentions a dollar amount, always write out the fully\nexpanded number there too (e.g. \"$215.9 billion\" -> 215900000000), not the\nabbreviated form — the structured `value` field must match a number that\nalready appears fully expanded in your reasoning, not one you expand only\nat the last step.",
+      "instructions": "Extract discrete, checkable financial claims from a paragraph of a company's\nSEC filing. A claim is a specific assertion tying a number to a metric and a\nperiod. Ignore purely qualitative statements with no number attached.\n\nA sentence stating two absolute values side by side with no computed delta\n(\"Net income was $5.00 billion compared with $4.80 billion\") is TWO absolute\nclaims, not one — the FIRST value is the current-period figure, the SECOND is\nthe prior-period comparison figure being cited for context. This applies no\nmatter which connective word joins them (\"from\", \"compared with\", \"compared\nto\", \"versus\", \"up from\") — never drop the first value and keep only the\nsecond, and never compute or report a delta the text itself doesn't state.\n\nWhen your reasoning mentions a dollar amount, always write out the fully\nexpanded number there too (e.g. \"$215.9 billion\" -> 215900000000), not the\nabbreviated form — the structured `value` field must match a number that\nalready appears fully expanded in your reasoning, not one you expand only\nat the last step.\n\nA sentence stating a metric \"was positively/negatively impacted by X%\" (or\n\"benefited/hurt by X%\", \"contributed X percentage points\") by some named\nfactor (foreign currency, an acquisition, a one-time item) is NOT a\ngrowth_pct claim for that metric — it states only that factor's partial\ncontribution to some other, separately-stated total change, not the\nmetric's own total movement. (\"Total revenues ... was positively impacted\nby approximately one percent in foreign currency fluctuations\" does NOT\nmean revenue grew 1% — it means currency effects contributed about 1\npercentage point to revenue's real growth, a completely different, larger\nnumber stated elsewhere or not at all in this text.) There is no\ncheckable claim to extract from a bare factor-contribution sentence like\nthis — skip it, the same as any other qualitative statement with no\ndirectly checkable metric value.",
       "fields": [
         {
           "prefix": "Paragraph:",
@@ -94,7 +94,7 @@
   "metadata": {
     "dependency_versions": {
       "python": "3.12",
-      "dspy": "3.3.0",
+      "dspy": "3.3.1",
       "cloudpickle": "3.1"
     }
   }
