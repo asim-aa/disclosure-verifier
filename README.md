@@ -22,6 +22,8 @@ Built as the capstone for the SupportVectors AI Agents Bootcamp, against four re
 
 📒 **[The Full Ledger (PDF)](docs/field-guide.pdf)** — a complete reference: every required pillar mapped to where it's implemented, every phase (0–7) explained, every post-phase hardening pass, and the load-bearing concepts and likely questions behind all of it.
 
+🔍 **[The Cross-Examination (PDF)](docs/demo.pdf)** — a static export of the interactive exhibit: 122 real claims from 16 real companies' filings, matched to real SEC restatements, plus both specificity-check control sets. The live, searchable version is a published artifact; this is a faithful snapshot for the repo (search and click-to-select aren't functional in PDF form).
+
 ---
 
 ## Architecture
