@@ -61,7 +61,11 @@ class ExtractClaims(dspy.Signature):
     always looks like a huge, false miss.) By contrast, plain "X percent" or
     "X%" with no "percentage points"/"points"/"bps" wording ("revenue grew
     14%") is growth_pct as usual — this rule only applies when the text
-    itself uses point/bps language for the change amount."""
+    itself uses point/bps language for the change amount.
+
+    A period stated once early in the paragraph applies to every later claim
+    in it too, not just the sentence that first stated it — carry it forward
+    unless a later sentence states a different one of its own."""
 
     paragraph: str = dspy.InputField()
     claims: list[ExtractedClaim] = dspy.OutputField()

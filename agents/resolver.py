@@ -173,15 +173,17 @@ def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | N
 # free-text period.
 _FISCAL_YEAR_RE = re.compile(r"fiscal\s+(?:year\s+)?(\d{4})|\bFY\s?(\d{4})\b", re.IGNORECASE)
 
-# A period hint that's *just* a bare 4-digit year ("2024", nothing else) - real
-# case, confirmed against TXN's actual MD&A: "...was 12.4% in 2025 compared with
-# 12.0% in 2024." extracts as an absolute claim with period="2024", but
-# _FISCAL_YEAR_RE requires a "fiscal"/"FY" prefix, so this fell through to the
-# default (most recent) fact and got checked against 2025's real number instead.
-# Anchored to the whole string (not `search`) so this never fires on a longer,
-# ambiguous hint that merely contains a year among other words - only a period
-# extracted as literally nothing but a year is unambiguous enough to trust.
-_BARE_YEAR_RE = re.compile(r"^\s*(\d{4})\s*$")
+# A period hint that's *just* a bare 4-digit year ("2024", or "in 2024" -
+# extraction phrasing varies run to run for the identical real sentence),
+# nothing else - real case, confirmed against TXN's actual MD&A: "...was 12.4%
+# in 2025 compared with 12.0% in 2024." extracts as an absolute claim with
+# period="2024" (or "in 2024"), but _FISCAL_YEAR_RE requires a "fiscal"/"FY"
+# prefix, so this fell through to the default (most recent) fact and got
+# checked against 2025's real number instead. Anchored to the whole string
+# (not `search`) so this never fires on a longer, ambiguous hint that merely
+# contains a year among other words - only a period extracted as literally
+# nothing but a (optionally "in "-prefixed) year is unambiguous enough to trust.
+_BARE_YEAR_RE = re.compile(r"^\s*(?:in\s+)?(\d{4})\s*$", re.IGNORECASE)
 
 # Matches an *ordinal* quarter reference - "third quarter", "Q3", "3rd fiscal
 # quarter" - which maps directly and unambiguously to XBRL's own fiscal_period

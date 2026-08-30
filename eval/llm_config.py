@@ -10,6 +10,14 @@ OpenAI-compatible servers and passes the model id through unchanged.
 gpt-oss-20b is a reasoning model: it spends tokens on an internal reasoning trace
 before the final answer, so `max_tokens` needs real headroom or responses truncate
 mid-thought with empty content — this is why the default here is generous.
+
+Real bug, confirmed against CSCO's actual MD&A: a paragraph that yields 9 real
+claims (see eval/labeled_claims.jsonl id=82) regularly truncated at the
+previous default of 4000 — enough reasoning + 8 claims of structured output
+eats the budget before the 9th (diluted EPS, always last) finishes, either
+crashing the parse entirely or dropping that claim's own `period` field.
+Confirmed directly: 6000 lets this exact chunk complete reliably where 4000
+did not (both were tested against the real production extractor).
 """
 
 import os
@@ -19,7 +27,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_MAX_TOKENS = 4000
+DEFAULT_MAX_TOKENS = 6000
 
 
 def get_lm(max_tokens: int = DEFAULT_MAX_TOKENS) -> dspy.LM:

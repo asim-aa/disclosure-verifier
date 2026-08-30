@@ -329,6 +329,19 @@ def test_resolve_periods_period_hint_recognizes_a_bare_year():
     assert current.value == 0.12
 
 
+def test_resolve_periods_bare_year_hint_tolerates_an_in_prefix():
+    """Same real TXN sentence as above, extraction just phrased the period as
+    "in 2024" instead of bare "2024" on a different run - LLM extraction isn't
+    perfectly deterministic run to run, and the bare-year hint should still
+    match either phrasing since both unambiguously name only a year."""
+    facts = [
+        fact("EffectiveIncomeTaxRateContinuingOperations", 0.124, "2025-01-01", "2025-12-31", unit="pure", fiscal_year=2025),
+        fact("EffectiveIncomeTaxRateContinuingOperations", 0.12, "2024-01-01", "2024-12-31", unit="pure", fiscal_year=2024),
+    ]
+    current, _ = resolve_periods(facts, "EffectiveIncomeTaxRateContinuingOperations", period_hint="in 2024")
+    assert current.value == 0.12
+
+
 def test_resolve_periods_bare_year_hint_does_not_match_inside_longer_text():
     """A bare-year match must be anchored to the whole hint string, not a
     substring search - "fiscal year 2024 results" contains "2024" but isn't
