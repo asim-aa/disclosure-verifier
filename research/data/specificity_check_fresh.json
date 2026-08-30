@@ -1,0 +1,250 @@
+{
+  "control_tickers": [
+    "NOW",
+    "PANW",
+    "CRWD",
+    "WDAY",
+    "SNPS",
+    "FTNT",
+    "INTC",
+    "MU"
+  ],
+  "aggregate": {
+    "n_tickers": 8,
+    "n_succeeded": 8,
+    "failed_tickers": [],
+    "total_claims_verified": 73,
+    "by_verdict": {
+      "consistent": 6,
+      "unverifiable": 64,
+      "inconsistent": 3
+    },
+    "n_resolved_verdicts": 9,
+    "n_inconsistent": 3,
+    "apparent_false_positive_rate": 0.3333333333333333
+  },
+  "runs": [
+    {
+      "ticker": "NOW",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "NOW",
+        "n_claims": 0,
+        "by_verdict": {},
+        "n_tool_calls": 2,
+        "tool_calls_by_agent": {
+          "retrieval": 2
+        },
+        "n_reasoning_steps": 2,
+        "time_to_first_action_seconds": 3.246590495109558e-06,
+        "total_elapsed_seconds": 1.3125129044055939e-05,
+        "partial": false,
+        "partial_reason": null
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 0.3435235321521759
+    },
+    {
+      "ticker": "PANW",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "PANW",
+        "n_claims": 9,
+        "by_verdict": {
+          "consistent": 3,
+          "unverifiable": 6
+        },
+        "n_tool_calls": 51,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 9
+        },
+        "n_reasoning_steps": 49,
+        "time_to_first_action_seconds": 2.814456820487976e-06,
+        "total_elapsed_seconds": 60.599561063572764,
+        "partial": true,
+        "partial_reason": "max_chunks (40) reached"
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 61.02858091611415
+    },
+    {
+      "ticker": "CRWD",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "CRWD",
+        "n_claims": 6,
+        "by_verdict": {
+          "unverifiable": 6
+        },
+        "n_tool_calls": 48,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 6
+        },
+        "n_reasoning_steps": 48,
+        "time_to_first_action_seconds": 2.2444874048233032e-06,
+        "total_elapsed_seconds": 56.00886522512883,
+        "partial": true,
+        "partial_reason": "max_chunks (40) reached"
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 56.513468029908836
+    },
+    {
+      "ticker": "WDAY",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "WDAY",
+        "n_claims": 9,
+        "by_verdict": {
+          "unverifiable": 9
+        },
+        "n_tool_calls": 51,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 9
+        },
+        "n_reasoning_steps": 47,
+        "time_to_first_action_seconds": 2.0442530512809753e-06,
+        "total_elapsed_seconds": 68.82104042265564,
+        "partial": true,
+        "partial_reason": "max_chunks (40) reached"
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 69.29198528826237
+    },
+    {
+      "ticker": "SNPS",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "SNPS",
+        "n_claims": 27,
+        "by_verdict": {
+          "consistent": 1,
+          "unverifiable": 23,
+          "inconsistent": 3
+        },
+        "n_tool_calls": 69,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 27
+        },
+        "n_reasoning_steps": 63,
+        "time_to_first_action_seconds": 3.896653652191162e-06,
+        "total_elapsed_seconds": 107.72843595314771,
+        "partial": true,
+        "partial_reason": "max_extraction_calls (40) reached"
+      },
+      "inconsistent_claims": [
+        {
+          "metric": "Operating income",
+          "claimed_value": 1400000000.0,
+          "period": "",
+          "quote": "Operating income was $1.4 billion",
+          "explanation": "Claimed OperatingIncomeLoss=1,400,000,000; EDGAR reports 914,927,000 for the period ending 2025-10-31 (relative difference 53.02%).",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "Operating income",
+          "claimed_value": 82500000.0,
+          "period": "",
+          "quote": "an increase of $82.5 million",
+          "explanation": "Claimed OperatingIncomeLoss changed by 82,500,000; EDGAR data implies -440,784,000 (1,355,711,000 -> 914,927,000), a relative difference of 38.60%.",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "Operating income",
+          "claimed_value": 6.0,
+          "period": "",
+          "quote": "or 6%",
+          "explanation": "Claimed OperatingIncomeLoss growth of 6.00%; EDGAR data implies -32.51% (1,355,711,000 -> 914,927,000), a difference of 38.51 percentage points.",
+          "reason_code": "large_miss"
+        }
+      ],
+      "elapsed_seconds": 108.35374102555215
+    },
+    {
+      "ticker": "FTNT",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "FTNT",
+        "n_claims": 3,
+        "by_verdict": {
+          "unverifiable": 3
+        },
+        "n_tool_calls": 45,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 3
+        },
+        "n_reasoning_steps": 45,
+        "time_to_first_action_seconds": 2.2742897272109985e-06,
+        "total_elapsed_seconds": 51.102970372885466,
+        "partial": true,
+        "partial_reason": "max_chunks (40) reached"
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 51.4828073810786
+    },
+    {
+      "ticker": "INTC",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "INTC",
+        "n_claims": 0,
+        "by_verdict": {},
+        "n_tool_calls": 6,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 4
+        },
+        "n_reasoning_steps": 6,
+        "time_to_first_action_seconds": 3.6675482988357544e-06,
+        "total_elapsed_seconds": 3.3078772593289614,
+        "partial": false,
+        "partial_reason": null
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 4.028694039210677
+    },
+    {
+      "ticker": "MU",
+      "ok": true,
+      "error": null,
+      "summary": {
+        "ticker": "MU",
+        "n_claims": 19,
+        "by_verdict": {
+          "consistent": 2,
+          "unverifiable": 17
+        },
+        "n_tool_calls": 61,
+        "tool_calls_by_agent": {
+          "retrieval": 2,
+          "extraction": 40,
+          "verification": 19
+        },
+        "n_reasoning_steps": 46,
+        "time_to_first_action_seconds": 2.5033950805664062e-06,
+        "total_elapsed_seconds": 82.64385211002082,
+        "partial": true,
+        "partial_reason": "max_chunks (40) reached"
+      },
+      "inconsistent_claims": [],
+      "elapsed_seconds": 82.98100944142789
+    }
+  ]
+}

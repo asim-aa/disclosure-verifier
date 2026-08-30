@@ -65,7 +65,21 @@ class ExtractClaims(dspy.Signature):
 
     A period stated once early in the paragraph applies to every later claim
     in it too, not just the sentence that first stated it — carry it forward
-    unless a later sentence states a different one of its own."""
+    unless a later sentence states a different one of its own.
+
+    A sentence stating an overall company-wide figure that ALSO names a
+    segment, product, subsidiary, acquisition, or geography's own
+    sub-contribution ("Revenues were $7.1 billion ... which includes revenues
+    from Ansys of $756.6 million", "revenue decrease 22% ... in China ...
+    excluding Ansys") is describing TWO different, separately-checkable
+    things, not one. The bare metric name ("revenue") is ONLY for the
+    overall, unqualified company-wide figure — never drop a segment/
+    geography/subsidiary qualifier and let its number stand in for the
+    overall one, even when the overall figure is easy to miss in a long,
+    multi-clause sentence. The qualified sub-figure gets its OWN metric text
+    that keeps the qualifier ("revenue from Ansys", "China revenue") - never
+    the bare metric name for a number that the sentence itself scopes to one
+    piece of the business."""
 
     paragraph: str = dspy.InputField()
     claims: list[ExtractedClaim] = dspy.OutputField()
