@@ -16,12 +16,12 @@
     "total_claims_verified": 153,
     "by_verdict": {
       "unverifiable": 118,
-      "consistent": 29,
-      "inconsistent": 6
+      "consistent": 33,
+      "inconsistent": 2
     },
     "n_resolved_verdicts": 35,
-    "n_inconsistent": 6,
-    "apparent_false_positive_rate": 0.17142857142857143
+    "n_inconsistent": 2,
+    "apparent_false_positive_rate": 0.05714285714285714
   },
   "runs": [
     {
@@ -42,13 +42,13 @@
           "verification": 38
         },
         "n_reasoning_steps": 70,
-        "time_to_first_action_seconds": 3.3266842365264893e-06,
-        "total_elapsed_seconds": 2.048397489823401,
+        "time_to_first_action_seconds": 3.5669654607772827e-06,
+        "total_elapsed_seconds": 2.055899298749864,
         "partial": true,
         "partial_reason": "max_extraction_calls (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 2.4260198501870036
+      "elapsed_seconds": 2.4298852970823646
     },
     {
       "ticker": "CRM",
@@ -58,9 +58,9 @@
         "ticker": "CRM",
         "n_claims": 28,
         "by_verdict": {
-          "inconsistent": 6,
-          "consistent": 3,
-          "unverifiable": 19
+          "consistent": 7,
+          "unverifiable": 19,
+          "inconsistent": 2
         },
         "n_tool_calls": 70,
         "tool_calls_by_agent": {
@@ -69,44 +69,12 @@
           "verification": 28
         },
         "n_reasoning_steps": 58,
-        "time_to_first_action_seconds": 4.9192458391189575e-06,
-        "total_elapsed_seconds": 0.3604030665010214,
+        "time_to_first_action_seconds": 4.367902874946594e-06,
+        "total_elapsed_seconds": 0.3641055701300502,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [
-        {
-          "metric": "Revenue",
-          "claimed_value": 41500000000.0,
-          "period": "fiscal 2026",
-          "quote": "For fiscal 2026, revenue was $41.5 billion",
-          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax=41,500,000,000; EDGAR reports 30,324,000,000 for the period ending 2025-10-31 (relative difference 36.86%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "diluted net income per share",
-          "claimed_value": 7.8,
-          "period": "fiscal 2026",
-          "quote": "diluted net income per share was $7.80",
-          "explanation": "Claimed EarningsPerShareDiluted=8; EDGAR reports 6 for the period ending 2025-10-31 (relative difference 36.13%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "Cash provided by operations",
-          "claimed_value": 15000000000.0,
-          "period": "fiscal 2026",
-          "quote": "Cash provided by operations for fiscal 2026 was $15.0 billion",
-          "explanation": "Claimed NetCashProvidedByUsedInOperatingActivities=15,000,000,000; EDGAR reports 9,532,000,000 for the period ending 2025-10-31 (relative difference 57.36%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "Cash provided by operations",
-          "claimed_value": 15.0,
-          "period": "fiscal 2026",
-          "quote": "Cash provided by operations for fiscal 2026 was $15.0 billion , an increase of 15 percent year-over-year",
-          "explanation": "Claimed NetCashProvidedByUsedInOperatingActivities growth of 15.00%; EDGAR data implies 4.49% (9,122,000,000 -> 9,532,000,000), a difference of 10.51 percentage points.",
-          "reason_code": "large_miss"
-        },
         {
           "metric": "Total remaining performance obligation",
           "claimed_value": 14.0,
@@ -124,7 +92,7 @@
           "reason_code": "large_miss"
         }
       ],
-      "elapsed_seconds": 0.9082916025072336
+      "elapsed_seconds": 0.9096731636673212
     },
     {
       "ticker": "ORCL",
@@ -143,13 +111,13 @@
           "verification": 10
         },
         "n_reasoning_steps": 49,
-        "time_to_first_action_seconds": 2.584420144557953e-06,
-        "total_elapsed_seconds": 0.33506173361092806,
+        "time_to_first_action_seconds": 2.2640451788902283e-06,
+        "total_elapsed_seconds": 0.3355686627328396,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 1.2052886560559273
+      "elapsed_seconds": 1.2017878238111734
     },
     {
       "ticker": "CSCO",
@@ -169,13 +137,13 @@
           "verification": 27
         },
         "n_reasoning_steps": 66,
-        "time_to_first_action_seconds": 3.727152943611145e-06,
-        "total_elapsed_seconds": 0.3573060231283307,
+        "time_to_first_action_seconds": 3.1953677535057068e-06,
+        "total_elapsed_seconds": 0.3545201011002064,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 1.063083240762353
+      "elapsed_seconds": 1.071198247373104
     },
     {
       "ticker": "INTU",
@@ -194,13 +162,13 @@
           "verification": 11
         },
         "n_reasoning_steps": 51,
-        "time_to_first_action_seconds": 2.4139881134033203e-06,
-        "total_elapsed_seconds": 0.33457679860293865,
+        "time_to_first_action_seconds": 2.8545036911964417e-06,
+        "total_elapsed_seconds": 0.3355475440621376,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.9642525799572468
+      "elapsed_seconds": 0.9708072273060679
     },
     {
       "ticker": "IBM",
@@ -215,13 +183,13 @@
           "retrieval": 2
         },
         "n_reasoning_steps": 2,
-        "time_to_first_action_seconds": 3.4766271710395813e-06,
-        "total_elapsed_seconds": 1.1110678315162659e-05,
+        "time_to_first_action_seconds": 4.547648131847382e-06,
+        "total_elapsed_seconds": 1.1120922863483429e-05,
         "partial": false,
         "partial_reason": null
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.40424349159002304
+      "elapsed_seconds": 0.40086141414940357
     },
     {
       "ticker": "QCOM",
@@ -240,13 +208,13 @@
           "verification": 4
         },
         "n_reasoning_steps": 45,
-        "time_to_first_action_seconds": 2.7455389499664307e-06,
-        "total_elapsed_seconds": 0.33651964738965034,
+        "time_to_first_action_seconds": 2.9765069484710693e-06,
+        "total_elapsed_seconds": 0.3343523619696498,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.6389597160741687
+      "elapsed_seconds": 0.6332158772274852
     },
     {
       "ticker": "TXN",
@@ -266,13 +234,13 @@
           "verification": 35
         },
         "n_reasoning_steps": 68,
-        "time_to_first_action_seconds": 2.644956111907959e-06,
-        "total_elapsed_seconds": 0.37092491425573826,
+        "time_to_first_action_seconds": 2.3245811462402344e-06,
+        "total_elapsed_seconds": 0.3702186858281493,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.8472009235993028
+      "elapsed_seconds": 0.8373233051970601
     }
   ]
 }

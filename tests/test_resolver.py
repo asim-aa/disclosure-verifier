@@ -255,6 +255,35 @@ def test_resolve_periods_period_hint_recognizes_fy_shorthand():
     assert current.value == 180
 
 
+def test_resolve_periods_fiscal_year_hint_prefers_annual_fact_over_a_same_numbered_quarter():
+    """Real bug, confirmed against CRM's actual XBRL data: the FY2026 10-K's own
+    annual revenue fact (period 2025-02-01 to 2026-01-31, $41.525B, filed with
+    that 10-K) is tagged fiscal_year=2025 - but the Q3 FY2026 10-Q's quarterly
+    fact (a much smaller, wrong period) is tagged fiscal_year=2026, matching the
+    company's own "fiscal 2026" prose by number only by accident. A bare
+    fiscal-year hint (no quarter marker) must prefer the real annual fact even
+    when its own fiscal_year number is one off from the hint, over a same-
+    numbered quarterly fact that isn't what "fiscal NNNN" prose ever means."""
+    facts = [
+        fact("Revenues", 30_324_000_000, "2025-02-01", "2025-10-31", fiscal_year=2026, fiscal_period="Q3"),
+        fact("Revenues", 41_525_000_000, "2025-02-01", "2026-01-31", fiscal_year=2025, fiscal_period="FY"),
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="fiscal 2026")
+    assert current.value == 41_525_000_000
+
+
+def test_resolve_periods_fiscal_year_hint_still_prefers_an_exact_annual_match_when_one_exists():
+    """The off-by-one tolerance must not override a real, correctly-tagged
+    annual match - most companies (e.g. NVDA/TXN, already covered above) tag
+    their annual fact's fiscal_year exactly matching their own prose."""
+    facts = [
+        fact("Revenues", 999, "2024-01-01", "2024-12-31", fiscal_year=2025, fiscal_period="FY"),  # off-by-one decoy
+        fact("Revenues", 200, "2025-01-01", "2025-12-31", fiscal_year=2026, fiscal_period="FY"),  # exact match
+    ]
+    current, _ = resolve_periods(facts, "Revenues", period_hint="fiscal 2026")
+    assert current.value == 200
+
+
 def test_resolve_periods_period_hint_recognizes_a_bare_year():
     """Real bug, confirmed against TXN's actual MD&A: '...was 12.4% in 2025
     compared with 12.0% in 2024.' extracts with period="2024" (just the year,

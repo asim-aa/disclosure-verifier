@@ -377,8 +377,31 @@ def resolve_periods(
             )
         current = quarter_matches[0]
     elif hinted_year is not None:
-        year_matches = [f for f in matching if f.fiscal_year == hinted_year]
-        current = year_matches[0] if year_matches else matching[0]
+        # A bare fiscal-year hint (no quarter marker - that's the elif branch
+        # above) always means the ANNUAL figure, never a quarter that happens to
+        # carry the same fiscal_year number. That distinction matters because
+        # `fiscal_year` tagging can genuinely disagree between a company's own
+        # annual and quarterly filings for the SAME fiscal year - confirmed
+        # against real CRM data: the FY2026 10-K's own annual facts (period
+        # 2025-02-01 to 2026-01-31, filed with that 10-K) are tagged
+        # fiscal_year=2025, while the Q3 FY2026 10-Q's facts (an earlier,
+        # smaller, wrong period) are tagged fiscal_year=2026 - matching the
+        # company's own "fiscal 2026" prose by number, but only by accident.
+        # Preferring any annual (fiscal_period == "FY") fact over a same-
+        # numbered quarterly one - and tolerating the annual fact's number
+        # being one less than the hint, not just an exact match - fixes this
+        # without weakening the exact-match case every other company already
+        # relies on (checked first, unconditionally preferred when present).
+        annual_matches = [f for f in matching if f.fiscal_period == "FY"]
+        exact_annual = [f for f in annual_matches if f.fiscal_year == hinted_year]
+        off_by_one_annual = [f for f in annual_matches if f.fiscal_year == hinted_year - 1]
+        if exact_annual:
+            current = exact_annual[0]
+        elif off_by_one_annual:
+            current = off_by_one_annual[0]
+        else:
+            year_matches = [f for f in matching if f.fiscal_year == hinted_year]
+            current = year_matches[0] if year_matches else matching[0]
     else:
         current = matching[0]
 
