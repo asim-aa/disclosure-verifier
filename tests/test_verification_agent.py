@@ -159,6 +159,65 @@ def test_dollar_claim_against_a_dollar_concept_is_unaffected_by_the_guard():
     assert outcome.verdict == VERDICT_CONSISTENT
 
 
+# ---------- bps_change denominator_metric ----------
+#
+# Real gap, confirmed against CSCO's actual MD&A: "Total gross margin increased
+# by 0.2 percentage points." extracted correctly as a bps_change claim, but
+# nothing ever populated a denominator_metric for the reconciler to check the
+# ratio against, so every bps_change claim came back unverifiable regardless of
+# whether the data existed to check it. Fixed by wiring resolve_ratio_denominator.
+
+
+def test_bps_change_gross_margin_resolves_and_verifies_against_real_numbers():
+    """Real CSCO numbers: FY2025 gross margin 64.9380%, FY2024 64.7324% ->
+    +20.6bps computed, vs. the company's own claimed +20bps ("0.2 percentage
+    points") - within the 50bps tolerance."""
+    facts = [
+        fact("GrossProfit", 36_790_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("GrossProfit", 34_828_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 56_654_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 53_803_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+    ]
+    outcome = AGENT.verify(
+        extracted("total gross margin", 20.0, "bps", "bps_change"), "CSCO", facts
+    )
+    assert outcome.verdict == VERDICT_CONSISTENT
+
+
+def test_bps_change_gross_margin_still_catches_a_genuinely_wrong_claim():
+    facts = [
+        fact("GrossProfit", 36_790_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("GrossProfit", 34_828_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 56_654_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 53_803_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+    ]
+    outcome = AGENT.verify(
+        extracted("total gross margin", 500.0, "bps", "bps_change"), "CSCO", facts
+    )
+    assert outcome.verdict == VERDICT_INCONSISTENT
+
+
+def test_bps_change_without_a_ratio_mapping_stays_unverifiable():
+    """"operating income" resolves fine as a numerator concept (used by plain
+    absolute/growth_pct claims), but has no ratio-denominator mapping - "operating
+    margin" was tested against real data and deliberately excluded (see
+    METRIC_TO_RATIO_DENOMINATOR's own docstring): real CSCO GAAP operating
+    margin moves the OPPOSITE direction from what the company's own MD&A
+    states, likely because the prose describes a non-GAAP-adjusted figure.
+    Must stay unverifiable, not silently mapped to the wrong ratio."""
+    facts = [
+        fact("OperatingIncomeLoss", 11_760_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("OperatingIncomeLoss", 12_181_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 56_654_000_000, "2024-07-28", "2025-07-26", fiscal_year=2025),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 53_803_000_000, "2023-07-30", "2024-07-27", fiscal_year=2024),
+    ]
+    outcome = AGENT.verify(
+        extracted("operating income", 180.0, "bps", "bps_change"), "CSCO", facts
+    )
+    assert outcome.verdict == VERDICT_UNVERIFIABLE
+    assert "comparison period" in outcome.explanation.lower() or "denominator" in outcome.explanation.lower()
+
+
 # ---------- occurrence: the "compared with" pairing bug ----------
 #
 # Real bug, found via research/specificity_check.py: a sentence like "Net income

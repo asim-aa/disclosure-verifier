@@ -7,7 +7,12 @@ bitemporally consistent too — see tools/reconciler.py's `_find_fact` docstring
 
 from typing import Protocol
 
-from agents.resolver import is_relative_year_ago_hint, resolve_concept, resolve_periods
+from agents.resolver import (
+    is_relative_year_ago_hint,
+    resolve_concept,
+    resolve_periods,
+    resolve_ratio_denominator,
+)
 from agents.schema import VerificationOutcome
 from eval.schema import ExtractedClaim
 from tools.reconciler import reconcile
@@ -137,6 +142,18 @@ class RealVerificationAgent:
         if extracted.comparison_type == "absolute" and current_fact.unit == "pure" and extracted.value_unit == "percent":
             claimed_value = extracted.value / 100.0
 
+        # bps_change is a change in a RATIO (metric / denominator_metric), and
+        # the reconciler can't check one without a real denominator concept -
+        # confirmed against real CSCO data: "gross margin" safely maps to
+        # GrossProfit/Revenue (computed change matched the claim within
+        # tolerance), but a same-shaped "operating margin" claim does NOT -
+        # see METRIC_TO_RATIO_DENOMINATOR's own docstring for why that one was
+        # deliberately excluded rather than guessed. Metrics with no entry here
+        # correctly stay unverifiable, same as before this existed.
+        denominator_metric = None
+        if extracted.comparison_type == "bps_change":
+            denominator_metric = resolve_ratio_denominator(extracted.metric, facts, as_of=as_of)
+
         claim = Claim(
             ticker=ticker,
             metric=concept,
@@ -147,6 +164,7 @@ class RealVerificationAgent:
             comparison_period_start=comparison_fact.period_start if comparison_fact else None,
             comparison_period_end=comparison_fact.period_end if comparison_fact else None,
             unit=current_fact.unit,
+            denominator_metric=denominator_metric,
         )
 
         result = reconcile(claim, facts, as_of=as_of)

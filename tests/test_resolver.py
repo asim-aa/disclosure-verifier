@@ -1,6 +1,6 @@
 import pytest
 
-from agents.resolver import resolve_concept, resolve_periods
+from agents.resolver import resolve_concept, resolve_periods, resolve_ratio_denominator
 from tools.schema import FinancialFact
 
 
@@ -571,3 +571,46 @@ def test_resolve_concept_still_declines_a_genuine_segment_level_metric():
     finding) — "Azure revenue" has no safe candidate to fall back to."""
     facts = [fact("Revenues", 100, "2025-01-01", "2025-12-31")]
     assert resolve_concept("azure and other cloud services revenue", facts) is None
+
+
+# ---------- resolve_ratio_denominator ----------
+#
+# bps_change is a change in a RATIO (metric / denominator_metric); the reconciler
+# was always able to check one given a denominator_metric, but nothing ever
+# resolved one - agents/verification_agent.py never populated it. Confirmed
+# against real CSCO data before wiring: "gross margin" safely maps to
+# GrossProfit/Revenue (the computed change matched the company's own claim
+# within tolerance). "Operating margin" was tested too and deliberately
+# excluded - see METRIC_TO_RATIO_DENOMINATOR's own docstring for why.
+
+
+def test_resolve_ratio_denominator_resolves_gross_margin_to_revenue():
+    facts = [
+        fact("GrossProfit", 36_790_000_000, "2024-07-28", "2025-07-26"),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 56_654_000_000, "2024-07-28", "2025-07-26"),
+    ]
+    assert resolve_ratio_denominator("total gross margin", facts) == "RevenueFromContractWithCustomerExcludingAssessedTax"
+
+
+def test_resolve_ratio_denominator_declines_unmapped_metrics():
+    """Deliberately narrower than METRIC_TO_CONCEPTS - "operating margin" isn't
+    here at all (tested against real data and rejected, not just unconsidered),
+    and any metric with no explicit ratio mapping must stay unverifiable rather
+    than guess at "the obvious" denominator."""
+    facts = [
+        fact("OperatingIncomeLoss", 11_760_000_000, "2024-07-28", "2025-07-26"),
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 56_654_000_000, "2024-07-28", "2025-07-26"),
+    ]
+    assert resolve_ratio_denominator("operating margin", facts) is None
+    assert resolve_ratio_denominator("operating income as a percentage of revenue", facts) is None
+
+
+def test_resolve_ratio_denominator_picks_the_most_recently_reported_candidate():
+    """Same recency discipline as resolve_concept - a company that's retagged
+    its revenue concept over time shouldn't lock onto the stale one."""
+    facts = [
+        fact("GrossProfit", 100, "2025-01-01", "2025-12-31"),
+        fact("Revenues", 50, "2020-01-01", "2020-12-31", filed="2021-01-01"),  # old tag, stale
+        fact("RevenueFromContractWithCustomerExcludingAssessedTax", 200, "2025-01-01", "2025-12-31", filed="2026-01-01"),  # current tag
+    ]
+    assert resolve_ratio_denominator("gross margin", facts) == "RevenueFromContractWithCustomerExcludingAssessedTax"

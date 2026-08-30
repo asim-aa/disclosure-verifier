@@ -135,11 +135,9 @@ METRIC_TO_CONCEPTS: dict[str, list[str]] = {
 }
 
 
-def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | None = None) -> str | None:
-    """Return whichever candidate concept for `metric_text` has the most recently
-    reported data in `facts` as of `as_of` (a filing date — see resolve_periods
-    for why this cutoff matters), or None if the metric has no known mapping or
-    none of its candidates appear at all before that cutoff.
+def _most_recently_reported(candidates: list[str], facts: list[FinancialFact], as_of: str | None) -> str | None:
+    """Whichever of `candidates` has the most recently reported data in `facts`
+    as of `as_of`, or None if none of them appear at all before that cutoff.
 
     Picks by data recency, not just "first candidate that exists at all" —
     companies retag concepts over time (confirmed against real data: NVDA
@@ -147,14 +145,7 @@ def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | N
     through FY2022, then switched to plain Revenues; that old tag never
     disappears from the company's concept list, it just stops getting new data).
     Picking the first *existing* candidate would silently lock onto a
-    discontinued tag and reconcile claims against multi-year-stale data. Exact
-    metric-name match only (after normalization) — see the module/table
-    docstring for why fuzzy matching isn't safe here."""
-    key = metric_text.strip().lower()
-    candidates = METRIC_TO_CONCEPTS.get(key)
-    if not candidates:
-        return None
-
+    discontinued tag and reconcile claims against multi-year-stale data."""
     eligible = facts if as_of is None else [f for f in facts if f.filed <= as_of]
 
     best_concept, best_period_end = None, None
@@ -167,6 +158,57 @@ def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | N
             best_concept, best_period_end = concept, latest
 
     return best_concept
+
+
+def resolve_concept(metric_text: str, facts: list[FinancialFact], as_of: str | None = None) -> str | None:
+    """Return whichever candidate concept for `metric_text` has the most recently
+    reported data in `facts` as of `as_of` (a filing date — see resolve_periods
+    for why this cutoff matters), or None if the metric has no known mapping or
+    none of its candidates appear at all before that cutoff. Exact metric-name
+    match only (after normalization) — see the module/table docstring for why
+    fuzzy matching isn't safe here."""
+    key = metric_text.strip().lower()
+    candidates = METRIC_TO_CONCEPTS.get(key)
+    if not candidates:
+        return None
+    return _most_recently_reported(candidates, facts, as_of)
+
+
+# Denominator concept candidates for a RATIO claim (bps_change) - the numerator
+# concept comes from the normal METRIC_TO_CONCEPTS lookup above (e.g. "gross
+# margin" -> GrossProfit); this maps the SAME metric-text keys to what the
+# ratio is computed against. Deliberately narrow, and each entry confirmed
+# against real data before being added, same discipline as METRIC_TO_CONCEPTS.
+# "Operating margin"/"operating income as a percentage of revenue" was tested
+# and REJECTED, not just skipped: real CSCO data shows GAAP
+# OperatingIncomeLoss/Revenue moving in the OPPOSITE direction from what the
+# company's own MD&A states the margin did (-188bps computed vs. +180bps
+# claimed) - the sentence's own stated drivers ("lower amortization of
+# purchased intangible assets, lower restructuring charges") are exactly what
+# a non-GAAP-adjusted operating margin excludes, so this is almost certainly
+# an adjusted figure with no plain GAAP-ratio equivalent. Mapping it anyway
+# would create a NEW false positive, not fix one - the same mistake already
+# made and undone once this session for "gross profit margin" vs. GrossProfit
+# as a raw dollar concept.
+METRIC_TO_RATIO_DENOMINATOR: dict[str, list[str]] = {
+    "gross margin": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+    "gross margin percentage": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+    "gross profit": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+    "total gross margin": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+    "gross profit margin": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"],
+}
+
+
+def resolve_ratio_denominator(metric_text: str, facts: list[FinancialFact], as_of: str | None = None) -> str | None:
+    """Same resolution discipline as resolve_concept (recency-based candidate
+    pick, exact metric-text match only), but for a bps_change claim's
+    denominator concept - see METRIC_TO_RATIO_DENOMINATOR's own docstring for
+    why this table is kept deliberately narrower than METRIC_TO_CONCEPTS."""
+    key = metric_text.strip().lower()
+    candidates = METRIC_TO_RATIO_DENOMINATOR.get(key)
+    if not candidates:
+        return None
+    return _most_recently_reported(candidates, facts, as_of)
 
 
 # Matches "fiscal year 2025", "fiscal 2025", or "FY2025"/"FY 2025" in a claim's

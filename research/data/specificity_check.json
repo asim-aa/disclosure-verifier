@@ -15,10 +15,10 @@
     "failed_tickers": [],
     "total_claims_verified": 152,
     "by_verdict": {
-      "unverifiable": 120,
-      "consistent": 32
+      "unverifiable": 119,
+      "consistent": 33
     },
-    "n_resolved_verdicts": 32,
+    "n_resolved_verdicts": 33,
     "n_inconsistent": 0,
     "apparent_false_positive_rate": 0.0
   },
@@ -41,13 +41,13 @@
           "verification": 38
         },
         "n_reasoning_steps": 70,
-        "time_to_first_action_seconds": 3.917142748832703e-06,
-        "total_elapsed_seconds": 131.43743296153843,
+        "time_to_first_action_seconds": 3.1962990760803223e-06,
+        "total_elapsed_seconds": 2.081540033221245,
         "partial": true,
         "partial_reason": "max_extraction_calls (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 131.81520659849048
+      "elapsed_seconds": 2.4582821540534496
     },
     {
       "ticker": "CRM",
@@ -67,13 +67,13 @@
           "verification": 27
         },
         "n_reasoning_steps": 58,
-        "time_to_first_action_seconds": 4.898756742477417e-06,
-        "total_elapsed_seconds": 118.84773099515587,
+        "time_to_first_action_seconds": 4.498288035392761e-06,
+        "total_elapsed_seconds": 0.3611050732433796,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 119.39853448886424
+      "elapsed_seconds": 0.905629001557827
     },
     {
       "ticker": "ORCL",
@@ -92,13 +92,13 @@
           "verification": 10
         },
         "n_reasoning_steps": 49,
-        "time_to_first_action_seconds": 2.944841980934143e-06,
-        "total_elapsed_seconds": 69.19038779009134,
+        "time_to_first_action_seconds": 2.7352944016456604e-06,
+        "total_elapsed_seconds": 0.33908814936876297,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 70.04181017447263
+      "elapsed_seconds": 1.2100474331527948
     },
     {
       "ticker": "CSCO",
@@ -108,8 +108,8 @@
         "ticker": "CSCO",
         "n_claims": 28,
         "by_verdict": {
-          "consistent": 1,
-          "unverifiable": 27
+          "consistent": 2,
+          "unverifiable": 26
         },
         "n_tool_calls": 70,
         "tool_calls_by_agent": {
@@ -118,13 +118,13 @@
           "verification": 28
         },
         "n_reasoning_steps": 67,
-        "time_to_first_action_seconds": 3.255903720855713e-06,
-        "total_elapsed_seconds": 62.35711370036006,
+        "time_to_first_action_seconds": 3.116205334663391e-06,
+        "total_elapsed_seconds": 0.36202660389244556,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 63.049275745637715
+      "elapsed_seconds": 1.066977352835238
     },
     {
       "ticker": "INTU",
@@ -143,13 +143,13 @@
           "verification": 11
         },
         "n_reasoning_steps": 51,
-        "time_to_first_action_seconds": 2.8852373361587524e-06,
-        "total_elapsed_seconds": 70.07433686126024,
+        "time_to_first_action_seconds": 2.8247013688087463e-06,
+        "total_elapsed_seconds": 0.33858197275549173,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 70.69873128179461
+      "elapsed_seconds": 0.9991154577583075
     },
     {
       "ticker": "IBM",
@@ -164,13 +164,13 @@
           "retrieval": 2
         },
         "n_reasoning_steps": 2,
-        "time_to_first_action_seconds": 3.536231815814972e-06,
-        "total_elapsed_seconds": 1.1460855603218079e-05,
+        "time_to_first_action_seconds": 3.055669367313385e-06,
+        "total_elapsed_seconds": 1.0279007256031036e-05,
         "partial": false,
         "partial_reason": null
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.3988850321620703
+      "elapsed_seconds": 0.3960216110572219
     },
     {
       "ticker": "QCOM",
@@ -189,13 +189,13 @@
           "verification": 4
         },
         "n_reasoning_steps": 45,
-        "time_to_first_action_seconds": 2.814456820487976e-06,
-        "total_elapsed_seconds": 56.316605540923774,
+        "time_to_first_action_seconds": 2.434477210044861e-06,
+        "total_elapsed_seconds": 0.33865003008395433,
         "partial": true,
         "partial_reason": "max_extraction_calls (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 56.60936425626278
+      "elapsed_seconds": 0.6363688791170716
     },
     {
       "ticker": "TXN",
@@ -215,13 +215,13 @@
           "verification": 34
         },
         "n_reasoning_steps": 67,
-        "time_to_first_action_seconds": 2.4652108550071716e-06,
-        "total_elapsed_seconds": 104.51376661937684,
+        "time_to_first_action_seconds": 2.183951437473297e-06,
+        "total_elapsed_seconds": 0.3711670469492674,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 105.00570286251605
+      "elapsed_seconds": 0.8666314911097288
     }
   ]
 }
