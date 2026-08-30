@@ -49,7 +49,19 @@ class ExtractClaims(dspy.Signature):
     number stated elsewhere or not at all in this text.) There is no
     checkable claim to extract from a bare factor-contribution sentence like
     this — skip it, the same as any other qualitative statement with no
-    directly checkable metric value."""
+    directly checkable metric value.
+
+    "Increased/decreased/expanded/contracted by X percentage points" (or "X
+    bps") is a bps_change claim, NEVER growth_pct — it states the ABSOLUTE
+    change in a ratio that is itself already a percentage (a margin, a rate),
+    not a RELATIVE percent change in a dollar figure. ("Total gross margin
+    increased by 0.2 percentage points" means the margin ratio itself moved by
+    0.2 points — e.g. 62.1% to 62.3% — not that gross profit grew 0.2%; those
+    are wildly different numbers and checking the wrong one against real data
+    always looks like a huge, false miss.) By contrast, plain "X percent" or
+    "X%" with no "percentage points"/"points"/"bps" wording ("revenue grew
+    14%") is growth_pct as usual — this rule only applies when the text
+    itself uses point/bps language for the change amount."""
 
     paragraph: str = dspy.InputField()
     claims: list[ExtractedClaim] = dspy.OutputField()
