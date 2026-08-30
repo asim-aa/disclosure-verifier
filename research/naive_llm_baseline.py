@@ -46,7 +46,12 @@ from pathlib import Path
 import dspy
 
 from eval.llm_config import configure_dspy
-from eval.reconciler_audit import CASES, FACTS, RESTATEMENT_PROBE_FACTS, _RESTATEMENT_DEMO_LABEL
+from eval.reconciler_audit import (
+    _RESTATEMENT_DEMO_LABEL,
+    CASES,
+    FACTS,
+    RESTATEMENT_PROBE_FACTS,
+)
 from tools.edgar_client import EdgarClient
 from tools.schema import FinancialFact
 from tools.xbrl_parser import parse_company_facts
