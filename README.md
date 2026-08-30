@@ -20,6 +20,8 @@ Built as the capstone for the SupportVectors AI Agents Bootcamp, against four re
 
 📄 **[Read the full case study (PDF)](docs/case-study.pdf)** — results, a live example, and the real bugs found along the way.
 
+📒 **[The Full Ledger (PDF)](docs/field-guide.pdf)** — a complete reference: every required pillar mapped to where it's implemented, every phase (0–7) explained, every post-phase hardening pass, and the load-bearing concepts and likely questions behind all of it.
+
 ---
 
 ## Architecture
