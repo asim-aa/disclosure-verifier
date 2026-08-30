@@ -429,14 +429,42 @@ def resolve_periods(
     # back to the unfiltered pick when no similar-length candidate exists at
     # all (e.g. a company with only quarterly history to compare an annual
     # figure against).
-    same_length_older = [
-        f for f in older
-        if _is_distinct(f) and current_length is not None
-        and (length := _period_length_days(f)) is not None and _similar_length(length, current_length)
-    ]
-    default_comparison = same_length_older[0] if same_length_older else next(
-        (f for f in older if _is_distinct(f)), None
-    )
+    if current.period_start is None:
+        # An INSTANT fact (a balance as of one date - RemainingPerformanceObligation,
+        # not a duration like revenue) has no length for the same-length check above
+        # to match on at all, so it silently never applied here and this concept type
+        # kept using the unsafe "next distinct period_end" pick the duration fix above
+        # was meant to replace. Real MD&A prose for these metrics is almost always
+        # compared year-over-year ("$72.4 billion, an increase of 14 percent
+        # year-over-year") - confirmed against real CRM data: current = $72.4B RPO
+        # (as of 2026-01-31); the true comparable prior instant is $63.4B (as of
+        # 2025-01-31, matching the stated 14% exactly), but the naive "next distinct"
+        # pick grabbed a $59.5B intervening quarterly balance (as of 2025-10-31)
+        # instead, implying 21.7% and making an accurate claim look wildly wrong.
+        # Default to the closest distinct instant ~1 year before current's own date.
+        instant_older = [f for f in older if _is_distinct(f) and f.period_start is None]
+        closest_year_ago_instant = None
+        if instant_older and current.period_end is not None:
+            cur_end = date.fromisoformat(current.period_end)
+            try:
+                target_end = cur_end.replace(year=cur_end.year - 1)
+            except ValueError:
+                target_end = cur_end.replace(year=cur_end.year - 1, day=28)  # Feb 29 -> Feb 28
+            closest = min(instant_older, key=lambda f: abs((date.fromisoformat(f.period_end) - target_end).days))
+            if abs((date.fromisoformat(closest.period_end) - target_end).days) <= _YEAR_AGO_TOLERANCE_DAYS:
+                closest_year_ago_instant = closest
+        default_comparison = closest_year_ago_instant or next(
+            (f for f in older if _is_distinct(f)), None
+        )
+    else:
+        same_length_older = [
+            f for f in older
+            if _is_distinct(f) and current_length is not None
+            and (length := _period_length_days(f)) is not None and _similar_length(length, current_length)
+        ]
+        default_comparison = same_length_older[0] if same_length_older else next(
+            (f for f in older if _is_distinct(f)), None
+        )
 
     comparison = default_comparison
 

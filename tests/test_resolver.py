@@ -135,6 +135,38 @@ def test_resolve_periods_default_comparison_falls_back_when_no_similar_length_pe
     assert comparison.value == 20
 
 
+def test_resolve_periods_default_comparison_for_an_instant_fact_prefers_the_prior_year_date():
+    """Real bug, confirmed against CRM's actual XBRL data: RemainingPerformanceObligation
+    is an INSTANT fact (a balance as of one date, period_start=None) - the duration
+    "same length" safeguard above never applies to it at all (there's no length to
+    match), so it kept using the unsafe "next distinct period_end" pick this project
+    already fixed once for duration facts. Current = $72.4B RPO as of 2026-01-31; the
+    company's own MD&A states "an increase of 14 percent year-over-year" - the true
+    comparable prior instant is $63.4B as of 2025-01-31 (72.4/63.4 = +14.2%, matching),
+    but the naive pick grabbed a $59.5B intervening quarterly balance as of 2025-10-31
+    instead (72.4/59.5 = +21.7%), making an accurate claim look wildly wrong."""
+    facts = [
+        fact("RevenueRemainingPerformanceObligation", 72_400_000_000, None, "2026-01-31"),  # current
+        fact("RevenueRemainingPerformanceObligation", 59_500_000_000, None, "2025-10-31"),  # decoy: intervening quarter
+        fact("RevenueRemainingPerformanceObligation", 63_400_000_000, None, "2025-01-31"),  # correct: a year prior
+    ]
+    current, comparison = resolve_periods(facts, "RevenueRemainingPerformanceObligation")
+    assert current.value == 72_400_000_000
+    assert comparison.value == 63_400_000_000
+
+
+def test_resolve_periods_instant_fact_falls_back_when_no_year_ago_instant_exists():
+    """No candidate within tolerance of one year prior - falls back to the old
+    "closest distinct period" behavior, same discipline as the duration case."""
+    facts = [
+        fact("RevenueRemainingPerformanceObligation", 100, None, "2026-01-31"),
+        fact("RevenueRemainingPerformanceObligation", 90, None, "2025-10-31"),  # only ~3 months prior
+    ]
+    current, comparison = resolve_periods(facts, "RevenueRemainingPerformanceObligation")
+    assert current.value == 100
+    assert comparison.value == 90
+
+
 def test_resolve_periods_skips_duplicate_repeated_period_for_comparison():
     facts = [
         fact("Revenues", 100, "2024-01-01", "2024-12-31", accn="new"),
