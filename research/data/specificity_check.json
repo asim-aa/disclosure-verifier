@@ -13,15 +13,15 @@
     "n_tickers": 8,
     "n_succeeded": 8,
     "failed_tickers": [],
-    "total_claims_verified": 137,
+    "total_claims_verified": 153,
     "by_verdict": {
-      "unverifiable": 103,
-      "consistent": 28,
+      "unverifiable": 118,
+      "consistent": 29,
       "inconsistent": 6
     },
-    "n_resolved_verdicts": 34,
+    "n_resolved_verdicts": 35,
     "n_inconsistent": 6,
-    "apparent_false_positive_rate": 0.17647058823529413
+    "apparent_false_positive_rate": 0.17142857142857143
   },
   "runs": [
     {
@@ -30,25 +30,25 @@
       "error": null,
       "summary": {
         "ticker": "ADBE",
-        "n_claims": 34,
+        "n_claims": 38,
         "by_verdict": {
-          "unverifiable": 27,
+          "unverifiable": 31,
           "consistent": 7
         },
-        "n_tool_calls": 76,
+        "n_tool_calls": 80,
         "tool_calls_by_agent": {
           "retrieval": 2,
           "extraction": 40,
-          "verification": 34
+          "verification": 38
         },
-        "n_reasoning_steps": 67,
-        "time_to_first_action_seconds": 3.1348317861557007e-06,
-        "total_elapsed_seconds": 2.087820718996227,
+        "n_reasoning_steps": 70,
+        "time_to_first_action_seconds": 3.3266842365264893e-06,
+        "total_elapsed_seconds": 2.048397489823401,
         "partial": true,
-        "partial_reason": "max_chunks (40) reached"
+        "partial_reason": "max_extraction_calls (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 2.332242232747376
+      "elapsed_seconds": 2.4260198501870036
     },
     {
       "ticker": "CRM",
@@ -56,25 +56,41 @@
       "error": null,
       "summary": {
         "ticker": "CRM",
-        "n_claims": 16,
+        "n_claims": 28,
         "by_verdict": {
-          "consistent": 2,
-          "inconsistent": 5,
-          "unverifiable": 9
+          "inconsistent": 6,
+          "consistent": 3,
+          "unverifiable": 19
         },
-        "n_tool_calls": 58,
+        "n_tool_calls": 70,
         "tool_calls_by_agent": {
           "retrieval": 2,
           "extraction": 40,
-          "verification": 16
+          "verification": 28
         },
-        "n_reasoning_steps": 48,
-        "time_to_first_action_seconds": 5.370005965232849e-06,
-        "total_elapsed_seconds": 0.35457131639122963,
+        "n_reasoning_steps": 58,
+        "time_to_first_action_seconds": 4.9192458391189575e-06,
+        "total_elapsed_seconds": 0.3604030665010214,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [
+        {
+          "metric": "Revenue",
+          "claimed_value": 41500000000.0,
+          "period": "fiscal 2026",
+          "quote": "For fiscal 2026, revenue was $41.5 billion",
+          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax=41,500,000,000; EDGAR reports 30,324,000,000 for the period ending 2025-10-31 (relative difference 36.86%).",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "diluted net income per share",
+          "claimed_value": 7.8,
+          "period": "fiscal 2026",
+          "quote": "diluted net income per share was $7.80",
+          "explanation": "Claimed EarningsPerShareDiluted=8; EDGAR reports 6 for the period ending 2025-10-31 (relative difference 36.13%).",
+          "reason_code": "large_miss"
+        },
         {
           "metric": "Cash provided by operations",
           "claimed_value": 15000000000.0,
@@ -84,27 +100,19 @@
           "reason_code": "large_miss"
         },
         {
-          "metric": "revenue",
-          "claimed_value": 72400000000.0,
-          "period": "",
-          "quote": "$72.4 billion, an increase of 14 percent year-over-year",
-          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax=72,400,000,000; EDGAR reports 41,525,000,000 for the period ending 2026-01-31 (relative difference 74.35%).",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "revenue",
-          "claimed_value": 14.0,
-          "period": "",
-          "quote": "$72.4 billion, an increase of 14 percent year-over-year",
-          "explanation": "Claimed RevenueFromContractWithCustomerExcludingAssessedTax growth of 14.00%; EDGAR data implies 9.58% (37,895,000,000 -> 41,525,000,000), a difference of 4.42 percentage points.",
-          "reason_code": "large_miss"
-        },
-        {
-          "metric": "common stock repurchase amount",
-          "claimed_value": 12700000000.0,
+          "metric": "Cash provided by operations",
+          "claimed_value": 15.0,
           "period": "fiscal 2026",
-          "quote": "For fiscal 2026, we repurchased approximately 50 million shares of our common stock for approximately $12.7 billion as compared to 30 million shares for approximately $7.8 billion from a year ago.",
-          "explanation": "Claimed PaymentsForRepurchaseOfCommonStock=12,700,000,000; EDGAR reports 8,659,000,000 for the period ending 2025-10-31 (relative difference 46.67%).",
+          "quote": "Cash provided by operations for fiscal 2026 was $15.0 billion , an increase of 15 percent year-over-year",
+          "explanation": "Claimed NetCashProvidedByUsedInOperatingActivities growth of 15.00%; EDGAR data implies 4.49% (9,122,000,000 -> 9,532,000,000), a difference of 10.51 percentage points.",
+          "reason_code": "large_miss"
+        },
+        {
+          "metric": "Total remaining performance obligation",
+          "claimed_value": 14.0,
+          "period": "as of January 31, 2026",
+          "quote": "Total remaining performance obligation ... was an increase of 14 percent year-over-year",
+          "explanation": "Claimed RevenueRemainingPerformanceObligation growth of 14.00%; EDGAR data implies 21.68% (59,500,000,000 -> 72,400,000,000), a difference of 7.68 percentage points.",
           "reason_code": "large_miss"
         },
         {
@@ -116,7 +124,7 @@
           "reason_code": "large_miss"
         }
       ],
-      "elapsed_seconds": 0.7561880936846137
+      "elapsed_seconds": 0.9082916025072336
     },
     {
       "ticker": "ORCL",
@@ -135,13 +143,13 @@
           "verification": 10
         },
         "n_reasoning_steps": 49,
-        "time_to_first_action_seconds": 2.6151537895202637e-06,
-        "total_elapsed_seconds": 0.334830017760396,
+        "time_to_first_action_seconds": 2.584420144557953e-06,
+        "total_elapsed_seconds": 0.33506173361092806,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.8920453358441591
+      "elapsed_seconds": 1.2052886560559273
     },
     {
       "ticker": "CSCO",
@@ -152,8 +160,7 @@
         "n_claims": 27,
         "by_verdict": {
           "consistent": 1,
-          "unverifiable": 25,
-          "inconsistent": 1
+          "unverifiable": 26
         },
         "n_tool_calls": 69,
         "tool_calls_by_agent": {
@@ -161,23 +168,14 @@
           "extraction": 40,
           "verification": 27
         },
-        "n_reasoning_steps": 64,
-        "time_to_first_action_seconds": 2.564862370491028e-06,
-        "total_elapsed_seconds": 0.355539464391768,
+        "n_reasoning_steps": 66,
+        "time_to_first_action_seconds": 3.727152943611145e-06,
+        "total_elapsed_seconds": 0.3573060231283307,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
-      "inconsistent_claims": [
-        {
-          "metric": "Diluted earnings per share",
-          "claimed_value": 19.0,
-          "period": "",
-          "quote": "Diluted earnings per share increased by 19%",
-          "explanation": "Claimed EarningsPerShareDiluted growth of 19.00%; EDGAR data implies 0.39% (3 -> 3), a difference of 18.61 percentage points.",
-          "reason_code": "large_miss"
-        }
-      ],
-      "elapsed_seconds": 0.8728672098368406
+      "inconsistent_claims": [],
+      "elapsed_seconds": 1.063083240762353
     },
     {
       "ticker": "INTU",
@@ -196,13 +194,13 @@
           "verification": 11
         },
         "n_reasoning_steps": 51,
-        "time_to_first_action_seconds": 2.255663275718689e-06,
-        "total_elapsed_seconds": 0.33591466397047043,
+        "time_to_first_action_seconds": 2.4139881134033203e-06,
+        "total_elapsed_seconds": 0.33457679860293865,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.7785302372649312
+      "elapsed_seconds": 0.9642525799572468
     },
     {
       "ticker": "IBM",
@@ -217,13 +215,13 @@
           "retrieval": 2
         },
         "n_reasoning_steps": 2,
-        "time_to_first_action_seconds": 3.2354146242141724e-06,
-        "total_elapsed_seconds": 8.806586265563965e-06,
+        "time_to_first_action_seconds": 3.4766271710395813e-06,
+        "total_elapsed_seconds": 1.1110678315162659e-05,
         "partial": false,
         "partial_reason": null
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.3627540273591876
+      "elapsed_seconds": 0.40424349159002304
     },
     {
       "ticker": "QCOM",
@@ -242,13 +240,13 @@
           "verification": 4
         },
         "n_reasoning_steps": 45,
-        "time_to_first_action_seconds": 2.555549144744873e-06,
-        "total_elapsed_seconds": 0.3354437043890357,
+        "time_to_first_action_seconds": 2.7455389499664307e-06,
+        "total_elapsed_seconds": 0.33651964738965034,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.5289522148668766
+      "elapsed_seconds": 0.6389597160741687
     },
     {
       "ticker": "TXN",
@@ -268,13 +266,13 @@
           "verification": 35
         },
         "n_reasoning_steps": 68,
-        "time_to_first_action_seconds": 2.0833685994148254e-06,
-        "total_elapsed_seconds": 0.37145795300602913,
+        "time_to_first_action_seconds": 2.644956111907959e-06,
+        "total_elapsed_seconds": 0.37092491425573826,
         "partial": true,
         "partial_reason": "max_chunks (40) reached"
       },
       "inconsistent_claims": [],
-      "elapsed_seconds": 0.7511799996718764
+      "elapsed_seconds": 0.8472009235993028
     }
   ]
 }
